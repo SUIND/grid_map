@@ -56,6 +56,26 @@ bool getIndexFromPosition(Index& index,
                           const Index& bufferStartIndex = Index::Zero());
 
 /*!
+ * Gets the index of the cell which contains a position in the map frame.
+ * No checks performed making it unsafe but more efficient.
+ * @param[out] index of the cell.
+ * @param[in] position the position in the map frame.
+ * @param[in] mapLength the lengths in x and y direction.
+ * @param[in] mapPosition the position of the map.
+ * @param[in] resolution the resolution of the map.
+ * @param[in] bufferSize the size of the buffer (optional).
+ * @param[in] bufferStartIndex the index of the starting point of the circular buffer (optional).
+ * @return true if successful, false if position outside of map.
+ */
+bool getIndexFromPositionUnsafe(Index& index,
+                          const Position& position,
+                          const Length& mapLength,
+                          const Position& mapPosition,
+                          const double& resolution,
+                          const Size& bufferSize,
+                          const Index& bufferStartIndex = Index::Zero());
+
+/*!
  * Checks if position is within the map boundaries.
  * @param[in] position the position which is to be checked.
  * @param[in] mapLength the length of the map.

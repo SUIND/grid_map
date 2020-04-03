@@ -126,6 +126,22 @@ bool getPositionFromIndex(Position& position,
   return true;
 }
 
+bool getIndexFromPositionUnsafe(Index& index,
+                          const Position& position,
+                          const Length& mapLength,
+                          const Position& mapPosition,
+                          const double& resolution,
+                          const Size& bufferSize,
+                          const Index& bufferStartIndex)
+{
+  Vector offset;
+  getVectorToOrigin(offset, mapLength);
+  Vector indexVector = ((position - offset - mapPosition).array() / resolution).matrix();
+  index = getIndexFromIndexVector(indexVector, bufferSize, bufferStartIndex);
+  // if (!checkIfPositionWithinMap(position, mapLength, mapPosition)) return false;
+  return true;
+}
+
 bool getIndexFromPosition(Index& index,
                           const Position& position,
                           const Length& mapLength,
