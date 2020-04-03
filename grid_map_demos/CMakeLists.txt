@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(grid_map_demos)
 
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_STANDARD 11)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
@@ -114,6 +114,17 @@ add_executable(
   src/FiltersDemo.cpp
 )
 
+add_executable(
+  normal_filter_comparison_demo
+  src/normal_filter_comparison_node.cpp
+)
+
+add_executable(
+  interpolation_demo
+  src/interpolation_demo_node.cpp
+  src/InterpolationDemo.cpp
+)
+
 ## Specify libraries to link a library or executable target against
 target_link_libraries(
   simple_demo
@@ -167,6 +178,16 @@ target_link_libraries(
   ${catkin_LIBRARIES}
 )
 
+target_link_libraries(
+  normal_filter_comparison_demo
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(
+  interpolation_demo
+  ${catkin_LIBRARIES}
+)
+
 #############
 ## Install ##
 #############
@@ -178,7 +199,19 @@ catkin_install_python(
 
 # Mark executables and/or libraries for installation
 install(
-  TARGETS simple_demo tutorial_demo iterators_demo image_to_gridmap_demo octomap_to_gridmap_demo move_demo iterator_benchmark opencv_demo resolution_change_demo filters_demo
+  TARGETS 
+    filters_demo
+    image_to_gridmap_demo
+    interpolation_demo
+    iterator_benchmark
+    iterators_demo
+    move_demo
+    normal_filter_comparison_demo
+    octomap_to_gridmap_demo
+    opencv_demo
+    resolution_change_demo
+    simple_demo
+    tutorial_demo
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
