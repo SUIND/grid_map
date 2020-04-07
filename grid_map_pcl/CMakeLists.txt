@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(grid_map_pcl)
 
-set(CMAKE_CXX_STANDARD 14)
 add_compile_options(-Wall -Wextra -Wpedantic)
+SET(CMAKE_BUILD_TYPE Release) # Release, RelWithDebInfo
+SET(CMAKE_CXX_FLAGS "-std=c++14 -Wall -fPIC -pedantic -fopenmp -mtune=native -O3 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON) 
+set(Boost_USE_STATIC_RUNTIME ON)
 
 set(SRC_FILES
   src/GridMapPclConverter.cpp
