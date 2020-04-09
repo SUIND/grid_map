@@ -67,7 +67,7 @@ bool getIndexFromPosition(Index& index,
  * @param[in] bufferStartIndex the index of the starting point of the circular buffer (optional).
  * @return true if successful, false if position outside of map.
  */
-bool getIndexFromPositionUnsafe(Index& index,
+void getIndexFromPositionUnsafe(Index& index,
                           const Position& position,
                           const Length& mapLength,
                           const Position& mapPosition,

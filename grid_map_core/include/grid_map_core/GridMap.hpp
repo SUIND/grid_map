@@ -231,9 +231,8 @@ class GridMap
    * No checks performed making it unsafe but more efficient.
    * @param[in] position the requested position.
    * @param[out] index the corresponding index.
-   * @return true if successful, false if position outside of map.
    */
-  bool getIndexUnsafe(const Position& position, Index& index) const;
+  void getIndexUnsafe(const Position& position, Index& index) const;
 
   /*!
    * Gets the 2d position of cell specified by the index (x, y of cell position) in

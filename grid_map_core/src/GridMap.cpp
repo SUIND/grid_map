@@ -226,8 +226,8 @@ float GridMap::at(const std::string& layer, const Index& index) const {
   }
 }
 
-bool GridMap::getIndexUnsafe(const Position& position, Index& index) const {
-  return getIndexFromPositionUnsafe(index, position, length_, position_, resolution_, size_, startIndex_);
+void GridMap::getIndexUnsafe(const Position& position, Index& index) const {
+  getIndexFromPositionUnsafe(index, position, length_, position_, resolution_, size_, startIndex_);
 }
 
 bool GridMap::getIndex(const Position& position, Index& index) const {
