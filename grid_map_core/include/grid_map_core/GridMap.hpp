@@ -301,6 +301,19 @@ class GridMap
    * of the map and discretization.
    * @param[in] position the requested position of the submap (usually the center).
    * @param[in] length the requested length of the submap.
+   * @param[in] layers the requested layers for the submap.
+   * @param[out] isSuccess true if successful, false otherwise.
+   * @return submap (is empty if success is false).
+   */
+  GridMap getSubmap(const Position& position, const Length& length, const std::vector<std::string>& layers, bool& isSuccess) const;
+
+  /*!
+   * Gets a submap from the map. The requested submap is specified with the requested
+   * location and length.
+   * Note: The returned submap may not have the requested length due to the borders
+   * of the map and discretization.
+   * @param[in] position the requested position of the submap (usually the center).
+   * @param[in] length the requested length of the submap.
    * @param[out] isSuccess true if successful, false otherwise.
    * @return submap (is empty if success is false).
    */
