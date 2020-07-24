@@ -352,6 +352,17 @@ class GridMap
 
    /*!
     * Set the position of the grid map.
+    * Keep map alignment consitent.
+    * Note: This method does not change the data stored in the grid map and
+    * is complementary to the `move(...)` method. For a comparison between
+    * the `setPosition` and the `move` method, see the `move_demo_node.cpp`
+    * file of the `grid_map_demos` package.
+    * @param position the 2d position of the grid map in the grid map frame [m].
+    */
+   void setPositionAligned(const Position& position);
+
+   /*!
+    * Set the position of the grid map.
     * Note: This method does not change the data stored in the grid map and
     * is complementary to the `move(...)` method. For a comparison between
     * the `setPosition` and the `move` method, see the `move_demo_node.cpp`

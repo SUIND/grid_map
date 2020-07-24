@@ -490,6 +490,15 @@ GridMap GridMap::getTransformedMap(const Eigen::Isometry3d& transform, const std
   return newMap;
 }
 
+void GridMap::setPositionAligned(const Position& position) {
+  Index indexShift;
+  Position positionShift = position - position_;
+  getIndexShiftFromPositionShift(indexShift, positionShift, resolution_);
+  Position alignedPositionShift;
+  getPositionShiftFromIndexShift(alignedPositionShift, indexShift, resolution_);
+  position_ += alignedPositionShift;
+}
+
 void GridMap::setPosition(const Position& position) {
   position_ = position;
 }
