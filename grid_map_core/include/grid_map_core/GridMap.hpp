@@ -227,6 +227,14 @@ class GridMap
   bool getIndex(const Position& position, Index& index) const;
 
   /*!
+   * Gets the corresponding cell index for a position.
+   * No checks performed making it unsafe but more efficient.
+   * @param[in] position the requested position.
+   * @param[out] index the corresponding index.
+   */
+  void getIndexUnsafe(const Position& position, Index& index) const;
+
+  /*!
    * Gets the 2d position of cell specified by the index (x, y of cell position) in
    * the grid map frame.
    * @param[in] index the index of the requested cell.
@@ -293,6 +301,19 @@ class GridMap
    * of the map and discretization.
    * @param[in] position the requested position of the submap (usually the center).
    * @param[in] length the requested length of the submap.
+   * @param[in] layers the requested layers for the submap.
+   * @param[out] isSuccess true if successful, false otherwise.
+   * @return submap (is empty if success is false).
+   */
+  GridMap getSubmap(const Position& position, const Length& length, const std::vector<std::string>& layers, bool& isSuccess) const;
+
+  /*!
+   * Gets a submap from the map. The requested submap is specified with the requested
+   * location and length.
+   * Note: The returned submap may not have the requested length due to the borders
+   * of the map and discretization.
+   * @param[in] position the requested position of the submap (usually the center).
+   * @param[in] length the requested length of the submap.
    * @param[out] isSuccess true if successful, false otherwise.
    * @return submap (is empty if success is false).
    */
@@ -328,6 +349,17 @@ class GridMap
   GridMap getTransformedMap(const Eigen::Isometry3d& transform, const std::string& heightLayerName,
                             const std::string& newFrameId,
                             const double sampleRatio = 0.0) const;
+
+   /*!
+    * Set the position of the grid map.
+    * Keep map alignment consitent.
+    * Note: This method does not change the data stored in the grid map and
+    * is complementary to the `move(...)` method. For a comparison between
+    * the `setPosition` and the `move` method, see the `move_demo_node.cpp`
+    * file of the `grid_map_demos` package.
+    * @param position the 2d position of the grid map in the grid map frame [m].
+    */
+   void setPositionAligned(const Position& position);
 
    /*!
     * Set the position of the grid map.

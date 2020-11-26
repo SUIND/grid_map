@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.5.1)
 project(grid_map_visualization)
 
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+SET(CMAKE_BUILD_TYPE Release) # Release, RelWithDebInfo
+SET(CMAKE_CXX_FLAGS "-std=c++14 -Wall -fPIC -pedantic -fopenmp -mtune=native -O3 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
