@@ -10,6 +10,7 @@
   <author>Péter Fankhauser</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+<!--   <build_depend>cmake_clang_tools</build_depend> -->
   <build_depend>qtbase5-dev</build_depend>
   <build_depend>rviz</build_depend>
   <build_depend>grid_map_ros</build_depend>
@@ -20,6 +21,8 @@
   <run_depend>rviz</run_depend>
   <run_depend>grid_map_ros</run_depend>
   <run_depend>grid_map_msgs</run_depend>
+<!--   <test_depend>cmake_code_coverage</test_depend> -->
+  <test_depend>gtest</test_depend>
   <export>
       <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
