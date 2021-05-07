@@ -4,12 +4,10 @@ project(grid_map_filters)
 # Better with parallelized algorithms.
 #set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}  -ffast-math")
 
-# Better with serial algorithms.
-set(CMAKE_CXX_STANDARD 11)
 # We want performance (fast-math) but also need a representation for NaN values to represent missing values. 
 # Therefore, we disable the finite-math-only flag that was set by fast-math.  
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -fno-finite-math-only")
-
+SET(CMAKE_BUILD_TYPE Release) # Release, RelWithDebInfo
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -fPIC -pedantic -fopenmp -mtune=native -O3 -ffast-math -fno-finite-math-only")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Other possible options.

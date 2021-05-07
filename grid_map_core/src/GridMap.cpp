@@ -226,6 +226,10 @@ float GridMap::at(const std::string& layer, const Index& index) const {
   }
 }
 
+void GridMap::getIndexUnsafe(const Position& position, Index& index) const {
+  getIndexFromPositionUnsafe(index, position, length_, position_, resolution_, size_, startIndex_);
+}
+
 bool GridMap::getIndex(const Position& position, Index& index) const {
   return getIndexFromPosition(index, position, length_, position_, resolution_, size_, startIndex_);
 }
@@ -283,6 +287,52 @@ bool GridMap::getVector(const std::string& layerPrefix, const Index& index, Eige
     return true;
   }
 }
+
+GridMap GridMap::getSubmap(const Position& position, const Length& length, const std::vector<std::string>& layers, bool& isSuccess) const {
+  Index indexInSubmap;
+  // Submap the generate.
+  GridMap submap(layers);
+  submap.setTimestamp(timestamp_);
+  submap.setFrameId(frameId_);
+
+  // Get submap geometric information.
+  SubmapGeometry submapInformation(*this, position, length, isSuccess);
+  if (!isSuccess) {
+    return GridMap(layers);
+  }
+  submap.setGeometry(submapInformation);
+  submap.startIndex_.setZero();  // Because of the way we copy the data below.
+
+  // Copy data.
+  std::vector<BufferRegion> bufferRegions;
+
+  if (!getBufferRegionsForSubmap(bufferRegions, submapInformation.getStartIndex(), submap.getSize(), size_, startIndex_)) {
+    cout << "Cannot access submap of this size." << endl;
+    isSuccess = false;
+    return GridMap(layers);
+  }
+
+  for (const std::string& layer : layers) {
+    for (const auto& bufferRegion : bufferRegions) {
+      Index index = bufferRegion.getStartIndex();
+      Size size = bufferRegion.getSize();
+
+      if (bufferRegion.getQuadrant() == BufferRegion::Quadrant::TopLeft) {
+        submap.data_.at(layer).topLeftCorner(size(0), size(1)) = data_.at(layer).block(index(0), index(1), size(0), size(1));
+      } else if (bufferRegion.getQuadrant() == BufferRegion::Quadrant::TopRight) {
+        submap.data_.at(layer).topRightCorner(size(0), size(1)) = data_.at(layer).block(index(0), index(1), size(0), size(1));
+      } else if (bufferRegion.getQuadrant() == BufferRegion::Quadrant::BottomLeft) {
+        submap.data_.at(layer).bottomLeftCorner(size(0), size(1)) = data_.at(layer).block(index(0), index(1), size(0), size(1));
+      } else if (bufferRegion.getQuadrant() == BufferRegion::Quadrant::BottomRight) {
+        submap.data_.at(layer).bottomRightCorner(size(0), size(1)) = data_.at(layer).block(index(0), index(1), size(0), size(1));
+      }
+    }
+  }
+
+  isSuccess = true;
+  return submap;
+}
+
 
 GridMap GridMap::getSubmap(const Position& position, const Length& length, bool& isSuccess) const {
   Index index;
@@ -438,6 +488,15 @@ GridMap GridMap::getTransformedMap(const Eigen::Isometry3d& transform, const std
   }
 
   return newMap;
+}
+
+void GridMap::setPositionAligned(const Position& position) {
+  Index indexShift;
+  Position positionShift = position - position_;
+  getIndexShiftFromPositionShift(indexShift, positionShift, resolution_);
+  Position alignedPositionShift;
+  getPositionShiftFromIndexShift(alignedPositionShift, indexShift, resolution_);
+  position_ += alignedPositionShift;
 }
 
 void GridMap::setPosition(const Position& position) {
