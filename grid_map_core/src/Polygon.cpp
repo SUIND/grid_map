@@ -21,7 +21,7 @@ Polygon::Polygon()
 {
 }
 
-Polygon::Polygon(std::vector<Position> vertices)
+Polygon::Polygon(std::vector<Position, Eigen::aligned_allocator<Position>> vertices)
     : Polygon()
 {
   vertices_ = vertices;
@@ -63,7 +63,7 @@ const Position& Polygon::operator [](const size_t index) const
   return getVertex(index);
 }
 
-const std::vector<Position>& Polygon::getVertices() const
+const std::vector<Position, Eigen::aligned_allocator<Position>>& Polygon::getVertices() const
 {
   return vertices_;
 }
@@ -113,7 +113,7 @@ double Polygon::getArea() const
 Position Polygon::getCentroid() const
 {
   Position centroid = Position::Zero();
-  std::vector<Position> vertices = getVertices();
+  std::vector<Position, Eigen::aligned_allocator<Position>> vertices = getVertices();
   vertices.push_back(vertices.at(0));
   double area = 0.0;
   for (int i = 0; i < vertices.size() - 1; i++) {
@@ -186,7 +186,7 @@ bool Polygon::thickenLine(const double thickness)
   if (vertices_.size() != 2) return false;
   const Vector connection(vertices_[1] - vertices_[0]);
   const Vector orthogonal = thickness * Vector(connection.y(), -connection.x()).normalized();
-  std::vector<Position> newVertices;
+  std::vector<Position, Eigen::aligned_allocator<Position>> newVertices;
   newVertices.reserve(4);
   newVertices.push_back(vertices_[0] + orthogonal);
   newVertices.push_back(vertices_[0] - orthogonal);
@@ -207,7 +207,7 @@ bool Polygon::offsetInward(const double margin)
     neighbourIndices[i] << (i > 0 ? (i-1)%n : n-1), (i + 1) % n;
   }
 
-  std::vector<Position> copy(vertices_);
+  std::vector<Position, Eigen::aligned_allocator<Position>> copy(vertices_);
   for (unsigned int i = 0; i < neighbourIndices.size(); ++i) {
     Eigen::Vector2d v1 = vertices_[neighbourIndices[i](0)] - vertices_[i];
     Eigen::Vector2d v2 = vertices_[neighbourIndices[i](1)] - vertices_[i];
@@ -288,7 +288,7 @@ Polygon Polygon::convexHullOfTwoCircles(const Position center1,
 
 Polygon Polygon::convexHull(Polygon& polygon1, Polygon& polygon2)
 {
-  std::vector<Position> vertices;
+  std::vector<Position, Eigen::aligned_allocator<Position>> vertices;
   vertices.reserve(polygon1.nVertices() + polygon2.nVertices());
   vertices.insert(vertices.end(), polygon1.getVertices().begin(), polygon1.getVertices().end());
   vertices.insert(vertices.end(), polygon2.getVertices().begin(), polygon2.getVertices().end());
@@ -296,13 +296,13 @@ Polygon Polygon::convexHull(Polygon& polygon1, Polygon& polygon2)
   return monotoneChainConvexHullOfPoints(vertices);
 }
 
-Polygon Polygon::monotoneChainConvexHullOfPoints(const std::vector<Position>& points)
+Polygon Polygon::monotoneChainConvexHullOfPoints(const std::vector<Position, Eigen::aligned_allocator<Position>>& points)
 {
   // Adapted from https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
   if (points.size() <= 3) {
     return Polygon(points);
   }
-  std::vector<Position> pointsConvexHull(2 * points.size());
+  std::vector<Position, Eigen::aligned_allocator<Position>> pointsConvexHull(2 * points.size());
 
   // Sort points lexicographically.
   auto sortedPoints(points);
