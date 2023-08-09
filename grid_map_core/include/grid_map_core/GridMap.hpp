@@ -70,12 +70,22 @@ class GridMap
 
   /*!
    * Set the geometry of the grid map. Clears all the data.
-   * @param length the side lengths in x, and y-direction of the grid map [m].
+   * @param size the side size in x, and y-direction of the grid map [cells].
    * @param resolution the cell size in [m/cell].
    * @param position the 2d position of the grid map in the grid map frame [m].
    */
-  void setGeometry(const Length& length, const double resolution,
+  void setGeometrySize(const Size& size, const double resolution,
                    const Position& position = Position::Zero());
+
+  /*!
+   * Set the geometry of the grid map. Clears all the data.
+   * @param length the side lengths in x, and y-direction of the grid map [m].
+   * @param resolution the cell size in [m/cell].
+   * @param position the 2d position of the grid map in the grid map frame [m].
+   * @param round_up whether the map size should be always rounded up..
+   */
+  void setGeometry(const Length& length, const double resolution,
+                   const Position& position = Position::Zero(), const bool round_up = false);
 
   /*!
    * Set the geometry of the grid map from submap geometry information.

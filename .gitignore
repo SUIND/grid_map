@@ -36,4 +36,7 @@
 # OS X
 .DS_Store
 
+# qt creator
+*.txt.user*
+
 grid_map_pcl/data/

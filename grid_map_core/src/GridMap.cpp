@@ -42,14 +42,35 @@ GridMap::GridMap(const std::vector<std::string>& layers) {
 
 GridMap::GridMap() : GridMap(std::vector<std::string>()) {}
 
-void GridMap::setGeometry(const Length& length, const double resolution, const Position& position) {
+void GridMap::setGeometrySize(const Size& size, const double resolution, const Position& position) {
+  assert(size(0) > 0);
+  assert(size(1) > 0);
+  assert(resolution > 0.0);
+
+  resize(size);
+  clearAll();
+
+  resolution_ = resolution;
+  length_ = (size_.cast<double>() * resolution_).matrix();
+  position_ = position;
+  startIndex_.setZero();
+
+  return;
+}
+
+void GridMap::setGeometry(const Length& length, const double resolution, const Position& position, const bool round_up) {
   assert(length(0) > 0.0);
   assert(length(1) > 0.0);
   assert(resolution > 0.0);
 
   Size size;
-  size(0) = static_cast<int>(round(length(0) / resolution));  // There is no round() function in Eigen.
-  size(1) = static_cast<int>(round(length(1) / resolution));
+  if (round_up) {
+    size(0) = static_cast<int>(ceil(length(0) / resolution));
+    size(1) = static_cast<int>(ceil(length(1) / resolution));
+  } else {
+    size(0) = static_cast<int>(round(length(0) / resolution));  // There is no round() function in Eigen.
+    size(1) = static_cast<int>(round(length(1) / resolution));
+  }
   resize(size);
   clearAll();
 

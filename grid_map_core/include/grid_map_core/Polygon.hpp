@@ -35,7 +35,7 @@ class Polygon
    * Constructor with vertices.
    * @param vertices the points of the polygon.
    */
-  Polygon(std::vector<Position> vertices);
+  Polygon(std::vector<Position, Eigen::aligned_allocator<Position>> vertices);
 
   /*!
    * Destructor.
@@ -78,7 +78,7 @@ class Polygon
    * Returns the vertices of the polygon.
    * @return the vertices of the polygon.
    */
-  const std::vector<Position>& getVertices() const;
+  const std::vector<Position, Eigen::aligned_allocator<Position>>& getVertices() const;
 
   /*!
    * Returns the number of vertices.
@@ -208,7 +208,7 @@ class Polygon
    * @param[in] points points to use to compute the convex hull used to create the polygon.
    * @return convex hull as polygon.
    */
-  static Polygon monotoneChainConvexHullOfPoints(const std::vector<Position>& points);
+  static Polygon monotoneChainConvexHullOfPoints(const std::vector<Position, Eigen::aligned_allocator<Position>>& points);
 
  protected:
 
@@ -245,7 +245,7 @@ class Polygon
   uint64_t timestamp_;
 
   //! Vertices of the polygon.
-  std::vector<Position> vertices_;
+  std::vector<Position, Eigen::aligned_allocator<Position>> vertices_;
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

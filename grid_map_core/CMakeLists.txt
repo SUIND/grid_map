@@ -73,6 +73,7 @@ add_library(${PROJECT_NAME}
    src/iterators/PolygonIterator.cpp
    src/iterators/LineIterator.cpp
    src/iterators/SlidingWindowIterator.cpp
+   src/iterators/ThickenedLineIterator.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
