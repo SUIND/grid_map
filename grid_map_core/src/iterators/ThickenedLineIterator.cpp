@@ -53,7 +53,7 @@ bool ThickenedLineIterator::initialize(const grid_map::GridMap& gridMap, const P
     Position dir = end - start;
 
     // Perpendicular to direction
-    Position perp = Position(dir.x(), -dir.y());
+    Position perp = Position(-dir.y(), dir.x());
 
     // Normalized perpendicular
     Position nperp = perp.normalized();
