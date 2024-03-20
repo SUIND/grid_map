@@ -8,6 +8,7 @@
 
 #include "grid_map_core/iterators/LineIterator.hpp"
 #include "grid_map_core/GridMapMath.hpp"
+#include <iostream>
 
 using namespace std;
 
@@ -22,6 +23,10 @@ LineIterator::LineIterator(const grid_map::GridMap& gridMap, const Position& sta
     initialize(gridMap, startIndex, endIndex);
   }
   else {
+    std::cerr << "LineIterator: Could not initialize line iterator, start and end points are out of map range." << std::endl;
+    std::cerr << "Start: " << start.transpose() << ", End: " << end.transpose() 
+              << ", Map length: " << gridMap.getLength().transpose() 
+              << ", Map position: " << gridMap.getPosition().transpose() << std::endl;
     throw std::invalid_argument("Failed to construct LineIterator.");
   }
 }
