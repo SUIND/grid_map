@@ -8,28 +8,30 @@
 
 #include "grid_map_filters/DeletionFilter.hpp"
 
-#include <grid_map_core/GridMap.hpp>
 #include <pluginlib/class_list_macros.h>
+
+#include <grid_map_core/GridMap.hpp>
 
 using namespace filters;
 
-namespace grid_map {
-
-template<typename T>
+namespace grid_map
+{
+template <typename T>
 DeletionFilter<T>::DeletionFilter()
 {
 }
 
-template<typename T>
+template <typename T>
 DeletionFilter<T>::~DeletionFilter()
 {
 }
 
-template<typename T>
+template <typename T>
 bool DeletionFilter<T>::configure()
 {
   // Load Parameters
-  if (!FilterBase<T>::getParam(std::string("layers"), layers_)) {
+  if (!FilterBase<T>::getParam(std::string("layers"), layers_))
+  {
     ROS_ERROR("DeletionFilter did not find parameter 'layers'.");
     return false;
   }
@@ -37,20 +39,22 @@ bool DeletionFilter<T>::configure()
   return true;
 }
 
-template<typename T>
+template <typename T>
 bool DeletionFilter<T>::update(const T& mapIn, T& mapOut)
 {
   mapOut = mapIn;
 
-  for (const auto& layer : layers_) {
+  for (const auto& layer : layers_)
+  {
     // Check if layer exists.
-    if (!mapOut.exists(layer)) {
-      ROS_ERROR("Check your deletion layers! Type %s does not exist.",
-                layer.c_str());
+    if (!mapOut.exists(layer))
+    {
+      ROS_ERROR("Check your deletion layers! Type %s does not exist.", layer.c_str());
       continue;
     }
 
-    if (!mapOut.erase(layer)) {
+    if (!mapOut.erase(layer))
+    {
       ROS_ERROR("Could not remove type %s.", layer.c_str());
     }
   }
@@ -58,6 +62,6 @@ bool DeletionFilter<T>::update(const T& mapIn, T& mapOut)
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map
 
 PLUGINLIB_EXPORT_CLASS(grid_map::DeletionFilter<grid_map::GridMap>, filters::FilterBase<grid_map::GridMap>)

@@ -7,10 +7,10 @@
  */
 
 #include "grid_map_core/GridMap.hpp"
-#include "grid_map_core/iterators/GridMapIterator.hpp"
 #include "grid_map_core/gtest_eigen.hpp"
-#include "grid_map_ros/GridMapRosConverter.hpp"
+#include "grid_map_core/iterators/GridMapIterator.hpp"
 #include "grid_map_msgs/GridMap.h"
+#include "grid_map_ros/GridMapRosConverter.hpp"
 
 // gtest
 #include <gtest/gtest.h>
@@ -19,14 +19,15 @@
 #include <Eigen/Core>
 
 // STD
+#include <stdlib.h>
+
+#include <iterator>
 #include <string>
 #include <vector>
-#include <stdlib.h>
-#include <iterator>
 
 // ROS
-#include <nav_msgs/OccupancyGrid.h>
 #include <cv_bridge/cv_bridge.h>
+#include <nav_msgs/OccupancyGrid.h>
 #include <sensor_msgs/image_encodings.h>
 
 using namespace std;
@@ -43,7 +44,8 @@ TEST(RosMessageConversion, roundTrip)
   GridMap mapOut;
   GridMapRosConverter::fromMessage(message, mapOut);
 
-  for (size_t i = 0; i < mapIn.getLayers().size(); ++i) {
+  for (size_t i = 0; i < mapIn.getLayers().size(); ++i)
+  {
     EXPECT_EQ(mapIn.getLayers().at(i), mapOut.getLayers().at(i));
     const std::string layer = mapIn.getLayers().at(i);
     EXPECT_TRUE((mapIn[layer].array() == mapOut[layer].array()).all());
@@ -65,7 +67,8 @@ TEST(RosbagHandling, saveLoad)
   grid_map::GridMap gridMapIn(layers), gridMapOut;
   gridMapIn.setGeometry(grid_map::Length(1.0, 1.0), 0.5);
   double a = 1.0;
-  for (grid_map::GridMapIterator iterator(gridMapIn); !iterator.isPastEnd(); ++iterator) {
+  for (grid_map::GridMapIterator iterator(gridMapIn); !iterator.isPastEnd(); ++iterator)
+  {
     gridMapIn.at(layer, *iterator) = a;
     a += 1.0;
   }
@@ -77,7 +80,8 @@ TEST(RosbagHandling, saveLoad)
 
   EXPECT_TRUE(gridMapOut.exists(layer));
 
-  for (GridMapIterator iterator(gridMapIn); !iterator.isPastEnd(); ++iterator) {
+  for (GridMapIterator iterator(gridMapIn); !iterator.isPastEnd(); ++iterator)
+  {
     EXPECT_DOUBLE_EQ(gridMapIn.at(layer, *iterator), gridMapOut.at(layer, *iterator));
   }
 }
@@ -92,7 +96,8 @@ TEST(RosbagHandling, saveLoadWithTime)
   GridMap gridMapIn(layers), gridMapOut;
   gridMapIn.setGeometry(grid_map::Length(1.0, 1.0), 0.5);
   double a = 1.0;
-  for (GridMapIterator iterator(gridMapIn); !iterator.isPastEnd(); ++iterator) {
+  for (GridMapIterator iterator(gridMapIn); !iterator.isPastEnd(); ++iterator)
+  {
     gridMapIn.at(layer, *iterator) = a;
     a += 1.0;
   }
@@ -108,7 +113,8 @@ TEST(RosbagHandling, saveLoadWithTime)
 
   EXPECT_TRUE(gridMapOut.exists(layer));
 
-  for (GridMapIterator iterator(gridMapIn); !iterator.isPastEnd(); ++iterator) {
+  for (GridMapIterator iterator(gridMapIn); !iterator.isPastEnd(); ++iterator)
+  {
     EXPECT_DOUBLE_EQ(gridMapIn.at(layer, *iterator), gridMapOut.at(layer, *iterator));
   }
 }
@@ -151,8 +157,9 @@ TEST(OccupancyGridConversion, roundTrip)
   occupancyGrid.info.origin.orientation.w = 1.0;
   occupancyGrid.data.resize(occupancyGrid.info.width * occupancyGrid.info.height);
 
-  for (auto& cell : occupancyGrid.data) {
-    cell = rand() % 102 - 1; // [-1, 100]
+  for (auto& cell : occupancyGrid.data)
+  {
+    cell = rand() % 102 - 1;  // [-1, 100]
   }
 
   // Convert to grid map.
@@ -176,8 +183,9 @@ TEST(OccupancyGridConversion, roundTrip)
   EXPECT_DOUBLE_EQ(occupancyGrid.info.origin.orientation.w, occupancyGridResult.info.origin.orientation.w);
 
   // Check map data.
-  for (std::vector<int8_t>::iterator iterator = occupancyGrid.data.begin();
-      iterator != occupancyGrid.data.end(); ++iterator) {
+  for (std::vector<int8_t>::iterator iterator = occupancyGrid.data.begin(); iterator != occupancyGrid.data.end();
+       ++iterator)
+  {
     size_t i = std::distance(occupancyGrid.data.begin(), iterator);
     EXPECT_EQ((int)*iterator, (int)occupancyGridResult.data[i]);
   }
@@ -194,8 +202,7 @@ TEST(ImageConversion, roundTripBGRA8)
 
   // Convert to image message.
   sensor_msgs::Image image;
-  GridMapRosConverter::toImage(mapIn, "layer", sensor_msgs::image_encodings::BGRA8, minValue,
-                               maxValue, image);
+  GridMapRosConverter::toImage(mapIn, "layer", sensor_msgs::image_encodings::BGRA8, minValue, maxValue, image);
 
   // Convert back to grid map.
   GridMap mapOut;
@@ -203,7 +210,7 @@ TEST(ImageConversion, roundTripBGRA8)
   GridMapRosConverter::addLayerFromImage(image, "layer", mapOut, minValue, maxValue);
 
   // Check data.
-  const float resolution = (maxValue - minValue) / (float) std::numeric_limits<unsigned char>::max();
+  const float resolution = (maxValue - minValue) / (float)std::numeric_limits<unsigned char>::max();
   expectNear(mapIn["layer"], mapOut["layer"], resolution, "");
   EXPECT_TRUE((mapIn.getLength() == mapOut.getLength()).all());
   EXPECT_TRUE((mapIn.getSize() == mapOut.getSize()).all());
@@ -220,8 +227,7 @@ TEST(ImageConversion, roundTripMONO16)
 
   // Convert to image message.
   sensor_msgs::Image image;
-  GridMapRosConverter::toImage(mapIn, "layer", sensor_msgs::image_encodings::MONO16,
-                               minValue, maxValue, image);
+  GridMapRosConverter::toImage(mapIn, "layer", sensor_msgs::image_encodings::MONO16, minValue, maxValue, image);
 
   // Convert back to grid map.
   GridMap mapOut;
@@ -230,7 +236,7 @@ TEST(ImageConversion, roundTripMONO16)
 
   // Check data.
   // TODO Why is factor 300 necessary?
-  const float resolution = 300.0 * (maxValue - minValue) / (float) std::numeric_limits<unsigned short>::max();
+  const float resolution = 300.0 * (maxValue - minValue) / (float)std::numeric_limits<unsigned short>::max();
   expectNear(mapIn["layer"], mapOut["layer"], resolution, "");
   EXPECT_EQ(mapIn.getTimestamp(), mapOut.getTimestamp());
   EXPECT_TRUE((mapIn.getLength() == mapOut.getLength()).all());

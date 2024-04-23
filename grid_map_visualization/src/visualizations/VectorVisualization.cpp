@@ -18,23 +18,22 @@
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/Vector3.h>
 
-namespace grid_map_visualization {
-
+namespace grid_map_visualization
+{
 VectorVisualization::VectorVisualization(ros::NodeHandle& nodeHandle, const std::string& name)
     : VisualizationBase(nodeHandle, name)
 {
 }
 
-VectorVisualization::~VectorVisualization()
-{
-}
+VectorVisualization::~VectorVisualization() {}
 
 bool VectorVisualization::readParameters(XmlRpc::XmlRpcValue& config)
 {
   VisualizationBase::readParameters(config);
 
   std::string typePrefix;
-  if (!getParam("layer_prefix", typePrefix)) {
+  if (!getParam("layer_prefix", typePrefix))
+  {
     ROS_ERROR("VectorVisualization with name '%s' did not find a 'layer_prefix' parameter.", name_.c_str());
     return false;
   }
@@ -42,23 +41,27 @@ bool VectorVisualization::readParameters(XmlRpc::XmlRpcValue& config)
   types_.push_back(typePrefix + "y");
   types_.push_back(typePrefix + "z");
 
-  if (!getParam("position_layer", positionLayer_)) {
+  if (!getParam("position_layer", positionLayer_))
+  {
     ROS_ERROR("VectorVisualization with name '%s' did not find a 'position_layer' parameter.", name_.c_str());
     return false;
   }
 
   scale_ = 1.0;
-  if (!getParam("scale", scale_)) {
+  if (!getParam("scale", scale_))
+  {
     ROS_INFO("VectorVisualization with name '%s' did not find a 'scale' parameter. Using default.", name_.c_str());
   }
 
   lineWidth_ = 0.003;
-  if (!getParam("line_width", lineWidth_)) {
+  if (!getParam("line_width", lineWidth_))
+  {
     ROS_INFO("VectorVisualization with name '%s' did not find a 'line_width' parameter. Using default.", name_.c_str());
   }
 
-  int colorValue = 65280; // green
-  if (!getParam("color", colorValue)) {
+  int colorValue = 65280;  // green
+  if (!getParam("color", colorValue))
+  {
     ROS_INFO("VectorVisualization with name '%s' did not find a 'color' parameter. Using default.", name_.c_str());
   }
   setColorFromColorValue(color_, colorValue, true);
@@ -81,10 +84,11 @@ bool VectorVisualization::visualize(const grid_map::GridMap& map)
 {
   if (!isActive()) return true;
 
-  for (const auto& type : types_) {
-    if (!map.exists(type)) {
-      ROS_WARN_STREAM(
-          "VectorVisualization::visualize: No grid map layer with name '" << type << "' found.");
+  for (const auto& type : types_)
+  {
+    if (!map.exists(type))
+    {
+      ROS_WARN_STREAM("VectorVisualization::visualize: No grid map layer with name '" << type << "' found.");
       return false;
     }
   }
@@ -119,7 +123,7 @@ bool VectorVisualization::visualize(const grid_map::GridMap& map)
     endPoint.z = startPoint.z + scale_ * vector.z;
     marker_.points.push_back(endPoint);
 
-    marker_.colors.push_back(color_); // Each vertex needs a color.
+    marker_.colors.push_back(color_);  // Each vertex needs a color.
     marker_.colors.push_back(color_);
   }
 
@@ -127,4 +131,4 @@ bool VectorVisualization::visualize(const grid_map::GridMap& map)
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map_visualization

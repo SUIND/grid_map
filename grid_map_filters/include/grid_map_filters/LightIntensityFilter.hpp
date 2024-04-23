@@ -13,15 +13,14 @@
 #include <Eigen/Core>
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Compute the diffuse lighting of a surface as new black and white color layer.
  */
-template<typename T>
+template <typename T>
 class LightIntensityFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -56,4 +55,4 @@ class LightIntensityFilter : public filters::FilterBase<T>
   Eigen::Vector3f lightDirection_;
 };
 
-} /* namespace */
+}  // namespace grid_map

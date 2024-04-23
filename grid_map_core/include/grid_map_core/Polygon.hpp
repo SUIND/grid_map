@@ -16,14 +16,14 @@
 // Eigen
 #include <Eigen/Core>
 
-namespace grid_map {
-
+namespace grid_map
+{
 class Polygon
 {
  public:
-
-  enum class TriangulationMethods {
-    FAN // Fan triangulation (only for convex polygons).
+  enum class TriangulationMethods
+  {
+    FAN  // Fan triangulation (only for convex polygons).
   };
 
   /*!
@@ -72,7 +72,7 @@ class Polygon
    * @param index the index of the requested vertex.
    * @return the requested vertex.
    */
-  const Position& operator [](const size_t index) const;
+  const Position& operator[](const size_t index) const;
 
   /*!
    * Returns the vertices of the polygon.
@@ -137,18 +137,17 @@ class Polygon
   void getBoundingBox(Position& center, Length& length) const;
 
   /*!
-   * Convert polygon to inequality constraints which most tightly contain the points; i.e.,
-   * create constraints to bound the convex hull of polygon. The inequality constraints are
-   * represented as A and b, a set of constraints such that A*x <= b defining the region of
-   * space enclosing the convex hull.
+   * Convert polygon to inequality constraints which most tightly contain the
+   * points; i.e., create constraints to bound the convex hull of polygon. The
+   * inequality constraints are represented as A and b, a set of constraints
+   * such that A*x <= b defining the region of space enclosing the convex hull.
    * Based on the VERT2CON MATLAB method by Michael Kleder:
    * http://www.mathworks.com/matlabcentral/fileexchange/7895-vert2con-vertices-to-constraints
    * @param A the A matrix in of the inequality constraint.
    * @param b the b matrix in of the inequality constraint.
    * @return true if conversion successful, false otherwise.
    */
-  bool convertToInequalityConstraints(Eigen::MatrixXd& A,
-                                      Eigen::VectorXd& b) const;
+  bool convertToInequalityConstraints(Eigen::MatrixXd& A, Eigen::VectorXd& b) const;
 
   /*!
    * Offsets the polygon inward (buffering) by a margin.
@@ -176,23 +175,22 @@ class Polygon
    * Approximates a circle with a polygon.
    * @param[in] center the center position of the circle.
    * @param[in] radius radius of the circle.
-   * @param[in] nVertices number of vertices of the approximation polygon. Default = 20.
+   * @param[in] nVertices number of vertices of the approximation polygon.
+   * Default = 20.
    * @return circle as polygon.
    */
-  static Polygon fromCircle(const Position center, const double radius,
-                            const int nVertices = 20);
+  static Polygon fromCircle(const Position center, const double radius, const int nVertices = 20);
 
   /*!
    * Approximates two circles with a convex hull and returns it as polygon.
    * @param[in] center1 the center position of the first circle.
    * @param[in] center2 the center position of the second circle.
    * @param[in] radius radius of the circles.
-   * @param[in] nVertices number of vertices of the approximation polygon. Default = 20.
+   * @param[in] nVertices number of vertices of the approximation polygon.
+   * Default = 20.
    * @return convex hull of the two circles as polygon.
    */
-  static Polygon convexHullOfTwoCircles(const Position center1,
-                                        const Position center2,
-                                        const double radius,
+  static Polygon convexHullOfTwoCircles(const Position center1, const Position center2, const double radius,
                                         const int nVertices = 20);
 
   /*!
@@ -204,38 +202,38 @@ class Polygon
   static Polygon convexHull(Polygon& polygon1, Polygon& polygon2);
 
   /*!
-   * Computes the convex hull of given points, using Andrew's monotone chain convex hull algorithm, and returns it as polygon.
-   * @param[in] points points to use to compute the convex hull used to create the polygon.
+   * Computes the convex hull of given points, using Andrew's monotone chain
+   * convex hull algorithm, and returns it as polygon.
+   * @param[in] points points to use to compute the convex hull used to create
+   * the polygon.
    * @return convex hull as polygon.
    */
-  static Polygon monotoneChainConvexHullOfPoints(const std::vector<Position, Eigen::aligned_allocator<Position>>& points);
+  static Polygon monotoneChainConvexHullOfPoints(
+      const std::vector<Position, Eigen::aligned_allocator<Position>>& points);
 
  protected:
-
   /*!
    * Returns true if the vector1 and vector2 are sorted lexicographically.
    * @param[in] vector1 the first input vector.
    * @param[in] vector2 the second input vector.
    */
-  static bool sortVertices(const Eigen::Vector2d& vector1,
-                           const Eigen::Vector2d& vector2);
+  static bool sortVertices(const Eigen::Vector2d& vector1, const Eigen::Vector2d& vector2);
 
   /*!
    * Returns the 2D cross product of vector1 and vector2.
    * @param[in] vector1 the first input vector.
    * @param[in] vector2 the second input vector.
    */
-  static double computeCrossProduct2D(const Eigen::Vector2d& vector1,
-                                      const Eigen::Vector2d& vector2);
+  static double computeCrossProduct2D(const Eigen::Vector2d& vector1, const Eigen::Vector2d& vector2);
 
   /*!
-   * Returns true if OAB makes a clockwise turn or if the OA and OB vectors are collinear.
+   * Returns true if OAB makes a clockwise turn or if the OA and OB vectors are
+   * collinear.
    * @param[in] pointO point of the origin O, used to compute OA and OB.
    * @param[in] pointA input point A, used to compute OA.
    * @param[in] pointB input point B, used to compute OB.
    */
-  static double vectorsMakeClockwiseTurn(const Eigen::Vector2d& pointO,
-                                         const Eigen::Vector2d& pointA,
+  static double vectorsMakeClockwiseTurn(const Eigen::Vector2d& pointO, const Eigen::Vector2d& pointA,
                                          const Eigen::Vector2d& pointB);
 
   //! Frame id of the polygon.

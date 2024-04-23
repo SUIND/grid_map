@@ -13,10 +13,12 @@
 #include "grid_map_pcl/PclLoaderParameters.hpp"
 #include "grid_map_pcl/helpers.hpp"
 
-namespace grid_map {
-namespace grid_map_pcl {
-
-class PointcloudProcessor {
+namespace grid_map
+{
+namespace grid_map_pcl
+{
+class PointcloudProcessor
+{
  public:
   PointcloudProcessor();
   virtual ~PointcloudProcessor() = default;

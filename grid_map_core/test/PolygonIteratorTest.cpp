@@ -6,9 +6,9 @@
  *	 Institute: ETH Zurich, ANYbotics
  */
 
-#include "grid_map_core/iterators/PolygonIterator.hpp"
 #include "grid_map_core/GridMap.hpp"
 #include "grid_map_core/Polygon.hpp"
+#include "grid_map_core/iterators/PolygonIterator.hpp"
 
 // Eigen
 #include <Eigen/Core>
@@ -31,7 +31,7 @@ TEST(PolygonIterator, FullCover)
   vector<string> types;
   types.push_back("type");
   GridMap map(types);
-  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
 
   Polygon polygon;
   polygon.addVertex(Position(-100.0, 100.0));
@@ -68,7 +68,7 @@ TEST(PolygonIterator, FullCover)
 TEST(PolygonIterator, Outside)
 {
   GridMap map({"types"});
-  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
 
   Polygon polygon;
   polygon.addVertex(Position(99.0, 101.0));
@@ -84,7 +84,7 @@ TEST(PolygonIterator, Outside)
 TEST(PolygonIterator, Square)
 {
   GridMap map({"types"});
-  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
 
   Polygon polygon;
   polygon.addVertex(Position(-1.0, 1.5));
@@ -130,7 +130,7 @@ TEST(PolygonIterator, Square)
 TEST(PolygonIterator, TopLeftTriangle)
 {
   GridMap map({"types"});
-  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
 
   Polygon polygon;
   polygon.addVertex(Position(-40.1, 20.6));
@@ -154,7 +154,7 @@ TEST(PolygonIterator, TopLeftTriangle)
 TEST(PolygonIterator, MoveMap)
 {
   GridMap map({"layer"});
-  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
   map.move(Position(2.0, 0.0));
 
   Polygon polygon;

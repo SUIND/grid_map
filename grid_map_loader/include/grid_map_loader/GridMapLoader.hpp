@@ -18,15 +18,14 @@
 // STD
 #include <string>
 
-namespace grid_map_loader {
-
+namespace grid_map_loader
+{
 /*!
  * Loads and publishes a grid map from a bag file.
  */
 class GridMapLoader
 {
  public:
-
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -39,9 +38,9 @@ class GridMapLoader
   virtual ~GridMapLoader();
 
   /*!
-  * Reads and verifies the ROS parameters.
-  * @return true if successful.
-  */
+   * Reads and verifies the ROS parameters.
+   * @return true if successful.
+   */
   bool readParameters();
 
   /*!
@@ -56,7 +55,6 @@ class GridMapLoader
   void publish();
 
  private:
-
   //! ROS nodehandle.
   ros::NodeHandle nodeHandle_;
 
@@ -79,4 +77,4 @@ class GridMapLoader
   ros::Duration duration_;
 };
 
-} /* namespace */
+}  // namespace grid_map_loader

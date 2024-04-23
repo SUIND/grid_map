@@ -9,17 +9,17 @@
 #pragma once
 
 #include <array>
+#include <grid_map_core/GridMap.hpp>
 #include <memory>
 #include <string>
-
-#include <grid_map_core/GridMap.hpp>
 
 #include "grid_map_pcl/PclLoaderParameters.hpp"
 #include "grid_map_pcl/PointcloudProcessor.hpp"
 
-namespace grid_map {
-
-namespace grid_map_pcl_test {
+namespace grid_map
+{
+namespace grid_map_pcl_test
+{
 class GridMapPclLoaderTest_CalculateElevation_Test;
 }
 /*
@@ -32,7 +32,8 @@ class GridMapPclLoaderTest_CalculateElevation_Test;
  * indoors. All the calculations are performed in the point cloud frame.
  */
 
-class GridMapPclLoader {
+class GridMapPclLoader
+{
   friend class grid_map_pcl_test::GridMapPclLoaderTest_CalculateElevation_Test;
 
  public:
@@ -99,7 +100,8 @@ class GridMapPclLoader {
   grid_map::GridMap& getWorkingGridMap() { return workingGridMap_; }
 
   //! @return A const reference to the internal multiple heights representation.
-  const std::vector<std::vector<std::vector<float>>>& getClusterHeightsWithingGridMapCell() const {
+  const std::vector<std::vector<std::vector<float>>>& getClusterHeightsWithingGridMapCell() const
+  {
     return clusterHeightsWithingGridMapCell_;
   }
 

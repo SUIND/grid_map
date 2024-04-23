@@ -10,18 +10,17 @@
 
 #include <filters/filter_base.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Deletion filter class deletes layers of a grid map.
  */
-template<typename T>
+template <typename T>
 class DeletionFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -46,10 +45,8 @@ class DeletionFilter : public filters::FilterBase<T>
   virtual bool update(const T& mapIn, T& mapOut);
 
  private:
-
   //! List of layers that should be deleted.
   std::vector<std::string> layers_;
-
 };
 
-} /* namespace */
+}  // namespace grid_map

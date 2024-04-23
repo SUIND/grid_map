@@ -23,12 +23,13 @@
 #include <iostream>
 #include <vector>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Conversions between grid maps and PCL types.
  */
-class GridMapPclConverter {
+class GridMapPclConverter
+{
  public:
   /*!
    * Default constructor.
@@ -48,7 +49,8 @@ class GridMapPclConverter {
    * @param[out] gridMap the grid map to be initialized.
    * @return true if successful, false otherwise.
    */
-  static bool initializeFromPolygonMesh(const pcl::PolygonMesh& mesh, const double resolution, grid_map::GridMap& gridMap);
+  static bool initializeFromPolygonMesh(const pcl::PolygonMesh& mesh, const double resolution,
+                                        grid_map::GridMap& gridMap);
 
   /*!
    * Adds a layer with data from a polygon mesh. The mesh is ray traced from
@@ -58,11 +60,12 @@ class GridMapPclConverter {
    * @param[out] gridMap the grid map to be populated.
    * @return true if successful, false otherwise.
    */
-  static bool addLayerFromPolygonMesh(const pcl::PolygonMesh& mesh, const std::string& layer, grid_map::GridMap& gridMap);
+  static bool addLayerFromPolygonMesh(const pcl::PolygonMesh& mesh, const std::string& layer,
+                                      grid_map::GridMap& gridMap);
 
  private:
-  static bool rayTriangleIntersect(const Eigen::Vector3f& point, const Eigen::Vector3f& ray, const Eigen::Matrix3f& triangleVertices,
-                                   Eigen::Vector3f& intersectionPoint);
+  static bool rayTriangleIntersect(const Eigen::Vector3f& point, const Eigen::Vector3f& ray,
+                                   const Eigen::Matrix3f& triangleVertices, Eigen::Vector3f& intersectionPoint);
 };
 
 } /* namespace grid_map */

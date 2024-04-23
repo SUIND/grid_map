@@ -35,13 +35,13 @@
 #endif
 
 // The following replaces <rviz/frame_manager.h>
-#include "grid_map_rviz_plugin/modified/frame_manager.h"
+#include <rviz/display.h>
 #include <rviz/display_context.h>
 #include <rviz/properties/int_property.h>
 #include <rviz/properties/ros_topic_property.h>
-
-#include <rviz/display.h>
 #include <rviz/rviz_export.h>
+
+#include "grid_map_rviz_plugin/modified/frame_manager.h"
 
 namespace rviz
 {
@@ -51,26 +51,25 @@ namespace rviz
 class RVIZ_EXPORT _RosTopicDisplay : public Display
 {
   Q_OBJECT
-public:
+ public:
   _RosTopicDisplay()
   {
     topic_property_ = new RosTopicProperty("Topic", "", "", "", this, SLOT(updateTopic()));
     unreliable_property_ =
         new BoolProperty("Unreliable", false, "Prefer UDP topic transport", this, SLOT(updateTopic()));
-    queue_size_property_ =
-        new IntProperty("Queue Size", 1,
-                        "Size of TF message filter queue.\n"
-                        "Increasing this is useful if your TF data is delayed significantly "
-                        "w.r.t. your data, but it can greatly increase memory usage as well.",
-                        this, SLOT(updateQueueSize()));
+    queue_size_property_ = new IntProperty("Queue Size", 1,
+                                           "Size of TF message filter queue.\n"
+                                           "Increasing this is useful if your TF data is delayed significantly "
+                                           "w.r.t. your data, but it can greatly increase memory usage as well.",
+                                           this, SLOT(updateQueueSize()));
     queue_size_property_->setMin(0);
   }
 
-protected Q_SLOTS:
+ protected Q_SLOTS:
   virtual void updateTopic() = 0;
   virtual void updateQueueSize() = 0;
 
-protected:
+ protected:
   RosTopicProperty* topic_property_;
   BoolProperty* unreliable_property_;
   IntProperty* queue_size_property_;
@@ -86,7 +85,7 @@ template <class MessageType>
 class MessageFilterDisplay : public _RosTopicDisplay
 {
   // No Q_OBJECT macro here, moc does not support Q_OBJECT in a templated class.
-public:
+ public:
   /** @brief Convenience typedef so subclasses don't have to use
    * the long templated class name to refer to their super class. */
   typedef MessageFilterDisplay<MessageType> MFDClass;
@@ -102,12 +101,10 @@ public:
   {
     tf_filter_ =
         new tf2_ros::MessageFilter<MessageType>(*context_->getTF2BufferPtr(), fixed_frame_.toStdString(),
-                                                static_cast<uint32_t>(queue_size_property_->getInt()),
-                                                update_nh_);
+                                                static_cast<uint32_t>(queue_size_property_->getInt()), update_nh_);
 
     tf_filter_->connectInput(sub_);
-    tf_filter_->registerCallback(
-        boost::bind(&MessageFilterDisplay<MessageType>::incomingMessage, this, _1));
+    tf_filter_->registerCallback(boost::bind(&MessageFilterDisplay<MessageType>::incomingMessage, this, _1));
     context_->getFrameManager()->registerFilterForTransformStatusCheck(tf_filter_, this);
   }
 
@@ -123,17 +120,13 @@ public:
     Display::reset();
     tf_filter_->clear();
     // Quick fix for #1372. Can be removed if https://github.com/ros/geometry2/pull/402 is released
-    if (tf_filter_)
-      update_nh_.getCallbackQueue()->removeByID((uint64_t)tf_filter_);
+    if (tf_filter_) update_nh_.getCallbackQueue()->removeByID((uint64_t)tf_filter_);
     messages_received_ = 0;
   }
 
-  void setTopic(const QString& topic, const QString& /*datatype*/) override
-  {
-    topic_property_->setString(topic);
-  }
+  void setTopic(const QString& topic, const QString& /*datatype*/) override { topic_property_->setString(topic); }
 
-protected:
+ protected:
   void updateTopic() override
   {
     unsubscribe();
@@ -163,8 +156,8 @@ protected:
       {
         transport_hint = ros::TransportHints().unreliable();
       }
-      sub_.subscribe(update_nh_, topic_property_->getTopicStd(),
-                     static_cast<uint32_t>(queue_size_property_->getInt()), transport_hint);
+      sub_.subscribe(update_nh_, topic_property_->getTopicStd(), static_cast<uint32_t>(queue_size_property_->getInt()),
+                     transport_hint);
       setStatus(StatusProperty::Ok, "Topic", "OK");
     }
     catch (ros::Exception& e)
@@ -173,15 +166,9 @@ protected:
     }
   }
 
-  virtual void unsubscribe()
-  {
-    sub_.unsubscribe();
-  }
+  virtual void unsubscribe() { sub_.unsubscribe(); }
 
-  void onEnable() override
-  {
-    subscribe();
-  }
+  void onEnable() override { subscribe(); }
 
   void onDisable() override
   {
@@ -221,6 +208,6 @@ protected:
   uint32_t messages_received_;
 };
 
-} // end namespace rviz
+}  // end namespace rviz
 
-#endif // MESSAGE_FILTER_DISPLAY_H
+#endif  // MESSAGE_FILTER_DISPLAY_H

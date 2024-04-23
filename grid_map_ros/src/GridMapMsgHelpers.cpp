@@ -11,15 +11,11 @@
 // Boost
 #include <boost/assign.hpp>
 
-namespace grid_map {
-
-int nDimensions()
+namespace grid_map
 {
-  return 2;
-}
+int nDimensions() { return 2; }
 
-std::map<StorageIndices, std::string> storageIndexNames = boost::assign::map_list_of
-    (StorageIndices::Column,  "column_index")
-    (StorageIndices::Row, "row_index");
+std::map<StorageIndices, std::string> storageIndexNames =
+    boost::assign::map_list_of(StorageIndices::Column, "column_index")(StorageIndices::Row, "row_index");
 
-} /* namespace */
+}  // namespace grid_map

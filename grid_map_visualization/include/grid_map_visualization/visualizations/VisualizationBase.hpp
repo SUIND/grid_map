@@ -13,14 +13,13 @@
 // ROS
 #include <ros/ros.h>
 
-namespace grid_map_visualization {
-
+namespace grid_map_visualization
+{
 typedef std::map<std::string, XmlRpc::XmlRpcValue> StringMap;
 
 class VisualizationBase
 {
  public:
-
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -59,7 +58,6 @@ class VisualizationBase
   bool isActive() const;
 
  protected:
-
   /*!
    * Get a visualization parameter as a string.
    * @param[in] name the name of the parameter
@@ -90,7 +88,7 @@ class VisualizationBase
    * @param[out] value the int to set with the value.
    * @return true if parameter was found, false otherwise.
    */
-  bool getParam(const std::string&name, int& value);
+  bool getParam(const std::string& name, int& value);
 
   /*!
    * Get a visualization parameter as a boolean.
@@ -113,4 +111,4 @@ class VisualizationBase
   ros::Publisher publisher_;
 };
 
-} /* namespace */
+}  // namespace grid_map_visualization

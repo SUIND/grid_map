@@ -11,13 +11,13 @@
 
 using namespace grid_map;
 
-namespace grid_map_demos {
-
-FiltersDemo::FiltersDemo(ros::NodeHandle& nodeHandle, bool& success)
-    : nodeHandle_(nodeHandle),
-      filterChain_("grid_map::GridMap")
+namespace grid_map_demos
 {
-  if (!readParameters()) {
+FiltersDemo::FiltersDemo(ros::NodeHandle& nodeHandle, bool& success)
+    : nodeHandle_(nodeHandle), filterChain_("grid_map::GridMap")
+{
+  if (!readParameters())
+  {
     success = false;
     return;
   }
@@ -26,7 +26,8 @@ FiltersDemo::FiltersDemo(ros::NodeHandle& nodeHandle, bool& success)
   publisher_ = nodeHandle_.advertise<grid_map_msgs::GridMap>(outputTopic_, 1, true);
 
   // Setup filter chain.
-  if (!filterChain_.configure(filterChainParametersName_, nodeHandle)) {
+  if (!filterChain_.configure(filterChainParametersName_, nodeHandle))
+  {
     ROS_ERROR("Could not configure the filter chain!");
     success = false;
     return;
@@ -35,13 +36,12 @@ FiltersDemo::FiltersDemo(ros::NodeHandle& nodeHandle, bool& success)
   success = true;
 }
 
-FiltersDemo::~FiltersDemo()
-{
-}
+FiltersDemo::~FiltersDemo() {}
 
 bool FiltersDemo::readParameters()
 {
-  if (!nodeHandle_.getParam("input_topic", inputTopic_)) {
+  if (!nodeHandle_.getParam("input_topic", inputTopic_))
+  {
     ROS_ERROR("Could not read parameter `input_topic`.");
     return false;
   }
@@ -58,7 +58,8 @@ void FiltersDemo::callback(const grid_map_msgs::GridMap& message)
 
   // Apply filter chain.
   grid_map::GridMap outputMap;
-  if (!filterChain_.update(inputMap, outputMap)) {
+  if (!filterChain_.update(inputMap, outputMap))
+  {
     ROS_ERROR("Could not update the grid map filter chain!");
     return;
   }
@@ -70,4 +71,4 @@ void FiltersDemo::callback(const grid_map_msgs::GridMap& message)
   publisher_.publish(outputMessage);
 }
 
-} /* namespace */
+}  // namespace grid_map_demos

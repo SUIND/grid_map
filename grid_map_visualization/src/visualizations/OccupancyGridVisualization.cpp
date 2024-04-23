@@ -7,37 +7,38 @@
  */
 
 #include "grid_map_visualization/visualizations/OccupancyGridVisualization.hpp"
-#include <grid_map_ros/GridMapRosConverter.hpp>
+
 #include <nav_msgs/OccupancyGrid.h>
 
-namespace grid_map_visualization {
+#include <grid_map_ros/GridMapRosConverter.hpp>
 
+namespace grid_map_visualization
+{
 OccupancyGridVisualization::OccupancyGridVisualization(ros::NodeHandle& nodeHandle, const std::string& name)
-: VisualizationBase(nodeHandle, name),
-  dataMin_(0.0),
-  dataMax_(1.0)
+    : VisualizationBase(nodeHandle, name), dataMin_(0.0), dataMax_(1.0)
 {
 }
 
-OccupancyGridVisualization::~OccupancyGridVisualization()
-{
-}
+OccupancyGridVisualization::~OccupancyGridVisualization() {}
 
 bool OccupancyGridVisualization::readParameters(XmlRpc::XmlRpcValue& config)
 {
   VisualizationBase::readParameters(config);
 
-  if (!getParam("layer", layer_)) {
+  if (!getParam("layer", layer_))
+  {
     ROS_ERROR("OccupancyGridVisualization with name '%s' did not find a 'layer' parameter.", name_.c_str());
     return false;
   }
 
-  if (!getParam("data_min", dataMin_)) {
+  if (!getParam("data_min", dataMin_))
+  {
     ROS_ERROR("OccupancyGridVisualization with name '%s' did not find a 'data_min' parameter.", name_.c_str());
     return false;
   }
 
-  if (!getParam("data_max", dataMax_)) {
+  if (!getParam("data_max", dataMax_))
+  {
     ROS_ERROR("OccupancyGridVisualization with name '%s' did not find a 'data_max' parameter.", name_.c_str());
     return false;
   }
@@ -54,7 +55,8 @@ bool OccupancyGridVisualization::initialize()
 bool OccupancyGridVisualization::visualize(const grid_map::GridMap& map)
 {
   if (!isActive()) return true;
-  if (!map.exists(layer_)) {
+  if (!map.exists(layer_))
+  {
     ROS_WARN_STREAM("OccupancyGridVisualization::visualize: No grid map layer with name '" << layer_ << "' found.");
     return false;
   }
@@ -64,4 +66,4 @@ bool OccupancyGridVisualization::visualize(const grid_map::GridMap& map)
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map_visualization

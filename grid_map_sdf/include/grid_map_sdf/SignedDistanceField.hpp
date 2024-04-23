@@ -8,16 +8,15 @@
 
 #pragma once
 
-#include <grid_map_core/GridMap.hpp>
-
-#include <pcl/point_types.h>
 #include <pcl/conversions.h>
+#include <pcl/point_types.h>
 
+#include <grid_map_core/GridMap.hpp>
 #include <string>
 #include <vector>
 
-namespace grid_map {
-
+namespace grid_map
+{
 class SignedDistanceField
 {
  public:
@@ -42,4 +41,4 @@ class SignedDistanceField
   const float lowestHeight_;
 };
 
-} /* namespace */
+}  // namespace grid_map

@@ -6,8 +6,8 @@
  *	 Institute: ETH Zurich, ANYbotics
  */
 
-#include "grid_map_core/iterators/GridMapIterator.hpp"
 #include "grid_map_core/GridMap.hpp"
+#include "grid_map_core/iterators/GridMapIterator.hpp"
 
 // Eigen
 #include <Eigen/Core>
@@ -27,12 +27,13 @@ using namespace grid_map;
 TEST(GridMapIterator, Simple)
 {
   GridMap map;
-  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
   map.add("layer", 0.0);
   GridMapIterator iterator(map);
 
   unsigned int i = 0;
-  for (; !iterator.isPastEnd(); ++iterator, ++i) {
+  for (; !iterator.isPastEnd(); ++iterator, ++i)
+  {
     map.at("layer", *iterator) = 1.0;
     EXPECT_FALSE(iterator.isPastEnd());
   }
@@ -45,13 +46,14 @@ TEST(GridMapIterator, Simple)
 TEST(GridMapIterator, LinearIndex)
 {
   GridMap map;
-  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
   map.add("layer", 0.0);
   GridMapIterator iterator(map);
 
   auto& data = map["layer"];
   unsigned int i = 0;
-  for (; !iterator.isPastEnd(); ++iterator, ++i) {
+  for (; !iterator.isPastEnd(); ++iterator, ++i)
+  {
     data(iterator.getLinearIndex()) = 1.0;
     EXPECT_EQ(i, iterator.getLinearIndex());
     EXPECT_FALSE(iterator.isPastEnd());

@@ -13,15 +13,14 @@
 #include <Eigen/Core>
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Compute a new color layer based on normal vectors layers.
  */
-template<typename T>
+template <typename T>
 class NormalColorMapFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -53,4 +52,4 @@ class NormalColorMapFilter : public filters::FilterBase<T>
   std::string outputLayer_;
 };
 
-} /* namespace */
+}  // namespace grid_map

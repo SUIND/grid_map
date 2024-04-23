@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include "grid_map_core/GridMap.hpp"
-#include "grid_map_core/SubmapGeometry.hpp"
-#include "grid_map_core/BufferRegion.hpp"
-
 #include <Eigen/Core>
 
-namespace grid_map {
+#include "grid_map_core/BufferRegion.hpp"
+#include "grid_map_core/GridMap.hpp"
+#include "grid_map_core/SubmapGeometry.hpp"
 
+namespace grid_map
+{
 /*!
  * Iterator class to iterate through a rectangular part of the map (submap).
  * Before using this iterator, make sure that the requested submap is
@@ -23,8 +23,7 @@ namespace grid_map {
  */
 class SubmapIterator
 {
-public:
-
+ public:
   /*!
    * Constructor.
    * @param submap the submap geometry to iterate over.
@@ -43,8 +42,7 @@ public:
    * @param submapStartIndex the start index of the submap, typically top-left index.
    * @param submapSize the size of the submap to iterate on.
    */
-  SubmapIterator(const grid_map::GridMap& gridMap, const Index& submapStartIndex,
-                 const Size& submapSize);
+  SubmapIterator(const grid_map::GridMap& gridMap, const Index& submapStartIndex, const Size& submapSize);
 
   /*!
    * Copy constructor.
@@ -57,19 +55,19 @@ public:
    * @param iterator the iterator to copy data from.
    * @return a reference to *this.
    */
-  SubmapIterator& operator =(const SubmapIterator& other);
+  SubmapIterator& operator=(const SubmapIterator& other);
 
   /*!
    * Compare to another iterator.
    * @return whether the current iterator points to a different address than the other one.
    */
-  bool operator !=(const SubmapIterator& other) const;
+  bool operator!=(const SubmapIterator& other) const;
 
   /*!
    * Dereference the iterator with const.
    * @return the value to which the iterator is pointing.
    */
-  const Index& operator *() const;
+  const Index& operator*() const;
 
   /*!
    * Get the current index in the submap.
@@ -81,7 +79,7 @@ public:
    * Increase the iterator to the next element.
    * @return a reference to the updated iterator.
    */
-  SubmapIterator& operator ++();
+  SubmapIterator& operator++();
 
   /*!
    * Indicates if iterator is past end.
@@ -95,8 +93,7 @@ public:
    */
   const Size& getSubmapSize() const;
 
-private:
-
+ private:
   //! Size of the buffer.
   Size size_;
 
@@ -122,4 +119,4 @@ private:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-} /* namespace */
+}  // namespace grid_map

@@ -10,15 +10,15 @@
 
 #include <filters/filter_base.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Set specified layers of a grid map as basic layers.
  */
-template<typename T>
+template <typename T>
 class SetBasicLayersFilter : public filters::FilterBase<T>
 {
  public:
@@ -47,7 +47,6 @@ class SetBasicLayersFilter : public filters::FilterBase<T>
  private:
   //! List of layers that should be set as basic layers.
   std::vector<std::string> layers_;
-
 };
 
-} /* namespace */
+}  // namespace grid_map

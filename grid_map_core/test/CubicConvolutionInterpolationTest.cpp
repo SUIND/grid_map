@@ -6,9 +6,8 @@
  *      Institute: ETH Zurich, Robotic Systems Lab
  */
 
-#include "test_helpers.hpp"
-
 #include "grid_map_core/GridMap.hpp"
+#include "test_helpers.hpp"
 
 // gtest
 #include <gtest/gtest.h>
@@ -26,9 +25,9 @@ TEST(CubicConvolutionInterpolation, FlatWorld)
 
   verifyValuesAtQueryPointsAreClose(map, trueValues, queryPoints, gm::InterpolationMethods::INTER_CUBIC_CONVOLUTION);
 
-  if (::testing::Test::HasFailure()) {
-    std::cout << "\n Test CubicConvolutionInterpolation, FlatWorld failed with seed: " << seed
-              << std::endl;
+  if (::testing::Test::HasFailure())
+  {
+    std::cout << "\n Test CubicConvolutionInterpolation, FlatWorld failed with seed: " << seed << std::endl;
   }
 }
 
@@ -42,9 +41,9 @@ TEST(CubicConvolutionInterpolation, RationalFunctionWorld)
 
   verifyValuesAtQueryPointsAreClose(map, trueValues, queryPoints, gm::InterpolationMethods::INTER_CUBIC_CONVOLUTION);
 
-  if (::testing::Test::HasFailure()) {
-    std::cout << "\n Test CubicConvolutionInterpolation, RationalFunctionWorld failed with seed: "
-              << seed << std::endl;
+  if (::testing::Test::HasFailure())
+  {
+    std::cout << "\n Test CubicConvolutionInterpolation, RationalFunctionWorld failed with seed: " << seed << std::endl;
   }
 }
 
@@ -58,9 +57,9 @@ TEST(CubicConvolutionInterpolation, SaddleWorld)
 
   verifyValuesAtQueryPointsAreClose(map, trueValues, queryPoints, gm::InterpolationMethods::INTER_CUBIC_CONVOLUTION);
 
-  if (::testing::Test::HasFailure()) {
-    std::cout << "\n Test CubicConvolutionInterpolation, SaddleWorld failed with seed: " << seed
-              << std::endl;
+  if (::testing::Test::HasFailure())
+  {
+    std::cout << "\n Test CubicConvolutionInterpolation, SaddleWorld failed with seed: " << seed << std::endl;
   }
 }
 
@@ -74,9 +73,9 @@ TEST(CubicConvolutionInterpolation, SecondOrderPolyWorld)
 
   verifyValuesAtQueryPointsAreClose(map, trueValues, queryPoints, gm::InterpolationMethods::INTER_CUBIC_CONVOLUTION);
 
-  if (::testing::Test::HasFailure()) {
-    std::cout << "\n Test CubicConvolutionInterpolation, SecondOrderPolyWorld failed with seed: "
-              << seed << std::endl;
+  if (::testing::Test::HasFailure())
+  {
+    std::cout << "\n Test CubicConvolutionInterpolation, SecondOrderPolyWorld failed with seed: " << seed << std::endl;
   }
 }
 
@@ -90,9 +89,9 @@ TEST(CubicConvolutionInterpolation, SineWorld)
 
   verifyValuesAtQueryPointsAreClose(map, trueValues, queryPoints, gm::InterpolationMethods::INTER_CUBIC_CONVOLUTION);
 
-  if (::testing::Test::HasFailure()) {
-    std::cout << "\n Test CubicConvolutionInterpolation, SineWorld failed with seed: " << seed
-              << std::endl;
+  if (::testing::Test::HasFailure())
+  {
+    std::cout << "\n Test CubicConvolutionInterpolation, SineWorld failed with seed: " << seed << std::endl;
   }
 }
 
@@ -106,9 +105,9 @@ TEST(CubicConvolutionInterpolation, TanhWorld)
 
   verifyValuesAtQueryPointsAreClose(map, trueValues, queryPoints, gm::InterpolationMethods::INTER_CUBIC_CONVOLUTION);
 
-  if (::testing::Test::HasFailure()) {
-    std::cout << "\n Test CubicConvolutionInterpolation, TanhWorld failed with seed: " << seed
-              << std::endl;
+  if (::testing::Test::HasFailure())
+  {
+    std::cout << "\n Test CubicConvolutionInterpolation, TanhWorld failed with seed: " << seed << std::endl;
   }
 }
 
@@ -122,9 +121,8 @@ TEST(CubicConvolutionInterpolation, GaussianWorld)
 
   verifyValuesAtQueryPointsAreClose(map, trueValues, queryPoints, gm::InterpolationMethods::INTER_CUBIC_CONVOLUTION);
 
-  if (::testing::Test::HasFailure()) {
-    std::cout << "\n Test CubicConvolutionInterpolation, GaussianWorld failed with seed: " << seed
-              << std::endl;
+  if (::testing::Test::HasFailure())
+  {
+    std::cout << "\n Test CubicConvolutionInterpolation, GaussianWorld failed with seed: " << seed << std::endl;
   }
 }
-

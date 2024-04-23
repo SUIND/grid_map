@@ -7,17 +7,19 @@
  */
 
 #pragma once
-#include "grid_map_core/TypeDefs.hpp"
 #include <functional>
-#include <vector>
 #include <random>
+#include <vector>
 
-namespace grid_map {
-  class GridMap;
+#include "grid_map_core/TypeDefs.hpp"
+
+namespace grid_map
+{
+class GridMap;
 }
 
-namespace grid_map_test {
-
+namespace grid_map_test
+{
 /*
  * Name of the layer that is used in all tests.
  * It has no special meaning.
@@ -48,8 +50,7 @@ extern std::mt19937 rndGenerator;
 // Maximal tolerance when comparing doubles in tests.
 const double maxAbsErrorValue = 1e-3;
 
-grid_map::GridMap createMap(const grid_map::Length &length, double resolution,
-                            const grid_map::Position &pos);
+grid_map::GridMap createMap(const grid_map::Length &length, double resolution, const grid_map::Position &pos);
 
 /*
  * Collections of methods that modify the grid map.
@@ -81,8 +82,7 @@ void fillGridMap(grid_map::GridMap *map, const AnalyticalFunctions &functions);
 /*
  * Create numPoints uniformly distributed random points that lie within the grid map.
  */
-std::vector<Point2D> uniformlyDitributedPointsWithinMap(const grid_map::GridMap &map,
-                                                        unsigned int numPoints);
+std::vector<Point2D> uniformlyDitributedPointsWithinMap(const grid_map::GridMap &map, unsigned int numPoints);
 
 /*
  * For each point in queryPoints, verify that the interpolated value of the grid map
@@ -90,7 +90,7 @@ std::vector<Point2D> uniformlyDitributedPointsWithinMap(const grid_map::GridMap 
  * Called inside the tests. Calls macros from gtest.
  */
 void verifyValuesAtQueryPointsAreClose(const grid_map::GridMap &map, const AnalyticalFunctions &trueValues,
-                               const std::vector<Point2D> &queryPoints,
-                               grid_map::InterpolationMethods interpolationMethod);
+                                       const std::vector<Point2D> &queryPoints,
+                                       grid_map::InterpolationMethods interpolationMethod);
 
-} /*grid_map_test*/
+}  // namespace grid_map_test

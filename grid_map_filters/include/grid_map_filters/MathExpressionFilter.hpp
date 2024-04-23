@@ -8,21 +8,20 @@
 
 #pragma once
 
-#include "EigenLab/EigenLab.h"
-
 #include <filters/filter_base.h>
 
 #include <string>
 
-namespace grid_map {
+#include "EigenLab/EigenLab.h"
 
+namespace grid_map
+{
 /*!
  * Parses and evaluates a mathematical matrix expression with layers of a grid map.
  */
-template<typename T>
+template <typename T>
 class MathExpressionFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -57,4 +56,4 @@ class MathExpressionFilter : public filters::FilterBase<T>
   std::string outputLayer_;
 };
 
-} /* namespace */
+}  // namespace grid_map

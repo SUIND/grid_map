@@ -13,20 +13,19 @@
 // Eigen
 #include <Eigen/Core>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Iterator class to iterate trough the entire grid map.
  */
 class GridMapIterator
 {
-public:
-
+ public:
   /*!
    * Constructor.
    * @param gridMap the grid map to iterate on.
    */
-  GridMapIterator(const grid_map::GridMap &gridMap);
+  GridMapIterator(const grid_map::GridMap& gridMap);
 
   /*!
    * Copy constructor.
@@ -39,20 +38,20 @@ public:
    * @param iterator the iterator to copy data from.
    * @return a reference to *this.
    */
-  GridMapIterator& operator =(const GridMapIterator& other);
+  GridMapIterator& operator=(const GridMapIterator& other);
 
   /*!
    * Compare to another iterator.
    * @return whether the current iterator points to a different address than the other one.
    */
-  bool operator !=(const GridMapIterator& other) const;
+  bool operator!=(const GridMapIterator& other) const;
 
   /*!
    * Dereference the iterator to return the regular index (2-dim.) of the cell
    * to which the iterator is pointing at.
    * @return the regular index (2-dim.) of the cell on which the iterator is pointing.
    */
-  const Index operator *() const;
+  const Index operator*() const;
 
   /*!
    * Returns the the linear (1-dim.) index of the cell the iterator is pointing at.
@@ -72,7 +71,7 @@ public:
    * Increase the iterator to the next element.
    * @return a reference to the updated iterator.
    */
-  virtual GridMapIterator& operator ++();
+  virtual GridMapIterator& operator++();
 
   /*!
    * Return the end iterator
@@ -86,8 +85,7 @@ public:
    */
   bool isPastEnd() const;
 
-protected:
-
+ protected:
   //! Size of the buffer.
   Size size_;
 
@@ -107,4 +105,4 @@ protected:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-} /* namespace */
+}  // namespace grid_map

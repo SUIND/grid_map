@@ -6,8 +6,8 @@
  *	 Institute: University of Hamburg, TAMS
  */
 
-#include "grid_map_core/iterators/SpiralIterator.hpp"
 #include "grid_map_core/GridMap.hpp"
+#include "grid_map_core/iterators/SpiralIterator.hpp"
 
 // Eigen
 #include <Eigen/Core>
@@ -27,7 +27,7 @@ using namespace grid_map;
 
 TEST(SpiralIterator, CenterOutOfMap)
 {
-  GridMap map( { "types" });
+  GridMap map({"types"});
   map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0));
   Position center(8.0, 0.0);
   double radius = 5.0;

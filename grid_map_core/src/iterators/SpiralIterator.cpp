@@ -7,19 +7,17 @@
  */
 
 #include "grid_map_core/iterators/SpiralIterator.hpp"
-#include "grid_map_core/GridMapMath.hpp"
 
 #include <cmath>
 
+#include "grid_map_core/GridMapMath.hpp"
+
 using namespace std;
 
-namespace grid_map {
-
-SpiralIterator::SpiralIterator(const grid_map::GridMap& gridMap, const Eigen::Vector2d& center,
-                               const double radius)
-    : center_(center),
-      radius_(radius),
-      distance_(0)
+namespace grid_map
+{
+SpiralIterator::SpiralIterator(const grid_map::GridMap& gridMap, const Eigen::Vector2d& center, const double radius)
+    : center_(center), radius_(radius), distance_(0)
 {
   radiusSquare_ = radius_ * radius_;
   mapLength_ = gridMap.getLength();
@@ -31,11 +29,10 @@ SpiralIterator::SpiralIterator(const grid_map::GridMap& gridMap, const Eigen::Ve
   if (checkIfIndexInRange(indexCenter_, bufferSize_))
     pointsRing_.push_back(indexCenter_);
   else
-    while(pointsRing_.empty() && !isPastEnd())
-      generateRing();
+    while (pointsRing_.empty() && !isPastEnd()) generateRing();
 }
 
-SpiralIterator& SpiralIterator::operator =(const SpiralIterator& other)
+SpiralIterator& SpiralIterator::operator=(const SpiralIterator& other)
 {
   center_ = other.center_;
   indexCenter_ = other.indexCenter_;
@@ -51,27 +48,21 @@ SpiralIterator& SpiralIterator::operator =(const SpiralIterator& other)
   return *this;
 }
 
-bool SpiralIterator::operator !=(const SpiralIterator& other) const
+bool SpiralIterator::operator!=(const SpiralIterator& other) const
 {
   return (pointsRing_.back() != pointsRing_.back()).any();
 }
 
-const Eigen::Array2i& SpiralIterator::operator *() const
-{
-  return pointsRing_.back();
-}
+const Eigen::Array2i& SpiralIterator::operator*() const { return pointsRing_.back(); }
 
-SpiralIterator& SpiralIterator::operator ++()
+SpiralIterator& SpiralIterator::operator++()
 {
   pointsRing_.pop_back();
   if (pointsRing_.empty() && !isPastEnd()) generateRing();
   return *this;
 }
 
-bool SpiralIterator::isPastEnd() const
-{
-  return (distance_ == nRings_ && pointsRing_.empty());
-}
+bool SpiralIterator::isPastEnd() const { return (distance_ == nRings_ && pointsRing_.empty()); }
 
 bool SpiralIterator::isInside(const Index index) const
 {
@@ -87,26 +78,29 @@ void SpiralIterator::generateRing()
   Index point(distance_, 0);
   Index pointInMap;
   Index normal;
-  do {
+  do
+  {
     pointInMap.x() = point.x() + indexCenter_.x();
     pointInMap.y() = point.y() + indexCenter_.y();
-    if (checkIfIndexInRange(pointInMap, bufferSize_)) {
-      if (distance_ == nRings_ || distance_ == nRings_ - 1) {
-        if (isInside(pointInMap))
-          pointsRing_.push_back(pointInMap);
-      } else {
+    if (checkIfIndexInRange(pointInMap, bufferSize_))
+    {
+      if (distance_ == nRings_ || distance_ == nRings_ - 1)
+      {
+        if (isInside(pointInMap)) pointsRing_.push_back(pointInMap);
+      }
+      else
+      {
         pointsRing_.push_back(pointInMap);
       }
     }
     normal.x() = -signum(point.y());
     normal.y() = signum(point.x());
-    if (normal.x() != 0
-        && (int) Vector(point.x() + normal.x(), point.y()).norm() == distance_)
+    if (normal.x() != 0 && (int)Vector(point.x() + normal.x(), point.y()).norm() == distance_)
       point.x() += normal.x();
-    else if (normal.y() != 0
-        && (int) Vector(point.x(), point.y() + normal.y()).norm() == distance_)
+    else if (normal.y() != 0 && (int)Vector(point.x(), point.y() + normal.y()).norm() == distance_)
       point.y() += normal.y();
-    else {
+    else
+    {
       point.x() += normal.x();
       point.y() += normal.y();
     }
@@ -120,4 +114,3 @@ double SpiralIterator::getCurrentRadius() const
 }
 
 } /* namespace grid_map */
-

@@ -14,11 +14,10 @@
 #include <sensor_msgs/Image.h>
 
 #include <grid_map_ros/grid_map_ros.hpp>
-
 #include <string>
 
-namespace grid_map_demos {
-
+namespace grid_map_demos
+{
 /*!
  * Loads an image and saves it as layer 'elevation' of a grid map.
  * The grid map is published and can be viewed in Rviz.
@@ -26,7 +25,6 @@ namespace grid_map_demos {
 class ImageToGridmapDemo
 {
  public:
-
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -39,15 +37,14 @@ class ImageToGridmapDemo
   virtual ~ImageToGridmapDemo();
 
   /*!
-  * Reads and verifies the ROS parameters.
-  * @return true if successful.
-  */
+   * Reads and verifies the ROS parameters.
+   * @return true if successful.
+   */
   bool readParameters();
 
   void imageCallback(const sensor_msgs::Image& msg);
 
  private:
-
   //! ROS nodehandle.
   ros::NodeHandle& nodeHandle_;
 
@@ -79,4 +76,4 @@ class ImageToGridmapDemo
   bool mapInitialized_;
 };
 
-} /* namespace */
+}  // namespace grid_map_demos

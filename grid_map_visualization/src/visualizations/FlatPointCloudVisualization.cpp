@@ -6,30 +6,29 @@
  *   Institute: ETH Zurich, ANYbotics
  */
 
-#include <grid_map_visualization/visualizations/FlatPointCloudVisualization.hpp>
-#include <grid_map_ros/GridMapRosConverter.hpp>
-
 #include <sensor_msgs/PointCloud2.h>
 
-namespace grid_map_visualization {
+#include <grid_map_ros/GridMapRosConverter.hpp>
+#include <grid_map_visualization/visualizations/FlatPointCloudVisualization.hpp>
 
+namespace grid_map_visualization
+{
 FlatPointCloudVisualization::FlatPointCloudVisualization(ros::NodeHandle& nodeHandle, const std::string& name)
-    : VisualizationBase(nodeHandle, name),
-      height_(0.0)
+    : VisualizationBase(nodeHandle, name), height_(0.0)
 {
 }
 
-FlatPointCloudVisualization::~FlatPointCloudVisualization()
-{
-}
+FlatPointCloudVisualization::~FlatPointCloudVisualization() {}
 
 bool FlatPointCloudVisualization::readParameters(XmlRpc::XmlRpcValue& config)
 {
   VisualizationBase::readParameters(config);
 
   height_ = 0.0;
-  if (!getParam("height", height_)) {
-    ROS_INFO("FlatPointCloudVisualization with name '%s' did not find a 'height' parameter. Using default.", name_.c_str());
+  if (!getParam("height", height_))
+  {
+    ROS_INFO("FlatPointCloudVisualization with name '%s' did not find a 'height' parameter. Using default.",
+             name_.c_str());
   }
 
   return true;
@@ -54,4 +53,4 @@ bool FlatPointCloudVisualization::visualize(const grid_map::GridMap& map)
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map_visualization

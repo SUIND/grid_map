@@ -11,8 +11,8 @@
 #include <grid_map_octomap/GridMapOctomapConverter.hpp>
 
 // Octomap
-#include <octomap/octomap.h>
 #include <octomap/math/Utils.h>
+#include <octomap/octomap.h>
 
 // Gtest
 #include <gtest/gtest.h>
@@ -32,8 +32,10 @@ TEST(OctomapConversion, convertOctomapToGridMap)
   octomap::point3d origin(1.0f, 1.0f, 1.0f);
   octomap::point3d point_on_surface(1.0f, 0.0f, 0.0f);
 
-  for (int i = 0; i < 360; i++) {
-    for (int j = 0; j < 360; j++) {
+  for (int i = 0; i < 360; i++)
+  {
+    for (int j = 0; j < 360; j++)
+    {
       octomap::point3d p = origin + point_on_surface;
       measurement->push_back(p);
       point_on_surface.rotate_IP(0, 0, DEG2RAD(1.));
@@ -69,13 +71,15 @@ TEST(OctomapConversion, convertOctomapToGridMapWithBoundingBox)
   octomap::point3d origin(1.0f, 1.0f, 1.0f);
   octomap::point3d point_on_surface(1.0f, 0.0f, 0.0f);
 
-  for (int i = 0; i < 360; i++) {
-    for (int j = 0; j < 360; j++) {
+  for (int i = 0; i < 360; i++)
+  {
+    for (int j = 0; j < 360; j++)
+    {
       octomap::point3d p = origin + point_on_surface;
       measurement->push_back(p);
-      point_on_surface.rotate_IP (0,0,DEG2RAD(1.));
+      point_on_surface.rotate_IP(0, 0, DEG2RAD(1.));
     }
-    point_on_surface.rotate_IP (0,DEG2RAD(1.),0);
+    point_on_surface.rotate_IP(0, DEG2RAD(1.), 0);
   }
   octomap.insertPointCloud(*measurement, origin);
 

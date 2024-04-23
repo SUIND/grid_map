@@ -10,17 +10,17 @@
 
 #include <filters/filter_base.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Filter class to find the mean of the values inside a radius.
  */
-template<typename T>
-class MeanInRadiusFilter : public filters::FilterBase<T> {
-
+template <typename T>
+class MeanInRadiusFilter : public filters::FilterBase<T>
+{
  public:
   /*!
    * Constructor
@@ -56,4 +56,4 @@ class MeanInRadiusFilter : public filters::FilterBase<T> {
   std::string outputLayer_;
 };
 
-} /* namespace */
+}  // namespace grid_map

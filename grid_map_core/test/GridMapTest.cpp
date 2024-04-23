@@ -57,7 +57,7 @@ TEST(GridMap, CopyAssign)
 TEST(GridMap, Move)
 {
   GridMap map;
-  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
   map.add("layer", 0.0);
   map.setBasicLayers(map.getLayers());
   std::vector<BufferRegion> regions;
@@ -67,7 +67,7 @@ TEST(GridMap, Move)
   EXPECT_EQ(3, startIndex(0));
   EXPECT_EQ(2, startIndex(1));
 
-  EXPECT_FALSE(map.isValid(Index(0, 0))); // TODO Check entire map.
+  EXPECT_FALSE(map.isValid(Index(0, 0)));  // TODO Check entire map.
   EXPECT_TRUE(map.isValid(Index(3, 2)));
   EXPECT_FALSE(map.isValid(Index(2, 2)));
   EXPECT_FALSE(map.isValid(Index(3, 1)));
@@ -93,7 +93,7 @@ TEST(GridMap, Transform)
   map.setGeometry(Length(1.0, 2.0), 0.1, Position(0.0, 0.0));
   map.add(heightLayerName, 0.0);
   map.setBasicLayers(map.getLayers());
-  map.get(heightLayerName)(0,0) = 1.0;
+  map.get(heightLayerName)(0, 0) = 1.0;
 
   // Transformation (90° rotation).
   Eigen::Isometry3d transform;
@@ -102,17 +102,17 @@ TEST(GridMap, Transform)
   transform.translation().y() = 0.0;
   transform.translation().z() = 0.0;
 
-  transform.linear()(0,0) =  0.0;
-  transform.linear()(0,1) = -1.0;
-  transform.linear()(0,2) =  0.0;
+  transform.linear()(0, 0) = 0.0;
+  transform.linear()(0, 1) = -1.0;
+  transform.linear()(0, 2) = 0.0;
 
-  transform.linear()(1,0) =  1.0;
-  transform.linear()(1,1) =  0.0;
-  transform.linear()(1,2) =  0.0;
+  transform.linear()(1, 0) = 1.0;
+  transform.linear()(1, 1) = 0.0;
+  transform.linear()(1, 2) = 0.0;
 
-  transform.linear()(2,0) =  0.0;
-  transform.linear()(2,1) =  0.0;
-  transform.linear()(2,2) =  1.0;
+  transform.linear()(2, 0) = 0.0;
+  transform.linear()(2, 1) = 0.0;
+  transform.linear()(2, 2) = 1.0;
 
   // Apply affine transformation.
   const GridMap transformedMap = map.getTransformedMap(transform, heightLayerName, map.getFrameId(), 0.25);
@@ -121,7 +121,7 @@ TEST(GridMap, Transform)
   EXPECT_NEAR(map.getLength().x(), transformedMap.getLength().y(), 1e-6);
   EXPECT_NEAR(map.getLength().y(), transformedMap.getLength().x(), 1e-6);
   EXPECT_EQ(map.get(heightLayerName).size(), transformedMap.get(heightLayerName).size());
-  EXPECT_DOUBLE_EQ(map.get(heightLayerName)(0,0), transformedMap.get(heightLayerName)(19,0));
+  EXPECT_DOUBLE_EQ(map.get(heightLayerName)(0, 0), transformedMap.get(heightLayerName)(19, 0));
 }
 
 TEST(GridMap, ClipToMap)
@@ -131,14 +131,14 @@ TEST(GridMap, ClipToMap)
   map["layer_a"].setConstant(1.0);
   map["layer_b"].setConstant(2.0);
 
-  const Position positionInMap = Position(0.4, 0.3); // position located inside the map
-  const Position positionOutMap = Position(1.0, 2.0); // position located outside the map
+  const Position positionInMap = Position(0.4, 0.3);   // position located inside the map
+  const Position positionOutMap = Position(1.0, 2.0);  // position located outside the map
 
   const Position clippedPositionInMap = map.getClosestPositionInMap(positionInMap);
   const Position clippedPositionOutMap = map.getClosestPositionInMap(positionOutMap);
 
   // Check if position-in-map remains unchanged.
-  EXPECT_NEAR(clippedPositionInMap.x(),positionInMap.x(), 1e-6);
+  EXPECT_NEAR(clippedPositionInMap.x(), positionInMap.x(), 1e-6);
   EXPECT_NEAR(clippedPositionInMap.y(), positionInMap.y(), 1e-6);
 
   // Check if position-out-map is indeed outside of the map.
@@ -151,7 +151,7 @@ TEST(GridMap, ClipToMap)
 TEST(AddDataFrom, ExtendMapAligned)
 {
   GridMap map1, map2;
-  map1.setGeometry(Length(5.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(5, 5)
+  map1.setGeometry(Length(5.1, 5.1), 1.0, Position(0.0, 0.0));  // bufferSize(5, 5)
   map1.add("zero", 0.0);
   map1.add("one", 1.0);
   map1.setBasicLayers(map1.getLayers());
@@ -177,7 +177,7 @@ TEST(AddDataFrom, ExtendMapAligned)
 TEST(AddDataFrom, ExtendMapNotAligned)
 {
   GridMap map1, map2;
-  map1.setGeometry(Length(6.1, 6.1), 1.0, Position(0.0, 0.0)); // bufferSize(6, 6)
+  map1.setGeometry(Length(6.1, 6.1), 1.0, Position(0.0, 0.0));  // bufferSize(6, 6)
   map1.add("nan");
   map1.add("one", 1.0);
   map1.add("zero", 0.0);
@@ -209,7 +209,7 @@ TEST(AddDataFrom, ExtendMapNotAligned)
 TEST(AddDataFrom, CopyData)
 {
   GridMap map1, map2;
-  map1.setGeometry(Length(5.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(5, 5)
+  map1.setGeometry(Length(5.1, 5.1), 1.0, Position(0.0, 0.0));  // bufferSize(5, 5)
   map1.add("zero", 0.0);
   map1.add("one");
   map1.setBasicLayers(map1.getLayers());
@@ -236,52 +236,52 @@ TEST(AddDataFrom, CopyData)
 
 TEST(ValueAtPosition, NearestNeighbor)
 {
-  GridMap map( { "types" });
+  GridMap map({"types"});
   map.setGeometry(Length(3.0, 3.0), 1.0, Position(0.0, 0.0));
 
-  map.at("types", Index(0,0)) = 0.5;
-  map.at("types", Index(0,1)) = 3.8;
-  map.at("types", Index(0,2)) = 2.0;
-  map.at("types", Index(1,0)) = 2.1;
-  map.at("types", Index(1,1)) = 1.0;
-  map.at("types", Index(1,2)) = 2.0;
-  map.at("types", Index(2,0)) = 1.0;
-  map.at("types", Index(2,1)) = 2.0;
-  map.at("types", Index(2,2)) = 2.0;
+  map.at("types", Index(0, 0)) = 0.5;
+  map.at("types", Index(0, 1)) = 3.8;
+  map.at("types", Index(0, 2)) = 2.0;
+  map.at("types", Index(1, 0)) = 2.1;
+  map.at("types", Index(1, 1)) = 1.0;
+  map.at("types", Index(1, 2)) = 2.0;
+  map.at("types", Index(2, 0)) = 1.0;
+  map.at("types", Index(2, 1)) = 2.0;
+  map.at("types", Index(2, 2)) = 2.0;
 
   double value;
 
-  value = map.atPosition("types", Position(1.35,-0.4));
+  value = map.atPosition("types", Position(1.35, -0.4));
   EXPECT_DOUBLE_EQ((float)3.8, value);
 
-  value = map.atPosition("types", Position(-0.3,0.0));
+  value = map.atPosition("types", Position(-0.3, 0.0));
   EXPECT_DOUBLE_EQ(1.0, value);
 }
 
 TEST(ValueAtPosition, LinearInterpolated)
 {
-  GridMap map( { "types" });
+  GridMap map({"types"});
   map.setGeometry(Length(3.0, 3.0), 1.0, Position(0.0, 0.0));
 
-  map.at("types", Index(0,0)) = 0.5;
-  map.at("types", Index(0,1)) = 3.8;
-  map.at("types", Index(0,2)) = 2.0;
-  map.at("types", Index(1,0)) = 2.1;
-  map.at("types", Index(1,1)) = 1.0;
-  map.at("types", Index(1,2)) = 2.0;
-  map.at("types", Index(2,0)) = 1.0;
-  map.at("types", Index(2,1)) = 2.0;
-  map.at("types", Index(2,2)) = 2.0;
+  map.at("types", Index(0, 0)) = 0.5;
+  map.at("types", Index(0, 1)) = 3.8;
+  map.at("types", Index(0, 2)) = 2.0;
+  map.at("types", Index(1, 0)) = 2.1;
+  map.at("types", Index(1, 1)) = 1.0;
+  map.at("types", Index(1, 2)) = 2.0;
+  map.at("types", Index(2, 0)) = 1.0;
+  map.at("types", Index(2, 1)) = 2.0;
+  map.at("types", Index(2, 2)) = 2.0;
 
   double value;
 
   // Close to the border -> reverting to INTER_NEAREST.
-  value = map.atPosition("types", Position(-0.5,-1.2), InterpolationMethods::INTER_LINEAR);
+  value = map.atPosition("types", Position(-0.5, -1.2), InterpolationMethods::INTER_LINEAR);
   EXPECT_DOUBLE_EQ(2.0, value);
   // In between 1.0 and 2.0 field.
-  value = map.atPosition("types", Position(-0.5,0.0), InterpolationMethods::INTER_LINEAR);
+  value = map.atPosition("types", Position(-0.5, 0.0), InterpolationMethods::INTER_LINEAR);
   EXPECT_DOUBLE_EQ(1.5, value);
   // Calculated "by Hand".
-  value = map.atPosition("types", Position(0.69,0.38), InterpolationMethods::INTER_LINEAR);
+  value = map.atPosition("types", Position(0.69, 0.38), InterpolationMethods::INTER_LINEAR);
   EXPECT_NEAR(2.1963200, value, 0.0000001);
 }

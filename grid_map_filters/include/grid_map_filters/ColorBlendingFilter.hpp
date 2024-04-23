@@ -13,12 +13,12 @@
 #include <Eigen/Core>
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Blend two color layers.
  */
-template<typename T>
+template <typename T>
 class ColorBlendingFilter : public filters::FilterBase<T>
 {
  public:
@@ -45,8 +45,8 @@ class ColorBlendingFilter : public filters::FilterBase<T>
   virtual bool update(const T& mapIn, T& mapOut);
 
  private:
-
-  enum class BlendModes {
+  enum class BlendModes
+  {
     Normal,
     HardLight,
     SoftLight
@@ -65,4 +65,4 @@ class ColorBlendingFilter : public filters::FilterBase<T>
   std::string outputLayer_;
 };
 
-} /* namespace */
+}  // namespace grid_map

@@ -6,13 +6,14 @@
  *	 Institute: ETH Zurich
  */
 
-#include "grid_map_core/iterators/SlidingWindowIterator.hpp"
-#include "grid_map_core/GridMap.hpp"
-
-#include <cfloat>
-#include <Eigen/Core>
 #include <gtest/gtest.h>
+
+#include <Eigen/Core>
+#include <cfloat>
 #include <vector>
+
+#include "grid_map_core/GridMap.hpp"
+#include "grid_map_core/iterators/SlidingWindowIterator.hpp"
 
 using namespace std;
 using namespace grid_map;
@@ -20,7 +21,7 @@ using namespace grid_map;
 TEST(SlidingWindowIterator, WindowSize3Cutoff)
 {
   GridMap map;
-  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
   map.add("layer");
   map["layer"].setRandom();
 
@@ -39,7 +40,8 @@ TEST(SlidingWindowIterator, WindowSize3Cutoff)
   EXPECT_EQ(iterator.getData().cols(), 2);
   EXPECT_TRUE(iterator.getData().isApprox(map["layer"].block(1, 0, 3, 2)));
 
-  for (; !iterator.isPastEnd(); ++iterator) {
+  for (; !iterator.isPastEnd(); ++iterator)
+  {
     EXPECT_FALSE(iterator.isPastEnd());
     if ((*iterator == Index(3, 2)).all()) break;
   }
@@ -48,7 +50,8 @@ TEST(SlidingWindowIterator, WindowSize3Cutoff)
   EXPECT_EQ(iterator.getData().cols(), 3);
   EXPECT_TRUE(iterator.getData().isApprox(map["layer"].block(2, 1, 3, 3)));
 
-  for (; !iterator.isPastEnd(); ++iterator) {
+  for (; !iterator.isPastEnd(); ++iterator)
+  {
     EXPECT_FALSE(iterator.isPastEnd());
     if ((*iterator == Index(7, 4)).all()) break;
   }
@@ -64,7 +67,7 @@ TEST(SlidingWindowIterator, WindowSize3Cutoff)
 TEST(SlidingWindowIterator, WindowSize5)
 {
   GridMap map;
-  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
   map.add("layer");
   map["layer"].setRandom();
 
@@ -83,7 +86,8 @@ TEST(SlidingWindowIterator, WindowSize5)
   EXPECT_EQ(iterator.getData().cols(), 3);
   EXPECT_TRUE(iterator.getData().isApprox(map["layer"].block(0, 0, 5, 3)));
 
-  for (; !iterator.isPastEnd(); ++iterator) {
+  for (; !iterator.isPastEnd(); ++iterator)
+  {
     EXPECT_FALSE(iterator.isPastEnd());
     if ((*iterator == Index(3, 2)).all()) break;
   }
@@ -92,7 +96,8 @@ TEST(SlidingWindowIterator, WindowSize5)
   EXPECT_EQ(iterator.getData().cols(), 5);
   EXPECT_TRUE(iterator.getData().isApprox(map["layer"].block(1, 0, 5, 5)));
 
-  for (; !iterator.isPastEnd(); ++iterator) {
+  for (; !iterator.isPastEnd(); ++iterator)
+  {
     EXPECT_FALSE(iterator.isPastEnd());
     if ((*iterator == Index(7, 4)).all()) break;
   }
@@ -108,7 +113,7 @@ TEST(SlidingWindowIterator, WindowSize5)
 TEST(SlidingWindowIterator, WindowSize3Inside)
 {
   GridMap map;
-  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
   map.add("layer");
   map["layer"].setRandom();
 
@@ -117,7 +122,8 @@ TEST(SlidingWindowIterator, WindowSize3Inside)
   EXPECT_EQ(iterator.getData().cols(), 3);
   EXPECT_TRUE(iterator.getData().isApprox(map["layer"].block(0, 0, 3, 3)));
 
-  for (; !iterator.isPastEnd(); ++iterator) {
+  for (; !iterator.isPastEnd(); ++iterator)
+  {
     EXPECT_FALSE(iterator.isPastEnd());
     if ((*iterator == Index(3, 2)).all()) break;
   }
@@ -126,7 +132,8 @@ TEST(SlidingWindowIterator, WindowSize3Inside)
   EXPECT_EQ(iterator.getData().cols(), 3);
   EXPECT_TRUE(iterator.getData().isApprox(map["layer"].block(2, 1, 3, 3)));
 
-  for (; !iterator.isPastEnd(); ++iterator) {
+  for (; !iterator.isPastEnd(); ++iterator)
+  {
     EXPECT_FALSE(iterator.isPastEnd());
     if ((*iterator == Index(6, 3)).all()) break;
   }

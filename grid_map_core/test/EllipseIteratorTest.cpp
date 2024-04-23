@@ -6,8 +6,8 @@
  *	 Institute: ETH Zurich, ANYbotics
  */
 
-#include "grid_map_core/iterators/EllipseIterator.hpp"
 #include "grid_map_core/GridMap.hpp"
+#include "grid_map_core/iterators/EllipseIterator.hpp"
 
 // Eigen
 #include <Eigen/Core>
@@ -27,7 +27,7 @@ using namespace grid_map;
 
 TEST(EllipseIterator, OneCellWideEllipse)
 {
-  GridMap map( { "types" });
+  GridMap map({"types"});
   map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0));
 
   EllipseIterator iterator(map, Position(0.0, 0.0), Length(8.0, 1.0));
