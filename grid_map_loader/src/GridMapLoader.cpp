@@ -7,15 +7,15 @@
  *
  */
 
-#include <grid_map_loader/GridMapLoader.hpp>
 #include <grid_map_msgs/GridMap.h>
+
+#include <grid_map_loader/GridMapLoader.hpp>
 
 using namespace grid_map;
 
-namespace grid_map_loader {
-
-GridMapLoader::GridMapLoader(ros::NodeHandle nodeHandle)
-    : nodeHandle_(nodeHandle)
+namespace grid_map_loader
+{
+GridMapLoader::GridMapLoader(ros::NodeHandle nodeHandle) : nodeHandle_(nodeHandle)
 {
   readParameters();
   publisher_ = nodeHandle_.advertise<grid_map_msgs::GridMap>(publishTopic_, 1, true);
@@ -24,9 +24,7 @@ GridMapLoader::GridMapLoader(ros::NodeHandle nodeHandle)
   ros::requestShutdown();
 }
 
-GridMapLoader::~GridMapLoader()
-{
-}
+GridMapLoader::~GridMapLoader() {}
 
 bool GridMapLoader::readParameters()
 {
@@ -53,4 +51,4 @@ void GridMapLoader::publish()
   duration_.sleep();
 }
 
-} /* namespace */
+}  // namespace grid_map_loader

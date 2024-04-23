@@ -12,11 +12,10 @@
 #include <ros/ros.h>
 
 #include <grid_map_ros/grid_map_ros.hpp>
-
 #include <string>
 
-namespace grid_map_demos {
-
+namespace grid_map_demos
+{
 /*!
  * Receives a volumetric OctoMap and converts it to a grid map with an elevation layer.
  * The grid map is published and can be viewed in Rviz.
@@ -24,7 +23,6 @@ namespace grid_map_demos {
 class OctomapToGridmapDemo
 {
  public:
-
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -37,15 +35,14 @@ class OctomapToGridmapDemo
   virtual ~OctomapToGridmapDemo();
 
   /*!
-  * Reads and verifies the ROS parameters.
-  * @return true if successful.
-  */
+   * Reads and verifies the ROS parameters.
+   * @return true if successful.
+   */
   bool readParameters();
 
   void convertAndPublishMap();
 
  private:
-
   //! ROS nodehandle.
   ros::NodeHandle& nodeHandle_;
 
@@ -73,4 +70,4 @@ class OctomapToGridmapDemo
   float maxZ_;
 };
 
-} /* namespace */
+}  // namespace grid_map_demos

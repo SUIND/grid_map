@@ -12,15 +12,14 @@
 
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Duplication filter class duplicates a layer of a grid map.
  */
-template<typename T>
+template <typename T>
 class DuplicationFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -52,4 +51,4 @@ class DuplicationFilter : public filters::FilterBase<T>
   std::string outputLayer_;
 };
 
-} /* namespace */
+}  // namespace grid_map

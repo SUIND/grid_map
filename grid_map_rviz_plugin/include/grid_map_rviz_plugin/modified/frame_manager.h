@@ -30,18 +30,15 @@
 #ifndef RVIZ_FRAME_MANAGER_H
 #define RVIZ_FRAME_MANAGER_H
 
-#include <map>
-
-#include <QObject>
-
+#include <OgreQuaternion.h>
+#include <OgreVector3.h>
+#include <geometry_msgs/Pose.h>
 #include <ros/time.h>
 #include <tf2_ros/buffer.h>
-#include <geometry_msgs/Pose.h>
 
-#include <OgreVector3.h>
-#include <OgreQuaternion.h>
-
+#include <QObject>
 #include <boost/thread/mutex.hpp>
+#include <map>
 
 #ifndef Q_MOC_RUN
 #include <tf2_ros/message_filter.h>
@@ -64,7 +61,7 @@ class Display;
 class FrameManager : public QObject
 {
   Q_OBJECT
-public:
+ public:
   enum SyncMode
   {
     SyncOff = 0,
@@ -73,9 +70,9 @@ public:
   };
 
   /// Constructor, will create a TransformListener (and Buffer) automatically if not provided
-  explicit FrameManager(std::shared_ptr<tf2_ros::Buffer> tf_buffer = std::shared_ptr<tf2_ros::Buffer>(),
-                        std::shared_ptr<tf2_ros::TransformListener> tf_listener =
-                            std::shared_ptr<tf2_ros::TransformListener>());
+  explicit FrameManager(
+      std::shared_ptr<tf2_ros::Buffer> tf_buffer = std::shared_ptr<tf2_ros::Buffer>(),
+      std::shared_ptr<tf2_ros::TransformListener> tf_listener = std::shared_ptr<tf2_ros::TransformListener>());
 
   /** @brief Destructor.
    *
@@ -93,27 +90,18 @@ public:
   /** @brief Enable/disable pause mode */
   void setPause(bool pause);
 
-  bool getPause()
-  {
-    return pause_;
-  }
+  bool getPause() { return pause_; }
 
   /** @brief Set synchronization mode (off/exact/approximate) */
   void setSyncMode(SyncMode mode);
 
-  SyncMode getSyncMode()
-  {
-    return sync_mode_;
-  }
+  SyncMode getSyncMode() { return sync_mode_; }
 
   /** @brief Synchronize with given time. */
   void syncTime(ros::Time time);
 
   /** @brief Get current time, depending on the sync mode. */
-  ros::Time getTime()
-  {
-    return sync_time_;
-  }
+  ros::Time getTime() { return sync_time_; }
 
   /** @brief Return the pose for a header, relative to the fixed frame, in Ogre classes.
    * @param[in] header The source of the frame name and time.
@@ -132,10 +120,7 @@ public:
    * @param[out] position The position of the frame relative to the fixed frame.
    * @param[out] orientation The orientation of the frame relative to the fixed frame.
    * @return true on success, false on failure. */
-  bool getTransform(const std::string& frame,
-                    ros::Time time,
-                    Ogre::Vector3& position,
-                    Ogre::Quaternion& orientation);
+  bool getTransform(const std::string& frame, ros::Time time, Ogre::Vector3& position, Ogre::Quaternion& orientation);
 
   /** @brief Transform a pose from a frame into the fixed frame.
    * @param[in] header The source of the input frame and time.
@@ -144,9 +129,7 @@ public:
    * @param[out] orientation: Orientation part of pose relative to the fixed frame.
    * @return true on success, false on failure. */
   template <typename Header>
-  bool transform(const Header& header,
-                 const geometry_msgs::Pose& pose,
-                 Ogre::Vector3& position,
+  bool transform(const Header& header, const geometry_msgs::Pose& pose, Ogre::Vector3& position,
                  Ogre::Quaternion& orientation)
   {
     return transform(header.frame_id, header.stamp, pose, position, orientation);
@@ -159,10 +142,7 @@ public:
    * @param[out] position Position part of pose relative to the fixed frame.
    * @param[out] orientation: Orientation part of pose relative to the fixed frame.
    * @return true on success, false on failure. */
-  bool transform(const std::string& frame,
-                 ros::Time time,
-                 const geometry_msgs::Pose& pose,
-                 Ogre::Vector3& position,
+  bool transform(const std::string& frame, ros::Time time, const geometry_msgs::Pose& pose, Ogre::Vector3& position,
                  Ogre::Quaternion& orientation);
 
   /** @brief Clear the internal cache. */
@@ -193,20 +173,14 @@ public:
   void registerFilterForTransformStatusCheck(tf2_ros::MessageFilter<M>* filter, Display* display)
   {
     filter->registerCallback(boost::bind(&FrameManager::messageCallback<M>, this, _1, display));
-    filter->registerFailureCallback(boost::bind(
-        &FrameManager::failureCallback<M, tf2_ros::FilterFailureReason>, this, _1, _2, display));
+    filter->registerFailureCallback(
+        boost::bind(&FrameManager::failureCallback<M, tf2_ros::FilterFailureReason>, this, _1, _2, display));
   }
 
   /** @brief Return the current fixed frame name. */
-  const std::string& getFixedFrame()
-  {
-    return fixed_frame_;
-  }
+  const std::string& getFixedFrame() { return fixed_frame_; }
 
-  const std::shared_ptr<tf2_ros::Buffer> getTF2BufferPtr()
-  {
-    return tf_buffer_;
-  }
+  const std::shared_ptr<tf2_ros::Buffer> getTF2BufferPtr() { return tf_buffer_; }
 
   /** Create a description of a transform problem.
    * @param frame_id The name of the frame with issues.
@@ -217,16 +191,14 @@ public:
    *
    * Once a problem has been detected with a given frame or transform,
    * call this to get an error message describing the problem. */
-  std::string discoverFailureReason(const std::string& frame_id,
-                                    const ros::Time& stamp,
-                                    const std::string& caller_id,
+  std::string discoverFailureReason(const std::string& frame_id, const ros::Time& stamp, const std::string& caller_id,
                                     tf2_ros::FilterFailureReason reason);
 
-Q_SIGNALS:
+ Q_SIGNALS:
   /** @brief Emitted whenever the fixed frame changes. */
   void fixedFrameChanged();
 
-private:
+ private:
   bool adjustTime(const std::string& frame, ros::Time& time);
 
   template <class M>
@@ -234,15 +206,13 @@ private:
   {
     boost::shared_ptr<M const> const& msg = msg_evt.getConstMessage();
     const std::string& authority = msg_evt.getPublisherName();
-    
+
     // the following diverges from original rviz sources (noetic) for backward compatibility
     messageArrived(msg->info.header.frame_id, msg->info.header.stamp, authority, display);
   }
 
   template <class M, class TfFilterFailureReasonType>
-  void failureCallback(const ros::MessageEvent<M const>& msg_evt,
-                       TfFilterFailureReasonType reason,
-                       Display* display)
+  void failureCallback(const ros::MessageEvent<M const>& msg_evt, TfFilterFailureReasonType reason, Display* display)
   {
     boost::shared_ptr<M const> const& msg = msg_evt.getConstMessage();
     const std::string& authority = msg_evt.getPublisherName();
@@ -251,19 +221,14 @@ private:
     messageFailed(msg->info.header.frame_id, msg->info.header.stamp, authority, reason, display);
   }
 
-  void messageArrived(const std::string& frame_id,
-                      const ros::Time& stamp,
-                      const std::string& caller_id,
+  void messageArrived(const std::string& frame_id, const ros::Time& stamp, const std::string& caller_id,
                       Display* display);
 
   void messageFailedImpl(const std::string& caller_id, const std::string& status_text, Display* display);
 
   template <class TfFilterFailureReasonType>
-  void messageFailed(const std::string& frame_id,
-                     const ros::Time& stamp,
-                     const std::string& caller_id,
-                     TfFilterFailureReasonType reason,
-                     Display* display)
+  void messageFailed(const std::string& frame_id, const ros::Time& stamp, const std::string& caller_id,
+                     TfFilterFailureReasonType reason, Display* display)
   {
     std::string status_text = discoverFailureReason(frame_id, stamp, caller_id, reason);
     messageFailedImpl(caller_id, status_text, display);
@@ -271,9 +236,7 @@ private:
 
   struct CacheKey
   {
-    CacheKey(const std::string& f, ros::Time t) : frame(f), time(t)
-    {
-    }
+    CacheKey(const std::string& f, ros::Time t) : frame(f), time(t) {}
 
     bool operator<(const CacheKey& rhs) const
     {
@@ -291,9 +254,7 @@ private:
 
   struct CacheEntry
   {
-    CacheEntry(const Ogre::Vector3& p, const Ogre::Quaternion& o) : position(p), orientation(o)
-    {
-    }
+    CacheEntry(const Ogre::Vector3& p, const Ogre::Quaternion& o) : position(p), orientation(o) {}
 
     Ogre::Vector3 position;
     Ogre::Quaternion orientation;
@@ -320,6 +281,6 @@ private:
   double current_delta_;
 };
 
-} // namespace rviz
+}  // namespace rviz
 
-#endif // RVIZ_FRAME_MANAGER_H
+#endif  // RVIZ_FRAME_MANAGER_H

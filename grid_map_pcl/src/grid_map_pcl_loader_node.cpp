@@ -16,7 +16,8 @@
 
 namespace gm = ::grid_map::grid_map_pcl;
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
   ros::init(argc, argv, "grid_map_pcl_loader_node");
   ros::NodeHandle nh("~");
   gm::setVerbosityLevelToDebugIfFlagSet(nh);

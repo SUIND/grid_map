@@ -1,8 +1,8 @@
+#include <filters/filter_base.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <grid_map_core/GridMap.hpp>
-#include <filters/filter_base.h>
 
 #include "grid_map_filters/MedianFillFilter.hpp"
 
@@ -12,12 +12,14 @@ using namespace ::testing;
 using BASE = filters::FilterBase<grid_map::GridMap>;
 using MedianFillFilterT = MedianFillFilter<GridMap>;
 
-TEST(MedianFillFilter, ConstructFilterTest) {  // NOLINT
+TEST(MedianFillFilter, ConstructFilterTest)
+{  // NOLINT
   MedianFillFilterT medianFillFilter{};
   SUCCEED();
 }
 
-TEST(MedianFillFilter, LoadParametersAndUpdateTest) {  // NOLINT
+TEST(MedianFillFilter, LoadParametersAndUpdateTest)
+{  // NOLINT
   MedianFillFilterT medianFillFilter{};
 
   // Set up the parameters
@@ -51,7 +53,8 @@ TEST(MedianFillFilter, LoadParametersAndUpdateTest) {  // NOLINT
   GridMap filterOutput;
   medianFillFilter.update(filterInput, filterOutput);
 
-  ASSERT_THAT(filterOutput.getLayers(), ElementsAre(StrEq("elevation"), StrEq("variance"), StrEq("elevation_filtered")));
+  ASSERT_THAT(filterOutput.getLayers(),
+              ElementsAre(StrEq("elevation"), StrEq("variance"), StrEq("elevation_filtered")));
 
   ASSERT_TRUE(filterInput["elevation"].isApprox(filterOutput["elevation"]));
   ASSERT_TRUE(filterInput["variance"].isApprox(filterOutput["variance"]));

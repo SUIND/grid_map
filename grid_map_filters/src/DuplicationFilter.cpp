@@ -8,32 +8,35 @@
 
 #include "grid_map_filters/DuplicationFilter.hpp"
 
-#include <grid_map_core/GridMap.hpp>
 #include <pluginlib/class_list_macros.h>
+
+#include <grid_map_core/GridMap.hpp>
 
 using namespace filters;
 
-namespace grid_map {
-
-template<typename T>
+namespace grid_map
+{
+template <typename T>
 DuplicationFilter<T>::DuplicationFilter()
 {
 }
 
-template<typename T>
+template <typename T>
 DuplicationFilter<T>::~DuplicationFilter()
 {
 }
 
-template<typename T>
+template <typename T>
 bool DuplicationFilter<T>::configure()
 {
-  if (!FilterBase<T>::getParam(std::string("input_layer"), inputLayer_)) {
+  if (!FilterBase<T>::getParam(std::string("input_layer"), inputLayer_))
+  {
     ROS_ERROR("DuplicationFilter did not find parameter 'input_layer'.");
     return false;
   }
 
-  if (!FilterBase<T>::getParam(std::string("output_layer"), outputLayer_)) {
+  if (!FilterBase<T>::getParam(std::string("output_layer"), outputLayer_))
+  {
     ROS_ERROR("DuplicationFilter did not find parameter 'output_layer'.");
     return false;
   }
@@ -41,7 +44,7 @@ bool DuplicationFilter<T>::configure()
   return true;
 }
 
-template<typename T>
+template <typename T>
 bool DuplicationFilter<T>::update(const T& mapIn, T& mapOut)
 {
   mapOut = mapIn;
@@ -49,6 +52,6 @@ bool DuplicationFilter<T>::update(const T& mapIn, T& mapOut)
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map
 
 PLUGINLIB_EXPORT_CLASS(grid_map::DuplicationFilter<grid_map::GridMap>, filters::FilterBase<grid_map::GridMap>)

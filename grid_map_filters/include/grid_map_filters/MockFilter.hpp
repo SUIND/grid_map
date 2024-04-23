@@ -12,15 +12,14 @@
 
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Duplication filter class duplicates a layer of a grid map.
  */
-template<typename T>
+template <typename T>
 class MockFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -38,14 +37,14 @@ class MockFilter : public filters::FilterBase<T>
   virtual bool configure();
 
   /*!
-   * Copies the input to the output. The time for the update is specified by processingTime_. Optionally the update is logged.
+   * Copies the input to the output. The time for the update is specified by processingTime_. Optionally the update is
+   * logged.
    * @param mapIn Input.
    * @param mapOut Output.
    */
   virtual bool update(const T& mapIn, T& mapOut);
 
  private:
-
   //! Flag indicating wheter to also log on update.
   bool printName_;
 
@@ -53,4 +52,4 @@ class MockFilter : public filters::FilterBase<T>
   uint processingTime_;
 };
 
-} /* namespace */
+}  // namespace grid_map

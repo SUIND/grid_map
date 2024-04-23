@@ -8,23 +8,21 @@
 
 #pragma once
 
+#include <Eigen/Core>
+#include <memory>
+
 #include "grid_map_core/GridMap.hpp"
 #include "grid_map_core/iterators/SubmapIterator.hpp"
 
-#include <Eigen/Core>
-
-#include <memory>
-
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Iterator class to iterate through a ellipsoid area of the map.
  * The main axis of the ellipse are aligned with the map frame.
  */
 class EllipseIterator
 {
-public:
-
+ public:
   /*!
    * Constructor.
    * @param gridMap the grid map to iterate on.
@@ -39,25 +37,25 @@ public:
    * @param iterator the iterator to copy data from.
    * @return a reference to *this.
    */
-  EllipseIterator& operator =(const EllipseIterator& other);
+  EllipseIterator& operator=(const EllipseIterator& other);
 
   /*!
    * Compare to another iterator.
    * @return whether the current iterator points to a different address than the other one.
    */
-  bool operator !=(const EllipseIterator& other) const;
+  bool operator!=(const EllipseIterator& other) const;
 
   /*!
    * Dereference the iterator with const.
    * @return the value to which the iterator is pointing.
    */
-  const Index& operator *() const;
+  const Index& operator*() const;
 
   /*!
    * Increase the iterator to the next element.
    * @return a reference to the updated iterator.
    */
-  EllipseIterator& operator ++();
+  EllipseIterator& operator++();
 
   /*!
    * Indicates if iterator is past end.
@@ -71,8 +69,7 @@ public:
    */
   const Size& getSubmapSize() const;
 
-private:
-
+ private:
   /*!
    * Check if current index is inside the ellipse.
    * @return true if inside, false otherwise.
@@ -87,8 +84,8 @@ private:
    * @param[out] startIndex the start index of the submap.
    * @param[out] bufferSize the buffer size of the submap.
    */
-  void findSubmapParameters(const Position& center, const Length& length, const double rotation,
-                            Index& startIndex, Size& bufferSize) const;
+  void findSubmapParameters(const Position& center, const Length& length, const double rotation, Index& startIndex,
+                            Size& bufferSize) const;
 
   //! Position of the circle center;
   Position center_;
@@ -113,4 +110,4 @@ private:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-} /* namespace */
+}  // namespace grid_map

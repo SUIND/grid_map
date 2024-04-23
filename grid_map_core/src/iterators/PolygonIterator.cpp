@@ -7,14 +7,14 @@
  */
 
 #include "grid_map_core/iterators/PolygonIterator.hpp"
+
 #include "grid_map_core/GridMapMath.hpp"
 
 using namespace std;
 
-namespace grid_map {
-
-PolygonIterator::PolygonIterator(const grid_map::GridMap& gridMap, const grid_map::Polygon& polygon)
-    : polygon_(polygon)
+namespace grid_map
+{
+PolygonIterator::PolygonIterator(const grid_map::GridMap& gridMap, const grid_map::Polygon& polygon) : polygon_(polygon)
 {
   mapLength_ = gridMap.getLength();
   mapPosition_ = gridMap.getPosition();
@@ -25,10 +25,10 @@ PolygonIterator::PolygonIterator(const grid_map::GridMap& gridMap, const grid_ma
   Size submapBufferSize;
   findSubmapParameters(polygon, submapStartIndex, submapBufferSize);
   internalIterator_ = std::shared_ptr<SubmapIterator>(new SubmapIterator(gridMap, submapStartIndex, submapBufferSize));
-  if(!isInside()) ++(*this);
+  if (!isInside()) ++(*this);
 }
 
-PolygonIterator& PolygonIterator::operator =(const PolygonIterator& other)
+PolygonIterator& PolygonIterator::operator=(const PolygonIterator& other)
 {
   polygon_ = other.polygon_;
   internalIterator_ = other.internalIterator_;
@@ -40,37 +40,33 @@ PolygonIterator& PolygonIterator::operator =(const PolygonIterator& other)
   return *this;
 }
 
-bool PolygonIterator::operator !=(const PolygonIterator& other) const
+bool PolygonIterator::operator!=(const PolygonIterator& other) const
 {
   return (internalIterator_ != other.internalIterator_);
 }
 
-const Index& PolygonIterator::operator *() const
-{
-  return *(*internalIterator_);
-}
+const Index& PolygonIterator::operator*() const { return *(*internalIterator_); }
 
-PolygonIterator& PolygonIterator::operator ++()
+PolygonIterator& PolygonIterator::operator++()
 {
   ++(*internalIterator_);
   if (internalIterator_->isPastEnd()) return *this;
 
-  for ( ; !internalIterator_->isPastEnd(); ++(*internalIterator_)) {
+  for (; !internalIterator_->isPastEnd(); ++(*internalIterator_))
+  {
     if (isInside()) break;
   }
 
   return *this;
 }
 
-bool PolygonIterator::isPastEnd() const
-{
-  return internalIterator_->isPastEnd();
-}
+bool PolygonIterator::isPastEnd() const { return internalIterator_->isPastEnd(); }
 
 bool PolygonIterator::isInside() const
 {
   Position position;
-  getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_,
+                       bufferStartIndex_);
   return polygon_.isInside(position);
 }
 
@@ -78,7 +74,8 @@ void PolygonIterator::findSubmapParameters(const grid_map::Polygon& polygon, Ind
 {
   Position topLeft = polygon_.getVertices()[0];
   Position bottomRight = topLeft;
-  for (const auto& vertex : polygon_.getVertices()) {
+  for (const auto& vertex : polygon_.getVertices())
+  {
     topLeft = topLeft.array().max(vertex.array());
     bottomRight = bottomRight.array().min(vertex.array());
   }
@@ -91,4 +88,3 @@ void PolygonIterator::findSubmapParameters(const grid_map::Polygon& polygon, Ind
 }
 
 } /* namespace grid_map */
-

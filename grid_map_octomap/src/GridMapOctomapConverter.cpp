@@ -8,23 +8,18 @@
 
 #include "grid_map_octomap/GridMapOctomapConverter.hpp"
 
-namespace grid_map {
-
-GridMapOctomapConverter::GridMapOctomapConverter()
+namespace grid_map
 {
-}
+GridMapOctomapConverter::GridMapOctomapConverter() {}
 
-GridMapOctomapConverter::~GridMapOctomapConverter()
-{
-}
+GridMapOctomapConverter::~GridMapOctomapConverter() {}
 
-bool GridMapOctomapConverter::fromOctomap(const octomap::OcTree& octomap,
-                                          const std::string& layer,
-                                          grid_map::GridMap& gridMap,
-                                          const grid_map::Position3* minPoint,
+bool GridMapOctomapConverter::fromOctomap(const octomap::OcTree& octomap, const std::string& layer,
+                                          grid_map::GridMap& gridMap, const grid_map::Position3* minPoint,
                                           const grid_map::Position3* maxPoint)
 {
-  if (octomap.getTreeType() != "OcTree") {
+  if (octomap.getTreeType() != "OcTree")
+  {
     std::cerr << "Octomap conversion only implemented for standard OcTree type." << std::endl;
     return false;
   }
@@ -37,20 +32,24 @@ bool GridMapOctomapConverter::fromOctomap(const octomap::OcTree& octomap,
   unsigned int max_depth = octomapCopy.getTreeDepth();
   // Adapted from octomap octree2pointcloud.cpp.
   std::vector<octomap::OcTreeNode*> collapsed_occ_nodes;
-  do {
+  do
+  {
     collapsed_occ_nodes.clear();
-    for (octomap::OcTree::iterator it = octomapCopy.begin(); it != octomapCopy.end(); ++it) {
-      if (octomapCopy.isNodeOccupied(*it) && it.getDepth() < max_depth) {
+    for (octomap::OcTree::iterator it = octomapCopy.begin(); it != octomapCopy.end(); ++it)
+    {
+      if (octomapCopy.isNodeOccupied(*it) && it.getDepth() < max_depth)
+      {
         collapsed_occ_nodes.push_back(&(*it));
       }
     }
-    for (std::vector<octomap::OcTreeNode*>::iterator it = collapsed_occ_nodes.begin();
-                                            it != collapsed_occ_nodes.end(); ++it) {
-      #if OCTOMAP_VERSION_BEFORE_ROS_KINETIC
-        (*it)->expandNode();
-      #else
-        octomapCopy.expandNode(*it);
-      #endif
+    for (std::vector<octomap::OcTreeNode*>::iterator it = collapsed_occ_nodes.begin(); it != collapsed_occ_nodes.end();
+         ++it)
+    {
+#if OCTOMAP_VERSION_BEFORE_ROS_KINETIC
+      (*it)->expandNode();
+#else
+      octomapCopy.expandNode(*it);
+#endif
     }
     // std::cout << "Expanded " << collapsed_occ_nodes.size() << " nodes" << std::endl;
   } while (collapsed_occ_nodes.size() > 0);
@@ -65,19 +64,21 @@ bool GridMapOctomapConverter::fromOctomap(const octomap::OcTree& octomap,
 
   // User can provide coordinate limits to only convert a bounding box.
   octomap::point3d minBbx(minBound(0), minBound(1), minBound(2));
-  if (minPoint) {
+  if (minPoint)
+  {
     minBbx = octomap::point3d((*minPoint)(0), (*minPoint)(1), (*minPoint)(2));
     minBound = grid_map::Position3(minBbx.x(), minBbx.y(), minBbx.z());
   }
   octomap::point3d maxBbx(maxBound(0), maxBound(1), maxBound(2));
-  if (maxPoint) {
+  if (maxPoint)
+  {
     maxBbx = octomap::point3d((*maxPoint)(0), (*maxPoint)(1), (*maxPoint)(2));
     maxBound = grid_map::Position3(maxBbx.x(), maxBbx.y(), maxBbx.z());
   }
 
   grid_map::Length length = grid_map::Length(maxBound(0) - minBound(0), maxBound(1) - minBound(1));
-  grid_map::Position position = grid_map::Position((maxBound(0) + minBound(0)) / 2.0,
-                                                   (maxBound(1) + minBound(1)) / 2.0);
+  grid_map::Position position =
+      grid_map::Position((maxBound(0) + minBound(0)) / 2.0, (maxBound(1) + minBound(1)) / 2.0);
   gridMap.setGeometry(length, resolution, position);
   // std::cout << "grid map geometry: " << std::endl;
   // std::cout << "Length: [" << length(0) << ", " << length(1) << "]" << std::endl;
@@ -92,20 +93,26 @@ bool GridMapOctomapConverter::fromOctomap(const octomap::OcTree& octomap,
   // corresponding grid map cell, overwrite it.
   // std::cout << "Iterating from " << min_bbx << " to " << max_bbx << std::endl;
   grid_map::Matrix& gridMapData = gridMap[layer];
-  for(octomap::OcTree::leaf_bbx_iterator it = octomapCopy.begin_leafs_bbx(minBbx, maxBbx),
-          end = octomapCopy.end_leafs_bbx(); it != end; ++it) {
-    if (octomapCopy.isNodeOccupied(*it)) {
+  for (octomap::OcTree::leaf_bbx_iterator it = octomapCopy.begin_leafs_bbx(minBbx, maxBbx),
+                                          end = octomapCopy.end_leafs_bbx();
+       it != end; ++it)
+  {
+    if (octomapCopy.isNodeOccupied(*it))
+    {
       octomap::point3d octoPos = it.getCoordinate();
       grid_map::Position position(octoPos.x(), octoPos.y());
       grid_map::Index index;
       gridMap.getIndex(position, index);
       // If no elevation has been set, use current elevation.
-      if (!gridMap.isValid(index)) {
+      if (!gridMap.isValid(index))
+      {
         gridMapData(index(0), index(1)) = octoPos.z();
       }
       // Check existing elevation, keep higher.
-      else {
-        if (gridMapData(index(0), index(1)) < octoPos.z()) {
+      else
+      {
+        if (gridMapData(index(0), index(1)) < octoPos.z())
+        {
           gridMapData(index(0), index(1)) = octoPos.z();
         }
       }
@@ -115,4 +122,4 @@ bool GridMapOctomapConverter::fromOctomap(const octomap::OcTree& octomap,
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map

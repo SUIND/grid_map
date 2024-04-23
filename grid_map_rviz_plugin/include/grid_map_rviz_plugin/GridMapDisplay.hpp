@@ -9,32 +9,35 @@
 #pragma once
 
 #ifndef Q_MOC_RUN
-#include <grid_map_ros/grid_map_ros.hpp>
 #include <grid_map_msgs/GridMap.h>
+
 #include <boost/circular_buffer.hpp>
+#include <grid_map_ros/grid_map_ros.hpp>
 // The following replaces <rviz/message_filter_display.h>
 #include "grid_map_rviz_plugin/modified/message_filter_display.h"
 #endif
 
-namespace Ogre {
+namespace Ogre
+{
 class SceneNode;
 }
 
-namespace rviz {
+namespace rviz
+{
 class BoolProperty;
 class ColorProperty;
 class FloatProperty;
 class IntProperty;
 class EnumProperty;
 class EditableEnumProperty;
-}
+}  // namespace rviz
 
-namespace grid_map_rviz_plugin {
-
+namespace grid_map_rviz_plugin
+{
 class GridMapVisual;
 class GridMapDisplay : public rviz::MessageFilterDisplay<grid_map_msgs::GridMap>
 {
-Q_OBJECT
+  Q_OBJECT
  public:
   GridMapDisplay();
   virtual ~GridMapDisplay();

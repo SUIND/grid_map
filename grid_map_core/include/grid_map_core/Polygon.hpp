@@ -16,11 +16,13 @@
 // Eigen
 #include <Eigen/Core>
 
-namespace grid_map {
-
-class Polygon {
+namespace grid_map
+{
+class Polygon
+{
  public:
-  enum class TriangulationMethods {
+  enum class TriangulationMethods
+  {
     FAN  // Fan triangulation (only for convex polygons).
   };
 
@@ -76,8 +78,7 @@ class Polygon {
    * Returns the vertices of the polygon.
    * @return the vertices of the polygon.
    */
-  const std::vector<Position, Eigen::aligned_allocator<Position>>& getVertices()
-      const;
+  const std::vector<Position, Eigen::aligned_allocator<Position>>& getVertices() const;
 
   /*!
    * Returns the number of vertices.
@@ -146,8 +147,7 @@ class Polygon {
    * @param b the b matrix in of the inequality constraint.
    * @return true if conversion successful, false otherwise.
    */
-  bool convertToInequalityConstraints(Eigen::MatrixXd& A,
-                                      Eigen::VectorXd& b) const;
+  bool convertToInequalityConstraints(Eigen::MatrixXd& A, Eigen::VectorXd& b) const;
 
   /*!
    * Offsets the polygon inward (buffering) by a margin.
@@ -169,8 +169,7 @@ class Polygon {
    * Return a triangulated version of the polygon.
    * @return a list of triangle polygons covering the same polygon.
    */
-  std::vector<Polygon> triangulate(
-      const TriangulationMethods& method = TriangulationMethods::FAN) const;
+  std::vector<Polygon> triangulate(const TriangulationMethods& method = TriangulationMethods::FAN) const;
 
   /*!
    * Approximates a circle with a polygon.
@@ -180,8 +179,7 @@ class Polygon {
    * Default = 20.
    * @return circle as polygon.
    */
-  static Polygon fromCircle(const Position center, const double radius,
-                            const int nVertices = 20);
+  static Polygon fromCircle(const Position center, const double radius, const int nVertices = 20);
 
   /*!
    * Approximates two circles with a convex hull and returns it as polygon.
@@ -192,9 +190,7 @@ class Polygon {
    * Default = 20.
    * @return convex hull of the two circles as polygon.
    */
-  static Polygon convexHullOfTwoCircles(const Position center1,
-                                        const Position center2,
-                                        const double radius,
+  static Polygon convexHullOfTwoCircles(const Position center1, const Position center2, const double radius,
                                         const int nVertices = 20);
 
   /*!
@@ -221,16 +217,14 @@ class Polygon {
    * @param[in] vector1 the first input vector.
    * @param[in] vector2 the second input vector.
    */
-  static bool sortVertices(const Eigen::Vector2d& vector1,
-                           const Eigen::Vector2d& vector2);
+  static bool sortVertices(const Eigen::Vector2d& vector1, const Eigen::Vector2d& vector2);
 
   /*!
    * Returns the 2D cross product of vector1 and vector2.
    * @param[in] vector1 the first input vector.
    * @param[in] vector2 the second input vector.
    */
-  static double computeCrossProduct2D(const Eigen::Vector2d& vector1,
-                                      const Eigen::Vector2d& vector2);
+  static double computeCrossProduct2D(const Eigen::Vector2d& vector1, const Eigen::Vector2d& vector2);
 
   /*!
    * Returns true if OAB makes a clockwise turn or if the OA and OB vectors are
@@ -239,8 +233,7 @@ class Polygon {
    * @param[in] pointA input point A, used to compute OA.
    * @param[in] pointB input point B, used to compute OB.
    */
-  static double vectorsMakeClockwiseTurn(const Eigen::Vector2d& pointO,
-                                         const Eigen::Vector2d& pointA,
+  static double vectorsMakeClockwiseTurn(const Eigen::Vector2d& pointO, const Eigen::Vector2d& pointA,
                                          const Eigen::Vector2d& pointB);
 
   //! Frame id of the polygon.

@@ -7,10 +7,11 @@
  */
 
 #include "grid_map_core/iterators/GridMapIterator.hpp"
+
 #include "grid_map_core/GridMapMath.hpp"
 
-namespace grid_map {
-
+namespace grid_map
+{
 GridMapIterator::GridMapIterator(const grid_map::GridMap& gridMap)
 {
   size_ = gridMap.getSize();
@@ -29,7 +30,7 @@ GridMapIterator::GridMapIterator(const GridMapIterator* other)
   isPastEnd_ = other->isPastEnd_;
 }
 
-GridMapIterator& GridMapIterator::operator =(const GridMapIterator& other)
+GridMapIterator& GridMapIterator::operator=(const GridMapIterator& other)
 {
   size_ = other.size_;
   startIndex_ = other.startIndex_;
@@ -39,32 +40,23 @@ GridMapIterator& GridMapIterator::operator =(const GridMapIterator& other)
   return *this;
 }
 
-bool GridMapIterator::operator !=(const GridMapIterator& other) const
-{
-  return linearIndex_ != other.linearIndex_;
-}
+bool GridMapIterator::operator!=(const GridMapIterator& other) const { return linearIndex_ != other.linearIndex_; }
 
-const Index GridMapIterator::operator *() const
-{
-  return getIndexFromLinearIndex(linearIndex_, size_);
-}
+const Index GridMapIterator::operator*() const { return getIndexFromLinearIndex(linearIndex_, size_); }
 
-const size_t& GridMapIterator::getLinearIndex() const
-{
-  return linearIndex_;
-}
+const size_t& GridMapIterator::getLinearIndex() const { return linearIndex_; }
 
-const Index GridMapIterator::getUnwrappedIndex() const
-{
-  return getIndexFromBufferIndex(*(*this), size_, startIndex_);
-}
+const Index GridMapIterator::getUnwrappedIndex() const { return getIndexFromBufferIndex(*(*this), size_, startIndex_); }
 
-GridMapIterator& GridMapIterator::operator ++()
+GridMapIterator& GridMapIterator::operator++()
 {
   size_t newIndex = linearIndex_ + 1;
-  if (newIndex < linearSize_) {
+  if (newIndex < linearSize_)
+  {
     linearIndex_ = newIndex;
-  } else {
+  }
+  else
+  {
     isPastEnd_ = true;
   }
   return *this;
@@ -77,9 +69,6 @@ GridMapIterator GridMapIterator::end() const
   return res;
 }
 
-bool GridMapIterator::isPastEnd() const
-{
-  return isPastEnd_;
-}
+bool GridMapIterator::isPastEnd() const { return isPastEnd_; }
 
 } /* namespace grid_map */

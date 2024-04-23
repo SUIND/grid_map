@@ -7,57 +7,60 @@
  */
 
 #include "grid_map_ros/GridMapRosConverter.hpp"
-#include "grid_map_ros/GridMapMsgHelpers.hpp"
+
 #include <grid_map_cv/grid_map_cv.hpp>
 
+#include "grid_map_ros/GridMapMsgHelpers.hpp"
+
 // ROS
-#include <sensor_msgs/point_cloud2_iterator.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/Quaternion.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
+#include <sensor_msgs/point_cloud2_iterator.h>
 
 // STL
-#include <limits>
 #include <algorithm>
+#include <limits>
 #include <vector>
 
 using namespace std;
 using namespace Eigen;
 
-namespace grid_map {
-
-GridMapRosConverter::GridMapRosConverter()
+namespace grid_map
 {
-}
+GridMapRosConverter::GridMapRosConverter() {}
 
-GridMapRosConverter::~GridMapRosConverter()
-{
-}
+GridMapRosConverter::~GridMapRosConverter() {}
 
-bool GridMapRosConverter::fromMessage(const grid_map_msgs::GridMap& message, grid_map::GridMap& gridMap, const std::vector<std::string>& layers, bool copyBasicLayers, bool copyAllNonBasicLayers)
+bool GridMapRosConverter::fromMessage(const grid_map_msgs::GridMap& message, grid_map::GridMap& gridMap,
+                                      const std::vector<std::string>& layers, bool copyBasicLayers,
+                                      bool copyAllNonBasicLayers)
 {
   gridMap.setTimestamp(message.info.header.stamp.toNSec());
   gridMap.setFrameId(message.info.header.frame_id);
   gridMap.setGeometry(Length(message.info.length_x, message.info.length_y), message.info.resolution,
                       Position(message.info.pose.position.x, message.info.pose.position.y));
 
-  if (message.layers.size() != message.data.size()) {
+  if (message.layers.size() != message.data.size())
+  {
     ROS_ERROR("Different number of layers and data in grid map message.");
     return false;
   }
 
   // Copy non-basic layers.
-  for (unsigned int i = 0u; i < message.layers.size(); ++i) {
-
+  for (unsigned int i = 0u; i < message.layers.size(); ++i)
+  {
     // check if layer should be copied.
-    if (!copyAllNonBasicLayers && std::find(layers.begin(), layers.end(), message.layers[i]) == layers.end()) {
+    if (!copyAllNonBasicLayers && std::find(layers.begin(), layers.end(), message.layers[i]) == layers.end())
+    {
       continue;
     }
 
     // TODO Could we use the data mapping (instead of copying) method here?
     Matrix data;
-    if(!multiArrayMessageCopyToMatrixEigen(message.data[i], data)) {
+    if (!multiArrayMessageCopyToMatrixEigen(message.data[i], data))
+    {
       return false;
     }
 
@@ -66,7 +69,8 @@ bool GridMapRosConverter::fromMessage(const grid_map_msgs::GridMap& message, gri
   }
 
   // Copy basic layers.
-  if (copyBasicLayers) {
+  if (copyBasicLayers)
+  {
     gridMap.setBasicLayers(message.basic_layers);
   }
 
@@ -85,7 +89,7 @@ void GridMapRosConverter::toMessage(const grid_map::GridMap& gridMap, grid_map_m
 }
 
 void GridMapRosConverter::toMessage(const grid_map::GridMap& gridMap, const std::vector<std::string>& layers,
-                      grid_map_msgs::GridMap& message)
+                                    grid_map_msgs::GridMap& message)
 {
   message.info.header.stamp.fromNSec(gridMap.getTimestamp());
   message.info.header.frame_id = gridMap.getFrameId();
@@ -104,7 +108,8 @@ void GridMapRosConverter::toMessage(const grid_map::GridMap& gridMap, const std:
   message.basic_layers = gridMap.getBasicLayers();
 
   message.data.clear();
-  for (const auto& layer : layers) {
+  for (const auto& layer : layers)
+  {
     std_msgs::Float32MultiArray dataArray;
     matrixEigenCopyToMultiArrayMessage(gridMap.get(layer), dataArray);
     message.data.push_back(dataArray);
@@ -114,17 +119,14 @@ void GridMapRosConverter::toMessage(const grid_map::GridMap& gridMap, const std:
   message.inner_start_index = gridMap.getStartIndex()(1);
 }
 
-void GridMapRosConverter::toPointCloud(const grid_map::GridMap& gridMap,
-                                       const std::string& pointLayer,
+void GridMapRosConverter::toPointCloud(const grid_map::GridMap& gridMap, const std::string& pointLayer,
                                        sensor_msgs::PointCloud2& pointCloud)
 {
   toPointCloud(gridMap, gridMap.getLayers(), pointLayer, pointCloud);
 }
 
-void GridMapRosConverter::toPointCloud(const grid_map::GridMap& gridMap,
-                                       const std::vector<std::string>& layers,
-                                       const std::string& pointLayer,
-                                       sensor_msgs::PointCloud2& pointCloud)
+void GridMapRosConverter::toPointCloud(const grid_map::GridMap& gridMap, const std::vector<std::string>& layers,
+                                       const std::string& pointLayer, sensor_msgs::PointCloud2& pointCloud)
 {
   // Header.
   pointCloud.header.frame_id = gridMap.getFrameId();
@@ -132,16 +134,22 @@ void GridMapRosConverter::toPointCloud(const grid_map::GridMap& gridMap,
   pointCloud.is_dense = false;
 
   // Fields.
-  std::vector <std::string> fieldNames;
+  std::vector<std::string> fieldNames;
 
-  for (const auto& layer : layers) {
-    if (layer == pointLayer) {
+  for (const auto& layer : layers)
+  {
+    if (layer == pointLayer)
+    {
       fieldNames.push_back("x");
       fieldNames.push_back("y");
       fieldNames.push_back("z");
-    } else if (layer == "color") {
+    }
+    else if (layer == "color")
+    {
       fieldNames.push_back("rgb");
-    } else {
+    }
+    else
+    {
       fieldNames.push_back(layer);
     }
   }
@@ -150,7 +158,8 @@ void GridMapRosConverter::toPointCloud(const grid_map::GridMap& gridMap,
   pointCloud.fields.reserve(fieldNames.size());
   int offset = 0;
 
-  for (auto& name : fieldNames) {
+  for (auto& name : fieldNames)
+  {
     sensor_msgs::PointField pointField;
     pointField.name = name;
     pointField.count = 1;
@@ -170,60 +179,76 @@ void GridMapRosConverter::toPointCloud(const grid_map::GridMap& gridMap,
 
   // Points.
   std::unordered_map<std::string, sensor_msgs::PointCloud2Iterator<float>> fieldIterators;
-  for (auto& name : fieldNames) {
-    fieldIterators.insert(
-        std::pair<std::string, sensor_msgs::PointCloud2Iterator<float>>(
-            name, sensor_msgs::PointCloud2Iterator<float>(pointCloud, name)));
+  for (auto& name : fieldNames)
+  {
+    fieldIterators.insert(std::pair<std::string, sensor_msgs::PointCloud2Iterator<float>>(
+        name, sensor_msgs::PointCloud2Iterator<float>(pointCloud, name)));
   }
 
   GridMapIterator mapIterator(gridMap);
   const bool hasBasicLayers = gridMap.getBasicLayers().size() > 0;
 
   size_t realNumberOfPoints = 0;
-  for (size_t i = 0; i < maxNumberOfPoints; ++i) {
-    if (hasBasicLayers) {
-      if (!gridMap.isValid(*mapIterator)) {
+  for (size_t i = 0; i < maxNumberOfPoints; ++i)
+  {
+    if (hasBasicLayers)
+    {
+      if (!gridMap.isValid(*mapIterator))
+      {
         ++mapIterator;
         continue;
       }
     }
 
     Position3 position;
-    if (!gridMap.getPosition3(pointLayer, *mapIterator, position)) {
+    if (!gridMap.getPosition3(pointLayer, *mapIterator, position))
+    {
       ++mapIterator;
       continue;
     }
 
-    for (auto& iterator : fieldIterators) {
-      if (iterator.first == "x") {
-        *iterator.second = (float) position.x();
-      } else if (iterator.first == "y") {
-        *iterator.second = (float) position.y();
-      } else if (iterator.first == "z") {
-        *iterator.second = (float) position.z();
-      } else if (iterator.first == "rgb") {
+    for (auto& iterator : fieldIterators)
+    {
+      if (iterator.first == "x")
+      {
+        *iterator.second = (float)position.x();
+      }
+      else if (iterator.first == "y")
+      {
+        *iterator.second = (float)position.y();
+      }
+      else if (iterator.first == "z")
+      {
+        *iterator.second = (float)position.z();
+      }
+      else if (iterator.first == "rgb")
+      {
         *iterator.second = gridMap.at("color", *mapIterator);
-      } else {
+      }
+      else
+      {
         *iterator.second = gridMap.at(iterator.first, *mapIterator);
       }
     }
 
     ++mapIterator;
-    for (auto& iterator : fieldIterators) {
+    for (auto& iterator : fieldIterators)
+    {
       ++iterator.second;
     }
     ++realNumberOfPoints;
   }
 
-  if (realNumberOfPoints != maxNumberOfPoints) {
+  if (realNumberOfPoints != maxNumberOfPoints)
+  {
     pointCloud.width = realNumberOfPoints;
     pointCloud.row_step = pointCloud.width * pointCloud.point_step;
     pointCloud.data.resize(pointCloud.height * pointCloud.row_step);
   }
 }
 
-bool GridMapRosConverter::fromOccupancyGrid(const nav_msgs::OccupancyGrid& occupancyGrid,
-                                            const std::string& layer, grid_map::GridMap& gridMap)
+bool GridMapRosConverter::fromOccupancyGrid(const nav_msgs::OccupancyGrid& occupancyGrid, const std::string& layer,
+                                            grid_map::GridMap& gridMap)
 {
   const Size size(occupancyGrid.info.width, occupancyGrid.info.height);
   const double resolution = occupancyGrid.info.resolution;
@@ -234,22 +259,24 @@ bool GridMapRosConverter::fromOccupancyGrid(const nav_msgs::OccupancyGrid& occup
   position += 0.5 * length.matrix();
 
   const auto& orientation = occupancyGrid.info.origin.orientation;
-  if (orientation.w != 1.0 && !(orientation.x == 0 && orientation.y == 0
-      && orientation.z == 0 && orientation.w == 0)) {
+  if (orientation.w != 1.0 && !(orientation.x == 0 && orientation.y == 0 && orientation.z == 0 && orientation.w == 0))
+  {
     ROS_WARN_STREAM("Conversion of occupancy grid: Grid maps do not support orientation.");
     ROS_INFO_STREAM("Orientation of occupancy grid: " << endl << occupancyGrid.info.origin.orientation);
     return false;
   }
 
-  if (size.prod() != occupancyGrid.data.size()) {
+  if (size.prod() != occupancyGrid.data.size())
+  {
     ROS_WARN_STREAM("Conversion of occupancy grid: Size of data does not correspond to width * height.");
     return false;
   }
 
   // TODO: Split to `initializeFrom` and `from` as for Costmap2d.
-  if ((gridMap.getSize() != size).any() || gridMap.getResolution() != resolution
-      || (gridMap.getLength() != length).any() || gridMap.getPosition() != position
-      || gridMap.getFrameId() != frameId || !gridMap.getStartIndex().isZero()) {
+  if ((gridMap.getSize() != size).any() || gridMap.getResolution() != resolution ||
+      (gridMap.getLength() != length).any() || gridMap.getPosition() != position || gridMap.getFrameId() != frameId ||
+      !gridMap.getStartIndex().isZero())
+  {
     gridMap.setTimestamp(occupancyGrid.header.stamp.toNSec());
     gridMap.setFrameId(frameId);
     gridMap.setGeometry(length, resolution, position);
@@ -259,7 +286,8 @@ bool GridMapRosConverter::fromOccupancyGrid(const nav_msgs::OccupancyGrid& occup
   // between occupancy grid and grid map.
   grid_map::Matrix data(size(0), size(1));
   for (std::vector<int8_t>::const_reverse_iterator iterator = occupancyGrid.data.rbegin();
-      iterator != occupancyGrid.data.rend(); ++iterator) {
+       iterator != occupancyGrid.data.rend(); ++iterator)
+  {
     size_t i = std::distance(occupancyGrid.data.rbegin(), iterator);
     data(i) = *iterator != -1 ? *iterator : NAN;
   }
@@ -268,9 +296,8 @@ bool GridMapRosConverter::fromOccupancyGrid(const nav_msgs::OccupancyGrid& occup
   return true;
 }
 
-void GridMapRosConverter::toOccupancyGrid(const grid_map::GridMap& gridMap,
-                                          const std::string& layer, float dataMin, float dataMax,
-                                          nav_msgs::OccupancyGrid& occupancyGrid)
+void GridMapRosConverter::toOccupancyGrid(const grid_map::GridMap& gridMap, const std::string& layer, float dataMin,
+                                          float dataMax, nav_msgs::OccupancyGrid& occupancyGrid)
 {
   occupancyGrid.header.frame_id = gridMap.getFrameId();
   occupancyGrid.header.stamp.fromNSec(gridMap.getTimestamp());
@@ -294,7 +321,8 @@ void GridMapRosConverter::toOccupancyGrid(const grid_map::GridMap& gridMap,
   const float cellMax = 100;
   const float cellRange = cellMax - cellMin;
 
-  for (GridMapIterator iterator(gridMap); !iterator.isPastEnd(); ++iterator) {
+  for (GridMapIterator iterator(gridMap); !iterator.isPastEnd(); ++iterator)
+  {
     float value = (gridMap.at(layer, *iterator) - dataMin) / (dataMax - dataMin);
     if (isnan(value))
       value = -1;
@@ -306,19 +334,19 @@ void GridMapRosConverter::toOccupancyGrid(const grid_map::GridMap& gridMap,
   }
 }
 
-void GridMapRosConverter::toGridCells(const grid_map::GridMap& gridMap, const std::string& layer,
-                                      float lowerThreshold, float upperThreshold,
-                                      nav_msgs::GridCells& gridCells)
+void GridMapRosConverter::toGridCells(const grid_map::GridMap& gridMap, const std::string& layer, float lowerThreshold,
+                                      float upperThreshold, nav_msgs::GridCells& gridCells)
 {
   gridCells.header.frame_id = gridMap.getFrameId();
   gridCells.header.stamp.fromNSec(gridMap.getTimestamp());
   gridCells.cell_width = gridMap.getResolution();
   gridCells.cell_height = gridMap.getResolution();
 
-  for (GridMapIterator iterator(gridMap); !iterator.isPastEnd(); ++iterator) {
+  for (GridMapIterator iterator(gridMap); !iterator.isPastEnd(); ++iterator)
+  {
     if (!gridMap.isValid(*iterator, layer)) continue;
-    if (gridMap.at(layer, *iterator) >= lowerThreshold
-        && gridMap.at(layer, *iterator) <= upperThreshold) {
+    if (gridMap.at(layer, *iterator) >= lowerThreshold && gridMap.at(layer, *iterator) <= upperThreshold)
+    {
       Position position;
       gridMap.getPosition(*iterator, position);
       geometry_msgs::Point point;
@@ -329,9 +357,8 @@ void GridMapRosConverter::toGridCells(const grid_map::GridMap& gridMap, const st
   }
 }
 
-bool GridMapRosConverter::initializeFromImage(const sensor_msgs::Image& image,
-                                              const double resolution, grid_map::GridMap& gridMap,
-                                              const grid_map::Position& position)
+bool GridMapRosConverter::initializeFromImage(const sensor_msgs::Image& image, const double resolution,
+                                              grid_map::GridMap& gridMap, const grid_map::Position& position)
 {
   const double lengthX = resolution * image.height;
   const double lengthY = resolution * image.width;
@@ -342,54 +369,66 @@ bool GridMapRosConverter::initializeFromImage(const sensor_msgs::Image& image,
   return true;
 }
 
-bool GridMapRosConverter::addLayerFromImage(const sensor_msgs::Image& image,
-                                            const std::string& layer, grid_map::GridMap& gridMap,
-                                            const float lowerValue, const float upperValue,
+bool GridMapRosConverter::addLayerFromImage(const sensor_msgs::Image& image, const std::string& layer,
+                                            grid_map::GridMap& gridMap, const float lowerValue, const float upperValue,
                                             const double alphaThreshold)
 {
   cv_bridge::CvImageConstPtr cvImage;
-  try {
+  try
+  {
     // TODO Use `toCvShared()`?
     cvImage = cv_bridge::toCvCopy(image, image.encoding);
-  } catch (cv_bridge::Exception& e) {
+  }
+  catch (cv_bridge::Exception& e)
+  {
     ROS_ERROR("cv_bridge exception: %s", e.what());
     return false;
   }
 
   const int cvEncoding = cv_bridge::getCvType(image.encoding);
-  switch (cvEncoding) {
+  switch (cvEncoding)
+  {
     case CV_8UC1:
-      return GridMapCvConverter::addLayerFromImage<unsigned char, 1>(cvImage->image, layer, gridMap, lowerValue, upperValue, alphaThreshold);
+      return GridMapCvConverter::addLayerFromImage<unsigned char, 1>(cvImage->image, layer, gridMap, lowerValue,
+                                                                     upperValue, alphaThreshold);
     case CV_8UC3:
-      return GridMapCvConverter::addLayerFromImage<unsigned char, 3>(cvImage->image, layer, gridMap, lowerValue, upperValue, alphaThreshold);
+      return GridMapCvConverter::addLayerFromImage<unsigned char, 3>(cvImage->image, layer, gridMap, lowerValue,
+                                                                     upperValue, alphaThreshold);
     case CV_8UC4:
-      return GridMapCvConverter::addLayerFromImage<unsigned char, 4>(cvImage->image, layer, gridMap, lowerValue, upperValue, alphaThreshold);
+      return GridMapCvConverter::addLayerFromImage<unsigned char, 4>(cvImage->image, layer, gridMap, lowerValue,
+                                                                     upperValue, alphaThreshold);
     case CV_16UC1:
-      return GridMapCvConverter::addLayerFromImage<unsigned short, 1>(cvImage->image, layer, gridMap, lowerValue, upperValue, alphaThreshold);
+      return GridMapCvConverter::addLayerFromImage<unsigned short, 1>(cvImage->image, layer, gridMap, lowerValue,
+                                                                      upperValue, alphaThreshold);
     case CV_16UC3:
-      return GridMapCvConverter::addLayerFromImage<unsigned short, 3>(cvImage->image, layer, gridMap, lowerValue, upperValue, alphaThreshold);
+      return GridMapCvConverter::addLayerFromImage<unsigned short, 3>(cvImage->image, layer, gridMap, lowerValue,
+                                                                      upperValue, alphaThreshold);
     case CV_16UC4:
-      return GridMapCvConverter::addLayerFromImage<unsigned short, 4>(cvImage->image, layer, gridMap, lowerValue, upperValue, alphaThreshold);
+      return GridMapCvConverter::addLayerFromImage<unsigned short, 4>(cvImage->image, layer, gridMap, lowerValue,
+                                                                      upperValue, alphaThreshold);
     default:
       ROS_ERROR("Expected MONO8, MONO16, RGB(A)8, RGB(A)16, BGR(A)8, or BGR(A)16 image encoding.");
       return false;
   }
 }
 
-bool GridMapRosConverter::addColorLayerFromImage(const sensor_msgs::Image& image,
-                                                 const std::string& layer,
+bool GridMapRosConverter::addColorLayerFromImage(const sensor_msgs::Image& image, const std::string& layer,
                                                  grid_map::GridMap& gridMap)
 {
   cv_bridge::CvImageConstPtr cvImage;
-  try {
+  try
+  {
     cvImage = cv_bridge::toCvCopy(image, image.encoding);
-  } catch (cv_bridge::Exception& e) {
+  }
+  catch (cv_bridge::Exception& e)
+  {
     ROS_ERROR("cv_bridge exception: %s", e.what());
     return false;
   }
 
   const int cvEncoding = cv_bridge::getCvType(image.encoding);
-  switch (cvEncoding) {
+  switch (cvEncoding)
+  {
     case CV_8UC3:
       return GridMapCvConverter::addColorLayerFromImage<unsigned char, 3>(cvImage->image, layer, gridMap);
     case CV_8UC4:
@@ -414,8 +453,8 @@ bool GridMapRosConverter::toImage(const grid_map::GridMap& gridMap, const std::s
 }
 
 bool GridMapRosConverter::toImage(const grid_map::GridMap& gridMap, const std::string& layer,
-                                  const std::string encoding, const float lowerValue,
-                                  const float upperValue, sensor_msgs::Image& image)
+                                  const std::string encoding, const float lowerValue, const float upperValue,
+                                  sensor_msgs::Image& image)
 {
   cv_bridge::CvImage cvImage;
   if (!toCvImage(gridMap, layer, encoding, lowerValue, upperValue, cvImage)) return false;
@@ -432,27 +471,34 @@ bool GridMapRosConverter::toCvImage(const grid_map::GridMap& gridMap, const std:
 }
 
 bool GridMapRosConverter::toCvImage(const grid_map::GridMap& gridMap, const std::string& layer,
-                                    const std::string encoding, const float lowerValue,
-                                    const float upperValue, cv_bridge::CvImage& cvImage)
+                                    const std::string encoding, const float lowerValue, const float upperValue,
+                                    cv_bridge::CvImage& cvImage)
 {
   cvImage.header.stamp.fromNSec(gridMap.getTimestamp());
   cvImage.header.frame_id = gridMap.getFrameId();
   cvImage.encoding = encoding;
 
   const int cvEncoding = cv_bridge::getCvType(encoding);
-  switch (cvEncoding) {
+  switch (cvEncoding)
+  {
     case CV_8UC1:
-      return GridMapCvConverter::toImage<unsigned char, 1>(gridMap, layer, cvEncoding, lowerValue, upperValue, cvImage.image);
+      return GridMapCvConverter::toImage<unsigned char, 1>(gridMap, layer, cvEncoding, lowerValue, upperValue,
+                                                           cvImage.image);
     case CV_8UC3:
-      return GridMapCvConverter::toImage<unsigned char, 3>(gridMap, layer, cvEncoding, lowerValue, upperValue, cvImage.image);
+      return GridMapCvConverter::toImage<unsigned char, 3>(gridMap, layer, cvEncoding, lowerValue, upperValue,
+                                                           cvImage.image);
     case CV_8UC4:
-      return GridMapCvConverter::toImage<unsigned char, 4>(gridMap, layer, cvEncoding, lowerValue, upperValue, cvImage.image);
+      return GridMapCvConverter::toImage<unsigned char, 4>(gridMap, layer, cvEncoding, lowerValue, upperValue,
+                                                           cvImage.image);
     case CV_16UC1:
-      return GridMapCvConverter::toImage<unsigned short, 1>(gridMap, layer, cvEncoding, lowerValue, upperValue, cvImage.image);
+      return GridMapCvConverter::toImage<unsigned short, 1>(gridMap, layer, cvEncoding, lowerValue, upperValue,
+                                                            cvImage.image);
     case CV_16UC3:
-      return GridMapCvConverter::toImage<unsigned short, 3>(gridMap, layer, cvEncoding, lowerValue, upperValue, cvImage.image);
+      return GridMapCvConverter::toImage<unsigned short, 3>(gridMap, layer, cvEncoding, lowerValue, upperValue,
+                                                            cvImage.image);
     case CV_16UC4:
-      return GridMapCvConverter::toImage<unsigned short, 4>(gridMap, layer, cvEncoding, lowerValue, upperValue, cvImage.image);
+      return GridMapCvConverter::toImage<unsigned short, 4>(gridMap, layer, cvEncoding, lowerValue, upperValue,
+                                                            cvImage.image);
     default:
       ROS_ERROR("Expected MONO8, MONO16, RGB(A)8, RGB(A)16, BGR(A)8, or BGR(A)16 image encoding.");
       return false;
@@ -467,7 +513,8 @@ bool GridMapRosConverter::saveToBag(const grid_map::GridMap& gridMap, const std:
   ros::Time time;
   time.fromNSec(gridMap.getTimestamp());
 
-  if (!time.isValid() || time.isZero()) {
+  if (!time.isValid() || time.isZero())
+  {
     if (!ros::Time::isValid()) ros::Time::init();
     time = ros::Time::now();
   }
@@ -487,12 +534,16 @@ bool GridMapRosConverter::loadFromBag(const std::string& pathToBag, const std::s
   rosbag::View view(bag, rosbag::TopicQuery(topic));
 
   bool isDataFound = false;
-  for (const auto& messageInstance : view) {
+  for (const auto& messageInstance : view)
+  {
     grid_map_msgs::GridMap::ConstPtr message = messageInstance.instantiate<grid_map_msgs::GridMap>();
-    if (message != NULL) {
+    if (message != NULL)
+    {
       fromMessage(*message, gridMap);
       isDataFound = true;
-    } else {
+    }
+    else
+    {
       bag.close();
       ROS_WARN("Unable to load data from ROS bag.");
       return false;
@@ -503,4 +554,4 @@ bool GridMapRosConverter::loadFromBag(const std::string& pathToBag, const std::s
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map

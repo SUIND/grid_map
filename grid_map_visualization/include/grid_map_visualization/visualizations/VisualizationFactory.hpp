@@ -9,12 +9,12 @@
 #pragma once
 
 #include <grid_map_visualization/visualizations/VisualizationBase.hpp>
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
-namespace grid_map_visualization {
-
+namespace grid_map_visualization
+{
 class VisualizationFactory
 {
  public:
@@ -29,4 +29,4 @@ class VisualizationFactory
   std::vector<std::string> types_;
 };
 
-} /* namespace */
+}  // namespace grid_map_visualization

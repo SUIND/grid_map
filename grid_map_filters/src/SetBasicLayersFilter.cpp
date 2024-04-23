@@ -8,27 +8,29 @@
 
 #include "../include/grid_map_filters/SetBasicLayersFilter.hpp"
 
-#include <grid_map_core/GridMap.hpp>
 #include <pluginlib/class_list_macros.h>
+
+#include <grid_map_core/GridMap.hpp>
 
 using namespace filters;
 
-namespace grid_map {
-
-template<typename T>
+namespace grid_map
+{
+template <typename T>
 SetBasicLayersFilter<T>::SetBasicLayersFilter()
 {
 }
 
-template<typename T>
+template <typename T>
 SetBasicLayersFilter<T>::~SetBasicLayersFilter()
 {
 }
 
-template<typename T>
+template <typename T>
 bool SetBasicLayersFilter<T>::configure()
 {
-  if (!FilterBase<T>::getParam(std::string("layers"), layers_)) {
+  if (!FilterBase<T>::getParam(std::string("layers"), layers_))
+  {
     ROS_ERROR("SetBasicLayersFilters did not find parameter 'layers'.");
     return false;
   }
@@ -36,14 +38,16 @@ bool SetBasicLayersFilter<T>::configure()
   return true;
 }
 
-template<typename T>
+template <typename T>
 bool SetBasicLayersFilter<T>::update(const T& mapIn, T& mapOut)
 {
   mapOut = mapIn;
   std::vector<std::string> layersChecked;
 
-  for (const auto& layer : layers_) {
-    if (!mapOut.exists(layer)) {
+  for (const auto& layer : layers_)
+  {
+    if (!mapOut.exists(layer))
+    {
       ROS_WARN("Layer `%s` does not exist and is not set as basic layer.", layer.c_str());
       continue;
     }
@@ -54,6 +58,6 @@ bool SetBasicLayersFilter<T>::update(const T& mapIn, T& mapOut)
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map
 
 PLUGINLIB_EXPORT_CLASS(grid_map::SetBasicLayersFilter<grid_map::GridMap>, filters::FilterBase<grid_map::GridMap>)

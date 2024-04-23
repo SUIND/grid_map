@@ -10,21 +10,22 @@
 
 // ROS
 #include <ros/ros.h>
-#include <visualization_msgs/MarkerArray.h>
 #include <std_msgs/ColorRGBA.h>
+#include <visualization_msgs/MarkerArray.h>
 
 // Eigen
 #include <Eigen/Core>
 
-namespace grid_map_visualization {
-
+namespace grid_map_visualization
+{
 /*!
  * Create a color message from a color vector.
  * @param[out] colorMessage the color message.
  * @param[in] colorVector the color vector
  * @param[in] resetTransparency if transparency should be reset (to fully visible) or left at current value.
  */
-void getColorMessageFromColorVector(std_msgs::ColorRGBA& colorMessage, const Eigen::Vector3f& colorVector, bool resetTransparency = true);
+void getColorMessageFromColorVector(std_msgs::ColorRGBA& colorMessage, const Eigen::Vector3f& colorVector,
+                                    bool resetTransparency = true);
 
 /*!
  * Create a color vector from a color message.
@@ -52,8 +53,8 @@ void setColorFromColorValue(std_msgs::ColorRGBA& color, const unsigned long& col
  * @param[in] colorChannelUpperValue the upper value for the color channel.
  */
 void setColorChannelFromValue(float& colorChannel, const double value, const double lowerValueBound,
-                              const double upperValueBound, const bool invert = false, const double colorChannelLowerValue = 0.0,
-                              const double colorChannelUpperValue = 1.0);
+                              const double upperValueBound, const bool invert = false,
+                              const double colorChannelLowerValue = 0.0, const double colorChannelUpperValue = 1.0);
 
 /*!
  * Sets the color to the interpolation between two colors based on a scalar value.
@@ -99,8 +100,7 @@ void setColorFromValue(std_msgs::ColorRGBA& color, const double value, const dou
  * @param mapUpperValue the upper map boundary.
  * @return the query mapped to the map.
  */
-double computeLinearMapping(
-    const double& sourceValue, const double& sourceLowerValue, const double& sourceUpperValue,
-    const double& mapLowerValue, const double& mapUpperValue);
+double computeLinearMapping(const double& sourceValue, const double& sourceLowerValue, const double& sourceUpperValue,
+                            const double& mapLowerValue, const double& mapUpperValue);
 
-} /* namespace */
+}  // namespace grid_map_visualization

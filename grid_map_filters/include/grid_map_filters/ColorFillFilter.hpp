@@ -13,15 +13,14 @@
 #include <Eigen/Core>
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Creates a new color layer.
  */
-template<typename T>
+template <typename T>
 class ColorFillFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -56,4 +55,4 @@ class ColorFillFilter : public filters::FilterBase<T>
   std::string outputLayer_;
 };
 
-} /* namespace */
+}  // namespace grid_map

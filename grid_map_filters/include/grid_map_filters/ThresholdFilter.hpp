@@ -13,16 +13,15 @@
 #include <string>
 #include <vector>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Threshold filter class to set values below/above a threshold to a
  * specified value.
  */
-template<typename T>
+template <typename T>
 class ThresholdFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -48,7 +47,6 @@ class ThresholdFilter : public filters::FilterBase<T>
   virtual bool update(const T& mapIn, T& mapOut);
 
  private:
-
   //! Layer the threshold should be applied to.
   std::string layer_;
 
@@ -65,4 +63,4 @@ class ThresholdFilter : public filters::FilterBase<T>
   bool useLowerThreshold_, useUpperThreshold_;
 };
 
-} /* namespace */
+}  // namespace grid_map

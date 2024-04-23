@@ -10,24 +10,25 @@
 
 // ROS
 #include <ros/ros.h>
-#include <std_msgs/UInt32MultiArray.h>
 #include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Float64MultiArray.h>
+#include <std_msgs/UInt32MultiArray.h>
 
 // Eigen
 #include <Eigen/Core>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Returns the number of dimensions of the grid map.
  * @return number of dimensions.
  */
 int nDimensions();
 
-enum class StorageIndices {
-    Column,
-    Row
+enum class StorageIndices
+{
+  Column,
+  Row
 };
 
 //! Holds the names of the storage indeces.
@@ -39,11 +40,13 @@ extern std::map<StorageIndices, std::string> storageIndexNames;
  * @param[in] message the message data.
  * @return true if is in row-major format, false if is in column-major format.
  */
-template<typename MultiArrayMessageType_>
+template <typename MultiArrayMessageType_>
 bool isRowMajor(const MultiArrayMessageType_& message)
 {
-  if (message.layout.dim[0].label == grid_map::storageIndexNames[grid_map::StorageIndices::Column]) return false;
-  else if (message.layout.dim[0].label == grid_map::storageIndexNames[grid_map::StorageIndices::Row]) return true;
+  if (message.layout.dim[0].label == grid_map::storageIndexNames[grid_map::StorageIndices::Column])
+    return false;
+  else if (message.layout.dim[0].label == grid_map::storageIndexNames[grid_map::StorageIndices::Row])
+    return true;
   ROS_ERROR("isRowMajor() failed because layout label is not set correctly.");
   return false;
 }
@@ -54,7 +57,7 @@ bool isRowMajor(const MultiArrayMessageType_& message)
  * @param[in] message the message data.
  * @return the number of columns.
  */
-template<typename MultiArrayMessageType_>
+template <typename MultiArrayMessageType_>
 unsigned int getCols(const MultiArrayMessageType_& message)
 {
   if (isRowMajor(message)) return message.layout.dim.at(1).size;
@@ -67,7 +70,7 @@ unsigned int getCols(const MultiArrayMessageType_& message)
  * @param[in] message the message data.
  * @return the number of rows.
  */
-template<typename MultiArrayMessageType_>
+template <typename MultiArrayMessageType_>
 unsigned int getRows(const MultiArrayMessageType_& message)
 {
   if (isRowMajor(message)) return message.layout.dim.at(0).size;
@@ -84,7 +87,7 @@ unsigned int getRows(const MultiArrayMessageType_& message)
  * @param[out] m the ROS message to which the data will be copied.
  * @return true if successful.
  */
-template<typename EigenType_, typename MultiArrayMessageType_>
+template <typename EigenType_, typename MultiArrayMessageType_>
 bool matrixEigenCopyToMultiArrayMessage(const EigenType_& e, MultiArrayMessageType_& m)
 {
   m.layout.dim.resize(nDimensions());
@@ -93,10 +96,13 @@ bool matrixEigenCopyToMultiArrayMessage(const EigenType_& e, MultiArrayMessageTy
   m.layout.dim[1].stride = e.innerSize();
   m.layout.dim[1].size = e.innerSize();
 
-  if (e.IsRowMajor) {
+  if (e.IsRowMajor)
+  {
     m.layout.dim[0].label = storageIndexNames[StorageIndices::Row];
     m.layout.dim[1].label = storageIndexNames[StorageIndices::Column];
-  } else {
+  }
+  else
+  {
     m.layout.dim[0].label = storageIndexNames[StorageIndices::Column];
     m.layout.dim[1].label = storageIndexNames[StorageIndices::Row];
   }
@@ -113,10 +119,11 @@ bool matrixEigenCopyToMultiArrayMessage(const EigenType_& e, MultiArrayMessageTy
  * @param[out] e the Eigen matrix to be converted.
  * @return true if successful.
  */
-template<typename EigenType_, typename MultiArrayMessageType_>
+template <typename EigenType_, typename MultiArrayMessageType_>
 bool multiArrayMessageCopyToMatrixEigen(const MultiArrayMessageType_& m, EigenType_& e)
 {
-  if (e.IsRowMajor != isRowMajor(m)) {
+  if (e.IsRowMajor != isRowMajor(m))
+  {
     ROS_ERROR("multiArrayMessageToMatrixEigen() failed because the storage order is not compatible.");
     return false;
   }
@@ -134,10 +141,11 @@ bool multiArrayMessageCopyToMatrixEigen(const MultiArrayMessageType_& m, EigenTy
  * @param[out] e the Eigen matrix to which the data will be mapped.
  * @return true if successful.
  */
-template<typename EigenType_, typename MultiArrayMessageType_>
+template <typename EigenType_, typename MultiArrayMessageType_>
 bool multiArrayMessageMapToMatrixEigen(MultiArrayMessageType_& m, EigenType_& e)
 {
-  if (e.IsRowMajor != isRowMajor(m)) {
+  if (e.IsRowMajor != isRowMajor(m))
+  {
     ROS_ERROR("multiArrayMessageToMatrixEigen() failed because the storage order is not compatible.");
     return false;
   }
@@ -147,4 +155,4 @@ bool multiArrayMessageMapToMatrixEigen(MultiArrayMessageType_& m, EigenType_& e)
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map

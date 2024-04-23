@@ -5,8 +5,9 @@
  *      Author: jelavice
  */
 
-#include "grid_map_demos/InterpolationDemo.hpp"
 #include <ros/ros.h>
+
+#include "grid_map_demos/InterpolationDemo.hpp"
 
 int main(int argc, char** argv)
 {

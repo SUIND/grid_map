@@ -7,16 +7,19 @@
  */
 
 #include "grid_map_core/iterators/EllipseIterator.hpp"
-#include "grid_map_core/GridMapMath.hpp"
 
 #include <math.h>
+
 #include <Eigen/Geometry>
+
+#include "grid_map_core/GridMapMath.hpp"
 
 using namespace std;
 
-namespace grid_map {
-
-EllipseIterator::EllipseIterator(const GridMap& gridMap, const Position& center, const Length& length, const double rotation)
+namespace grid_map
+{
+EllipseIterator::EllipseIterator(const GridMap& gridMap, const Position& center, const Length& length,
+                                 const double rotation)
     : center_(center)
 {
   semiAxisSquare_ = (0.5 * length).square();
@@ -32,10 +35,10 @@ EllipseIterator::EllipseIterator(const GridMap& gridMap, const Position& center,
   Index submapBufferSize;
   findSubmapParameters(center, length, rotation, submapStartIndex, submapBufferSize);
   internalIterator_ = std::shared_ptr<SubmapIterator>(new SubmapIterator(gridMap, submapStartIndex, submapBufferSize));
-  if(!isInside()) ++(*this);
+  if (!isInside()) ++(*this);
 }
 
-EllipseIterator& EllipseIterator::operator =(const EllipseIterator& other)
+EllipseIterator& EllipseIterator::operator=(const EllipseIterator& other)
 {
   center_ = other.center_;
   semiAxisSquare_ = other.semiAxisSquare_;
@@ -49,42 +52,35 @@ EllipseIterator& EllipseIterator::operator =(const EllipseIterator& other)
   return *this;
 }
 
-bool EllipseIterator::operator !=(const EllipseIterator& other) const
+bool EllipseIterator::operator!=(const EllipseIterator& other) const
 {
   return (internalIterator_ != other.internalIterator_);
 }
 
-const Eigen::Array2i& EllipseIterator::operator *() const
-{
-  return *(*internalIterator_);
-}
+const Eigen::Array2i& EllipseIterator::operator*() const { return *(*internalIterator_); }
 
-EllipseIterator& EllipseIterator::operator ++()
+EllipseIterator& EllipseIterator::operator++()
 {
   ++(*internalIterator_);
   if (internalIterator_->isPastEnd()) return *this;
 
-  for ( ; !internalIterator_->isPastEnd(); ++(*internalIterator_)) {
+  for (; !internalIterator_->isPastEnd(); ++(*internalIterator_))
+  {
     if (isInside()) break;
   }
 
   return *this;
 }
 
-bool EllipseIterator::isPastEnd() const
-{
-  return internalIterator_->isPastEnd();
-}
+bool EllipseIterator::isPastEnd() const { return internalIterator_->isPastEnd(); }
 
-const Size& EllipseIterator::getSubmapSize() const
-{
-  return internalIterator_->getSubmapSize();
-}
+const Size& EllipseIterator::getSubmapSize() const { return internalIterator_->getSubmapSize(); }
 
 bool EllipseIterator::isInside() const
 {
   Position position;
-  getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_,
+                       bufferStartIndex_);
   double value = ((transformMatrix_ * (position - center_)).array().square() / semiAxisSquare_).sum();
   return (value <= 1);
 }
@@ -107,4 +103,3 @@ void EllipseIterator::findSubmapParameters(const Position& center, const Length&
 }
 
 } /* namespace grid_map */
-

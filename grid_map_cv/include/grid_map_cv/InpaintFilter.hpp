@@ -10,21 +10,21 @@
 
 #include <filters/filter_base.h>
 
-//OpenCV
-#include "grid_map_cv/grid_map_cv.hpp"
+// OpenCV
 #include <opencv2/opencv.hpp>
-
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace grid_map {
+#include "grid_map_cv/grid_map_cv.hpp"
 
+namespace grid_map
+{
 /*!
  * Uses OpenCV function to inpaint/fill holes in the input layer.
  */
-template<typename T>
-class InpaintFilter : public filters::FilterBase<T> {
-
+template <typename T>
+class InpaintFilter : public filters::FilterBase<T>
+{
  public:
   /*!
    * Constructor
@@ -51,7 +51,6 @@ class InpaintFilter : public filters::FilterBase<T> {
   virtual bool update(const T& mapIn, T& mapOut);
 
  private:
-
   //! Inpainting radius.
   double radius_;
 
@@ -62,4 +61,4 @@ class InpaintFilter : public filters::FilterBase<T> {
   std::string outputLayer_;
 };
 
-} /* namespace */
+}  // namespace grid_map

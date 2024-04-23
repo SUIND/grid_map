@@ -11,17 +11,17 @@
 #include <filters/filter_base.h>
 
 #include <Eigen/Core>
+#include <grid_map_core/TypeDefs.hpp>
 #include <string>
 
-#include <grid_map_core/TypeDefs.hpp>
-
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Uses Boost accumulators to fill holes in the input layer by the median of the surrounding values.
  */
 template <typename T>
-class MedianFillFilter : public filters::FilterBase<T> {
+class MedianFillFilter : public filters::FilterBase<T>
+{
  public:
   /*!
    * Constructor
@@ -49,17 +49,17 @@ class MedianFillFilter : public filters::FilterBase<T> {
 
  protected:
   /*!
-   * Returns the median of the values in inputData in the neighbourhood around the centerIndex. The size of the quadratic neighbourhood is
-   * specified by radiusInPixels. If the number of values is even the "lower center" value is taken, eg with four values the second lowest
-   * is taken as median.
+   * Returns the median of the values in inputData in the neighbourhood around the centerIndex. The size of the
+   * quadratic neighbourhood is specified by radiusInPixels. If the number of values is even the "lower center" value is
+   * taken, eg with four values the second lowest is taken as median.
    * @param inputMap The data layer to compute a local median.
    * @param centerIndex The center cell of the neighbourhood.
    * @param radiusInPixels The maximum L_inf distance from index.
    * @param bufferSize The buffer size of the input
    * @return The median of finites in the specified neighbourhood.
    */
-  float getMedian(Eigen::Ref<const grid_map::Matrix> inputMap, const grid_map::Index& centerIndex, const size_t radiusInPixels,
-                  const grid_map::Size bufferSize);
+  float getMedian(Eigen::Ref<const grid_map::Matrix> inputMap, const grid_map::Index& centerIndex,
+                  const size_t radiusInPixels, const grid_map::Size bufferSize);
 
  private:
   //! Median filtering radius of NaN values in the input.

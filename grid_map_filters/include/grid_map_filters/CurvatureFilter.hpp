@@ -13,15 +13,14 @@
 #include <Eigen/Core>
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Compute the curvature (second derivative) of a layer in the map.
  */
-template<typename T>
+template <typename T>
 class CurvatureFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -54,4 +53,4 @@ class CurvatureFilter : public filters::FilterBase<T>
   std::string outputLayer_;
 };
 
-} /* namespace */
+}  // namespace grid_map

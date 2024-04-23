@@ -12,15 +12,14 @@
 
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Normalizes the buffer of a map such that it has default (zero) start index.
  */
-template<typename T>
+template <typename T>
 class BufferNormalizerFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -45,4 +44,4 @@ class BufferNormalizerFilter : public filters::FilterBase<T>
   virtual bool update(const T& mapIn, T& mapOut);
 };
 
-} /* namespace */
+}  // namespace grid_map

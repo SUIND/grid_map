@@ -14,13 +14,13 @@
 #include <octomap/octomap.h>
 
 // STD
-#include <iostream>
-#include <vector>
 #include <algorithm>
 #include <cmath>
+#include <iostream>
+#include <vector>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Conversions between grid maps and Octomap types.
  */
@@ -51,12 +51,8 @@ class GridMapOctomapConverter
    * @param[in] maxPoint (optional) maximum coordinate for bounding box.
    * @return true if successful, false otherwise.
    */
-  static bool fromOctomap(const octomap::OcTree& octomap,
-                          const std::string& layer,
-                          grid_map::GridMap& gridMap,
-                          const grid_map::Position3* minPoint = nullptr,
-                          const grid_map::Position3* maxPoint = nullptr);
-
+  static bool fromOctomap(const octomap::OcTree& octomap, const std::string& layer, grid_map::GridMap& gridMap,
+                          const grid_map::Position3* minPoint = nullptr, const grid_map::Position3* maxPoint = nullptr);
 };
 
-} /* namespace */
+}  // namespace grid_map

@@ -6,65 +6,71 @@
  *   Institute: ETH Zurich, ANYbotics
  */
 
-#include <grid_map_filters/ColorBlendingFilter.hpp>
-
-#include <grid_map_core/grid_map_core.hpp>
+#include <math.h>
 #include <pluginlib/class_list_macros.h>
 
 #include <Eigen/Dense>
-#include <math.h>
+#include <grid_map_core/grid_map_core.hpp>
+#include <grid_map_filters/ColorBlendingFilter.hpp>
 
 using namespace filters;
 
-namespace grid_map {
-
-template<typename T>
-ColorBlendingFilter<T>::ColorBlendingFilter()
-    : opacity_(1.0),
-      blendMode_(BlendModes::Normal)
+namespace grid_map
+{
+template <typename T>
+ColorBlendingFilter<T>::ColorBlendingFilter() : opacity_(1.0), blendMode_(BlendModes::Normal)
 {
 }
 
-template<typename T>
+template <typename T>
 ColorBlendingFilter<T>::~ColorBlendingFilter()
 {
 }
 
-template<typename T>
+template <typename T>
 bool ColorBlendingFilter<T>::configure()
 {
-  if (!FilterBase < T > ::getParam(std::string("background_layer"), backgroundLayer_)) {
+  if (!FilterBase<T>::getParam(std::string("background_layer"), backgroundLayer_))
+  {
     ROS_ERROR("Color blending filter did not find parameter `background_layer`.");
     return false;
   }
   ROS_DEBUG("Color blending filter background layer is = %s.", backgroundLayer_.c_str());
 
-  if (!FilterBase < T > ::getParam(std::string("foreground_layer"), foregroundLayer_)) {
+  if (!FilterBase<T>::getParam(std::string("foreground_layer"), foregroundLayer_))
+  {
     ROS_ERROR("Color blending filter did not find parameter `foreground_layer`.");
     return false;
   }
   ROS_DEBUG("Color blending filter foreground layer is = %s.", foregroundLayer_.c_str());
 
   std::string blendMode;
-  if (!FilterBase < T > ::getParam(std::string("blend_mode"), blendMode)) {
+  if (!FilterBase<T>::getParam(std::string("blend_mode"), blendMode))
+  {
     blendMode = "normal";
   }
   ROS_DEBUG("Color blending filter blend mode is = %s.", blendMode.c_str());
-  if (blendMode == "normal") blendMode_ = BlendModes::Normal;
-  else if (blendMode == "hard_light") blendMode_ = BlendModes::HardLight;
-  else if (blendMode == "soft_light") blendMode_ = BlendModes::SoftLight;
-  else {
+  if (blendMode == "normal")
+    blendMode_ = BlendModes::Normal;
+  else if (blendMode == "hard_light")
+    blendMode_ = BlendModes::HardLight;
+  else if (blendMode == "soft_light")
+    blendMode_ = BlendModes::SoftLight;
+  else
+  {
     ROS_ERROR("Color blending filter blend mode `%s` does not exist.", blendMode.c_str());
     return false;
   }
 
-  if (!FilterBase < T > ::getParam(std::string("opacity"), opacity_)) {
+  if (!FilterBase<T>::getParam(std::string("opacity"), opacity_))
+  {
     ROS_ERROR("Color blending filter did not find parameter `opacity`.");
     return false;
   }
   ROS_DEBUG("Color blending filter opacity is = %f.", opacity_);
 
-  if (!FilterBase < T > ::getParam(std::string("output_layer"), outputLayer_)) {
+  if (!FilterBase<T>::getParam(std::string("output_layer"), outputLayer_))
+  {
     ROS_ERROR("Color blending filter did not find parameter `output_layer`.");
     return false;
   }
@@ -72,7 +78,7 @@ bool ColorBlendingFilter<T>::configure()
   return true;
 }
 
-template<typename T>
+template <typename T>
 bool ColorBlendingFilter<T>::update(const T& mapIn, T& mapOut)
 {
   const auto& background = mapIn[backgroundLayer_];
@@ -83,12 +89,18 @@ bool ColorBlendingFilter<T>::update(const T& mapIn, T& mapOut)
   auto& output = mapOut[outputLayer_];
 
   // For each cell in map.
-  for (size_t i = 0; i < output.size(); ++i) {
-    if (std::isnan(background(i))) {
+  for (size_t i = 0; i < output.size(); ++i)
+  {
+    if (std::isnan(background(i)))
+    {
       output(i) = foreground(i);
-    } else if (std::isnan(foreground(i))) {
+    }
+    else if (std::isnan(foreground(i)))
+    {
       output(i) = background(i);
-    } else {
+    }
+    else
+    {
       Eigen::Array3f backgroundColor, foregroundColor, outputColor;
       Eigen::Vector3f color;
       colorValueToVector(background(i), color);
@@ -96,21 +108,28 @@ bool ColorBlendingFilter<T>::update(const T& mapIn, T& mapOut)
       colorValueToVector(foreground(i), color);
       foregroundColor = color.array();
 
-      switch (blendMode_) {
+      switch (blendMode_)
+      {
         case BlendModes::Normal:
           outputColor = (1.0 - opacity_) * backgroundColor + opacity_ * foregroundColor;
           break;
         case BlendModes::HardLight:
         {
           Eigen::Array3f blendedColor;
-          if (foregroundColor.mean() < 0.5) {
+          if (foregroundColor.mean() < 0.5)
+          {
             blendedColor = 2.0 * backgroundColor * foregroundColor;
-          } else {
+          }
+          else
+          {
             blendedColor = 1.0 - 2.0 * (1.0 - backgroundColor) * (1.0 - foregroundColor);
           }
-          if (opacity_ == 1.0) {
+          if (opacity_ == 1.0)
+          {
             outputColor = blendedColor;
-          } else {
+          }
+          else
+          {
             outputColor = (1.0 - opacity_) * backgroundColor + opacity_ * blendedColor;
           }
 
@@ -120,16 +139,22 @@ bool ColorBlendingFilter<T>::update(const T& mapIn, T& mapOut)
         {
           Eigen::Array3f blendedColor;
           // Photoshop.
-//          if (foregroundColor.mean() < 0.5) {
-//            blendedColor = 2.0 * backgroundColor * foregroundColor + backgroundColor.square() * (1.0 - 2.0 * foregroundColor);
-//          } else {
-//            blendedColor = 2.0 * backgroundColor * (1.0 - foregroundColor) + backgroundColor.sqrt() * (2.0 * foregroundColor - 1.0);
-//          }
+          //          if (foregroundColor.mean() < 0.5) {
+          //            blendedColor = 2.0 * backgroundColor * foregroundColor + backgroundColor.square() * (1.0 - 2.0 *
+          //            foregroundColor);
+          //          } else {
+          //            blendedColor = 2.0 * backgroundColor * (1.0 - foregroundColor) + backgroundColor.sqrt() * (2.0 *
+          //            foregroundColor - 1.0);
+          //          }
           // Pegtop.
-          blendedColor = ((1.0 - 2.0 * foregroundColor) * backgroundColor.square() + 2.0 * backgroundColor * foregroundColor);
-          if (opacity_ == 1.0) {
+          blendedColor =
+              ((1.0 - 2.0 * foregroundColor) * backgroundColor.square() + 2.0 * backgroundColor * foregroundColor);
+          if (opacity_ == 1.0)
+          {
             outputColor = blendedColor;
-          } else {
+          }
+          else
+          {
             outputColor = (1.0 - opacity_) * backgroundColor + opacity_ * blendedColor;
           }
 
@@ -144,6 +169,6 @@ bool ColorBlendingFilter<T>::update(const T& mapIn, T& mapOut)
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map
 
 PLUGINLIB_EXPORT_CLASS(grid_map::ColorBlendingFilter<grid_map::GridMap>, filters::FilterBase<grid_map::GridMap>)

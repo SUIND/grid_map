@@ -6,9 +6,9 @@
  *   Institute: ETH Zurich, ANYbotics
  */
 
-#include "grid_map_demos/FiltersDemo.hpp"
-
 #include <ros/ros.h>
+
+#include "grid_map_demos/FiltersDemo.hpp"
 
 int main(int argc, char** argv)
 {
@@ -19,10 +19,6 @@ int main(int argc, char** argv)
   if (success) ros::spin();
   return 0;
 }
-
-
-
-
 
 ///*
 // * filters_demo_node.cpp
@@ -38,9 +34,9 @@ int main(int argc, char** argv)
 //#include <grid_map_msgs/GridMap.h>
 //#include <ros/ros.h>
 //
-//using namespace grid_map;
+// using namespace grid_map;
 //
-//class GridMapFilterChain
+// class GridMapFilterChain
 //
 //
 //(const grid_map_msgs::GridMapPtr& message)
@@ -50,7 +46,7 @@ int main(int argc, char** argv)
 //  ROS_INFO("I heard: [%s]", msg->data.c_str());
 //}
 //
-//int main(int argc, char** argv)
+// int main(int argc, char** argv)
 //{
 //  ros::init(argc, argv, "grid_map_filters_demo");
 //  ros::NodeHandle nodeHandle("~");
@@ -68,7 +64,8 @@ int main(int argc, char** argv)
 //  GridMap inputMap({"elevation"});
 //  inputMap.setFrameId("map");
 //  inputMap.setGeometry(Length(0.7, 0.7), 0.01, Position(0.0, 0.0));
-//  ROS_INFO("Created map with size %f x %f m (%i x %i cells).\n The center of the map is located at (%f, %f) in the %s frame.",
+//  ROS_INFO("Created map with size %f x %f m (%i x %i cells).\n The center of the map is located at (%f, %f) in the %s
+//  frame.",
 //    inputMap.getLength().x(), inputMap.getLength().y(),
 //    inputMap.getSize()(0), inputMap.getSize()(1),
 //    inputMap.getPosition().x(), inputMap.getPosition().y(), inputMap.getFrameId().c_str());

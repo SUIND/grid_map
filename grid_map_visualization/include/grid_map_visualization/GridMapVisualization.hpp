@@ -10,28 +10,28 @@
 #pragma once
 
 #include <grid_map_msgs/GridMap.h>
-#include <grid_map_visualization/visualizations/VisualizationFactory.hpp>
+
 #include <grid_map_visualization/visualizations/MapRegionVisualization.hpp>
+#include <grid_map_visualization/visualizations/OccupancyGridVisualization.hpp>
 #include <grid_map_visualization/visualizations/PointCloudVisualization.hpp>
 #include <grid_map_visualization/visualizations/VectorVisualization.hpp>
-#include <grid_map_visualization/visualizations/OccupancyGridVisualization.hpp>
+#include <grid_map_visualization/visualizations/VisualizationFactory.hpp>
 
 // ROS
 #include <ros/ros.h>
 
 // STD
-#include <vector>
 #include <memory>
+#include <vector>
 
-namespace grid_map_visualization {
-
+namespace grid_map_visualization
+{
 /*!
  * Visualizes a grid map by publishing different topics that can be viewed in Rviz.
  */
 class GridMapVisualization
 {
  public:
-
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -50,7 +50,6 @@ class GridMapVisualization
   void callback(const grid_map_msgs::GridMap& message);
 
  private:
-
   /*!
    * Read parameters from ROS.
    * @return true if successful.
@@ -99,4 +98,4 @@ class GridMapVisualization
   bool isSubscribed_;
 };
 
-} /* namespace */
+}  // namespace grid_map_visualization

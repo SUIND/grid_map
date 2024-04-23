@@ -10,25 +10,28 @@
 
 #include <OGRE/OgreMaterial.h>
 #include <OGRE/OgreSharedPtr.h>
-
 #include <grid_map_msgs/GridMap.h>
+
 #include <grid_map_core/GridMap.hpp>
 
-namespace Ogre {
+namespace Ogre
+{
 class Vector3;
 class Quaternion;
 class ManualObject;
 class ColourValue;
 }  // namespace Ogre
 
-namespace rviz {
+namespace rviz
+{
 class BillboardLine;
 }
 
-namespace grid_map_rviz_plugin {
-
+namespace grid_map_rviz_plugin
+{
 // Visualizes a single grid_map_msgs::GridMap message.
-class GridMapVisual {
+class GridMapVisual
+{
  public:
   using MaskArray = Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic>;
   using ColorArray = Eigen::Array<Ogre::ColourValue, Eigen::Dynamic, Eigen::Dynamic>;
@@ -40,10 +43,10 @@ class GridMapVisual {
   void setMessage(const grid_map_msgs::GridMap::ConstPtr& msg);
   // Compute the visualization of map_.
 
-  void computeVisualization(float alpha, bool showGridLines, bool flatTerrain, std::string heightLayer, bool flatColor, bool noColor,
-                            Ogre::ColourValue meshColor, bool mapLayerColor, std::string colorLayer, bool useRainbow, bool invertRainbow,
-                            Ogre::ColourValue minColor, Ogre::ColourValue maxColor, bool autocomputeIntensity, float minIntensity,
-                            float maxIntensity);
+  void computeVisualization(float alpha, bool showGridLines, bool flatTerrain, std::string heightLayer, bool flatColor,
+                            bool noColor, Ogre::ColourValue meshColor, bool mapLayerColor, std::string colorLayer,
+                            bool useRainbow, bool invertRainbow, Ogre::ColourValue minColor, Ogre::ColourValue maxColor,
+                            bool autocomputeIntensity, float minIntensity, float maxIntensity);
 
   // Set the coordinate frame pose.
   void setFramePosition(const Ogre::Vector3& position);
@@ -53,7 +56,14 @@ class GridMapVisual {
   std::vector<std::string> getLayerNames();
 
  private:
-  enum class ColoringMethod { FLAT, COLOR_LAYER, INTENSITY_LAYER_MANUAL, INTENSITY_LAYER_RAINBOW, INTENSITY_LAYER_INVERTED_RAINBOW };
+  enum class ColoringMethod
+  {
+    FLAT,
+    COLOR_LAYER,
+    INTENSITY_LAYER_MANUAL,
+    INTENSITY_LAYER_RAINBOW,
+    INTENSITY_LAYER_INVERTED_RAINBOW
+  };
 
   Ogre::SceneNode* frameNode_;
   Ogre::SceneManager* sceneManager_;
@@ -78,25 +88,29 @@ class GridMapVisual {
   void initializeAndBeginManualObject(size_t nVertices);
 
   /**
-   * Computes a matrix of color values corresponding to the grid cells. Color is computed depending on the coloringMethod.
+   * Computes a matrix of color values corresponding to the grid cells. Color is computed depending on the
+   * coloringMethod.
    * @param heightData Height values of the cells.
    * @param colorData Values of the layer specified for coloring the mesh.
    * @param coloringMethod The strategy to color, see ColoringMethod.
    * @param flatColor Used only if coloringMethod is FLAT
    * @param minIntensity Used for the intensity based coloring methods only.
    * @param maxIntensity Used for the intensity based coloring methods only.
-   * @param autocomputeIntensity Wheter to override the values in min and max intensity and compute them based on the provided intensity
-   * data.
+   * @param autocomputeIntensity Wheter to override the values in min and max intensity and compute them based on the
+   * provided intensity data.
    * @param minColor Used only if coloringMethod is COLOR_LAYER.
    * @param maxColor Used only if coloringMethod is COLOR_LAYER.
    * @return The color for each cell.
    */
-  ColorArray computeColorValues(Eigen::Ref<const grid_map::Matrix> heightData, Eigen::Ref<const grid_map::Matrix> colorData,
-                                GridMapVisual::ColoringMethod coloringMethod, Ogre::ColourValue flatColor, double minIntensity,
-                                double maxIntensity, bool autocomputeIntensity, Ogre::ColourValue minColor, Ogre::ColourValue maxColor);
+  ColorArray computeColorValues(Eigen::Ref<const grid_map::Matrix> heightData,
+                                Eigen::Ref<const grid_map::Matrix> colorData,
+                                GridMapVisual::ColoringMethod coloringMethod, Ogre::ColourValue flatColor,
+                                double minIntensity, double maxIntensity, bool autocomputeIntensity,
+                                Ogre::ColourValue minColor, Ogre::ColourValue maxColor);
 
   /**
-   * Initialized the meshLines_ object. Should be called before adding lines. Sets the drawing style and allocates the buffer.
+   * Initialized the meshLines_ object. Should be called before adding lines. Sets the drawing style and allocates the
+   * buffer.
    * @param cols Number of columns that will be drawn.
    * @param rows Number of rows that will be drawn.
    * @param resolution Resolution of the map. Used to compute the line thickness.
@@ -112,8 +126,8 @@ class GridMapVisual {
   MaskArray computeIsValidMask(std::vector<std::string> basicLayers);
 
   /**
-   * Transforms the intensity into [0,1] range where 0 corresponds to the minIntensity and 1 to maxIntensity. The given value is clipped to
-   * that range.
+   * Transforms the intensity into [0,1] range where 0 corresponds to the minIntensity and 1 to maxIntensity. The given
+   * value is clipped to that range.
    * @param intensity The intensity value to normalize.
    * @param minIntensity Lower bound.
    * @param maxIntensity Upper bound.
@@ -121,8 +135,8 @@ class GridMapVisual {
   static void normalizeIntensity(float& intensity, float minIntensity, float maxIntensity);
 
   /**
-   * Copied from rviz/src/rviz/default_plugin/point_cloud_transformers.cpp. Transforms an intensity value in [0,1] range to a rainbow
-   * coloring.
+   * Copied from rviz/src/rviz/default_plugin/point_cloud_transformers.cpp. Transforms an intensity value in [0,1] range
+   * to a rainbow coloring.
    * @param intensity Value to color, should be in [0,1] range, otherwise it is clipped.
    * @return The corresponding rainbow color.
    */

@@ -8,21 +8,20 @@
 
 #pragma once
 
-#include <grid_map_visualization/visualizations/VisualizationBase.hpp>
 #include <grid_map_core/GridMap.hpp>
+#include <grid_map_visualization/visualizations/VisualizationBase.hpp>
 
 // ROS
 #include <ros/ros.h>
 
-namespace grid_map_visualization {
-
+namespace grid_map_visualization
+{
 /*!
  * Visualization of the grid map as a flat point cloud.
  */
 class FlatPointCloudVisualization : public VisualizationBase
 {
  public:
-
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -62,4 +61,4 @@ class FlatPointCloudVisualization : public VisualizationBase
   double height_;
 };
 
-} /* namespace */
+}  // namespace grid_map_visualization

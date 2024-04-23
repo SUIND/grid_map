@@ -8,21 +8,20 @@
 
 #pragma once
 
-#include "grid_map_core/GridMap.hpp"
-
 #include <Eigen/Core>
 #include <memory>
 #include <vector>
 
-namespace grid_map {
+#include "grid_map_core/GridMap.hpp"
 
+namespace grid_map
+{
 /*!
  * Iterator class to iterate through a circular area of the map with a spiral.
  */
 class SpiralIterator
 {
-public:
-
+ public:
   /*!
    * Constructor.
    * @param gridMap the grid map to iterate on.
@@ -36,25 +35,25 @@ public:
    * @param iterator the iterator to copy data from.
    * @return a reference to *this.
    */
-  SpiralIterator& operator =(const SpiralIterator& other);
+  SpiralIterator& operator=(const SpiralIterator& other);
 
   /*!
    * Compare to another iterator.
    * @return whether the current iterator points to a different address than the other one.
    */
-  bool operator !=(const SpiralIterator& other) const;
+  bool operator!=(const SpiralIterator& other) const;
 
   /*!
    * Dereference the iterator with const.
    * @return the value to which the iterator is pointing.
    */
-  const Eigen::Array2i& operator *() const;
+  const Eigen::Array2i& operator*() const;
 
   /*!
    * Increase the iterator to the next element.
    * @return a reference to the updated iterator.
    */
-  SpiralIterator& operator ++();
+  SpiralIterator& operator++();
 
   /*!
    * Indicates if iterator is past end.
@@ -68,8 +67,7 @@ public:
    */
   double getCurrentRadius() const;
 
-private:
-
+ private:
   /*!
    * Check if index is inside the circle.
    * @return true if inside, false otherwise.
@@ -82,14 +80,11 @@ private:
    */
   void generateRing();
 
-  int signum(const int val) {
-      return (0 < val) - (val < 0);
-  }
+  int signum(const int val) { return (0 < val) - (val < 0); }
 
   //! Position of the circle center;
   Position center_;
   Index indexCenter_;
-
 
   //! Radius of the circle.
   double radius_;
@@ -112,4 +107,4 @@ private:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-} /* namespace */
+}  // namespace grid_map

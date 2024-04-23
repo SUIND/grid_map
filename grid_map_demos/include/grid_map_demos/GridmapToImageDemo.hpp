@@ -10,19 +10,19 @@
 #pragma once
 
 // ROS
+#include <grid_map_msgs/GridMap.h>
 #include <ros/ros.h>
 
+#include <grid_map_ros/grid_map_ros.hpp>
 #include <string>
 
-#include <grid_map_msgs/GridMap.h>
-#include <grid_map_ros/grid_map_ros.hpp>
-
-namespace grid_map_demos {
-
+namespace grid_map_demos
+{
 /*!
  * Saves an ElevationMapping layer as image.
  */
-class GridMapToImageDemo {
+class GridMapToImageDemo
+{
  public:
   /*!
    * Constructor.
@@ -43,7 +43,8 @@ class GridMapToImageDemo {
 
   /**
    * @brief The callback receiving the grid map.
-   * It will convert the elevation layer into a png image and save it to the specified location. Afterwards the node will terminate.
+   * It will convert the elevation layer into a png image and save it to the specified location. Afterwards the node
+   * will terminate.
    * @param msg the recieved grid map to save to a file.
    */
   void gridMapCallback(const grid_map_msgs::GridMap& msg);

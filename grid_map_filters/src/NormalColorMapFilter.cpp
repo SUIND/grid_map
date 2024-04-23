@@ -6,37 +6,38 @@
  *   Institute: ETH Zurich, ANYbotics
  */
 
-#include <grid_map_filters/NormalColorMapFilter.hpp>
-
-#include <grid_map_core/grid_map_core.hpp>
 #include <pluginlib/class_list_macros.h>
 
 #include <Eigen/Dense>
+#include <grid_map_core/grid_map_core.hpp>
+#include <grid_map_filters/NormalColorMapFilter.hpp>
 
 using namespace filters;
 
-namespace grid_map {
-
-template<typename T>
+namespace grid_map
+{
+template <typename T>
 NormalColorMapFilter<T>::NormalColorMapFilter()
 {
 }
 
-template<typename T>
+template <typename T>
 NormalColorMapFilter<T>::~NormalColorMapFilter()
 {
 }
 
-template<typename T>
+template <typename T>
 bool NormalColorMapFilter<T>::configure()
 {
-  if (!FilterBase < T > ::getParam(std::string("input_layers_prefix"), inputLayersPrefix_)) {
+  if (!FilterBase<T>::getParam(std::string("input_layers_prefix"), inputLayersPrefix_))
+  {
     ROS_ERROR("Normal color map filter did not find parameter `input_layers_prefix`.");
     return false;
   }
   ROS_DEBUG("Normal color map filter input layers prefix is = %s.", inputLayersPrefix_.c_str());
 
-  if (!FilterBase < T > ::getParam(std::string("output_layer"), outputLayer_)) {
+  if (!FilterBase<T>::getParam(std::string("output_layer"), outputLayer_))
+  {
     ROS_ERROR("Normal color map filter did not find parameter `output_layer`.");
     return false;
   }
@@ -44,7 +45,7 @@ bool NormalColorMapFilter<T>::configure()
   return true;
 }
 
-template<typename T>
+template <typename T>
 bool NormalColorMapFilter<T>::update(const T& mapIn, T& mapOut)
 {
   const auto& normalX = mapIn[inputLayersPrefix_ + "x"];
@@ -60,16 +61,15 @@ bool NormalColorMapFilter<T>::update(const T& mapIn, T& mapOut)
   // Z:  0 to  1 : Blue: 128 to 255
 
   // For each cell in map.
-  for (size_t i = 0; i < color.size(); ++i) {
-    const Eigen::Vector3f colorVector((normalX(i) + 1.0) / 2.0,
-                                      (normalY(i) + 1.0) / 2.0,
-                                      (normalZ(i) / 2.0) + 0.5);
+  for (size_t i = 0; i < color.size(); ++i)
+  {
+    const Eigen::Vector3f colorVector((normalX(i) + 1.0) / 2.0, (normalY(i) + 1.0) / 2.0, (normalZ(i) / 2.0) + 0.5);
     colorVectorToValue(colorVector, color(i));
   }
 
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map
 
 PLUGINLIB_EXPORT_CLASS(grid_map::NormalColorMapFilter<grid_map::GridMap>, filters::FilterBase<grid_map::GridMap>)

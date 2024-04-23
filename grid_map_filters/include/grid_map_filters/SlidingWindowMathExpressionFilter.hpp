@@ -8,24 +8,22 @@
 
 #pragma once
 
-#include "EigenLab/EigenLab.h"
-
-#include <grid_map_core/grid_map_core.hpp>
-
 #include <filters/filter_base.h>
 
 #include <Eigen/Core>
+#include <grid_map_core/grid_map_core.hpp>
 #include <string>
 
-namespace grid_map {
+#include "EigenLab/EigenLab.h"
 
+namespace grid_map
+{
 /*!
  * Parse and evaluate a mathematical matrix expression within a sliding window on a layer of a grid map.
  */
-template<typename T>
+template <typename T>
 class SlidingWindowMathExpressionFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -78,4 +76,4 @@ class SlidingWindowMathExpressionFilter : public filters::FilterBase<T>
   SlidingWindowIterator::EdgeHandling edgeHandling_;
 };
 
-} /* namespace */
+}  // namespace grid_map

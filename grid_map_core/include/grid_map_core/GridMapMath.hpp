@@ -8,15 +8,15 @@
 
 #pragma once
 
-#include "grid_map_core/TypeDefs.hpp"
-#include "grid_map_core/BufferRegion.hpp"
-
 #include <Eigen/Core>
-#include <vector>
 #include <map>
+#include <vector>
 
-namespace grid_map {
+#include "grid_map_core/BufferRegion.hpp"
+#include "grid_map_core/TypeDefs.hpp"
 
+namespace grid_map
+{
 /*!
  * Gets the position of a cell specified by its index in the map frame.
  * @param[out] position the position of the center of the cell in the map frame.
@@ -28,12 +28,8 @@ namespace grid_map {
  * @param[in] bufferStartIndex the index of the starting point of the circular buffer (optional).
  * @return true if successful, false if index not within range of buffer.
  */
-bool getPositionFromIndex(Position& position,
-                          const Index& index,
-                          const Length& mapLength,
-                          const Position& mapPosition,
-                          const double& resolution,
-                          const Size& bufferSize,
+bool getPositionFromIndex(Position& position, const Index& index, const Length& mapLength, const Position& mapPosition,
+                          const double& resolution, const Size& bufferSize,
                           const Index& bufferStartIndex = Index::Zero());
 
 /*!
@@ -47,12 +43,8 @@ bool getPositionFromIndex(Position& position,
  * @param[in] bufferStartIndex the index of the starting point of the circular buffer (optional).
  * @return true if successful, false if position outside of map.
  */
-bool getIndexFromPosition(Index& index,
-                          const Position& position,
-                          const Length& mapLength,
-                          const Position& mapPosition,
-                          const double& resolution,
-                          const Size& bufferSize,
+bool getIndexFromPosition(Index& index, const Position& position, const Length& mapLength, const Position& mapPosition,
+                          const double& resolution, const Size& bufferSize,
                           const Index& bufferStartIndex = Index::Zero());
 
 /*!
@@ -67,13 +59,9 @@ bool getIndexFromPosition(Index& index,
  * @param[in] bufferStartIndex the index of the starting point of the circular buffer (optional).
  * @return true if successful, false if position outside of map.
  */
-void getIndexFromPositionUnsafe(Index& index,
-                          const Position& position,
-                          const Length& mapLength,
-                          const Position& mapPosition,
-                          const double& resolution,
-                          const Size& bufferSize,
-                          const Index& bufferStartIndex = Index::Zero());
+void getIndexFromPositionUnsafe(Index& index, const Position& position, const Length& mapLength,
+                                const Position& mapPosition, const double& resolution, const Size& bufferSize,
+                                const Index& bufferStartIndex = Index::Zero());
 
 /*!
  * Checks if position is within the map boundaries.
@@ -82,9 +70,7 @@ void getIndexFromPositionUnsafe(Index& index,
  * @param[in] mapPosition the position of the map.
  * @return true if position is within map, false otherwise.
  */
-bool checkIfPositionWithinMap(const Position& position,
-                              const Length& mapLength,
-                              const Position& mapPosition);
+bool checkIfPositionWithinMap(const Position& position, const Length& mapLength, const Position& mapPosition);
 
 /*!
  * Gets the position of the data structure origin.
@@ -92,9 +78,7 @@ bool checkIfPositionWithinMap(const Position& position,
  * @param[in] mapLength the map length.
  * @param[out] positionOfOrigin the position of the data structure origin.
  */
-void getPositionOfDataStructureOrigin(const Position& position,
-                                      const Length& mapLength,
-                                      Position& positionOfOrigin);
+void getPositionOfDataStructureOrigin(const Position& position, const Length& mapLength, Position& positionOfOrigin);
 
 /*!
  * Computes how many cells/indeces the map is moved based on a position shift in
@@ -105,9 +89,7 @@ void getPositionOfDataStructureOrigin(const Position& position,
  * @param[in] resolution the resolution of the map.
  * @return true if successful.
  */
-bool getIndexShiftFromPositionShift(Index& indexShift,
-                                    const Vector& positionShift,
-                                    const double& resolution);
+bool getIndexShiftFromPositionShift(Index& indexShift, const Vector& positionShift, const double& resolution);
 
 /*!
  * Computes the corresponding position shift from a index shift. Use this function
@@ -118,9 +100,7 @@ bool getIndexShiftFromPositionShift(Index& indexShift,
  * @param[in] resolution the resolution of the map.
  * @return true if successful.
  */
-bool getPositionShiftFromIndexShift(Vector& positionShift,
-                                    const Index& indexShift,
-                                    const double& resolution);
+bool getPositionShiftFromIndexShift(Vector& positionShift, const Index& indexShift, const double& resolution);
 
 /*!
  * Checks if index is within range of the buffer.
@@ -199,17 +179,10 @@ const Eigen::Matrix2i getBufferOrderToMapFrameAlignment();
  * @param[in] bufferStartIndex the index of the starting point of the circular buffer (optional).
  * @return true if successful.
  */
-bool getSubmapInformation(Index& submapTopLeftIndex,
-                          Size& submapBufferSize,
-                          Position& submapPosition,
-                          Length& submapLength,
-                          Index& requestedIndexInSubmap,
-                          const Position& requestedSubmapPosition,
-                          const Length& requestedSubmapLength,
-                          const Length& mapLength,
-                          const Position& mapPosition,
-                          const double& resolution,
-                          const Size& bufferSize,
+bool getSubmapInformation(Index& submapTopLeftIndex, Size& submapBufferSize, Position& submapPosition,
+                          Length& submapLength, Index& requestedIndexInSubmap, const Position& requestedSubmapPosition,
+                          const Length& requestedSubmapLength, const Length& mapLength, const Position& mapPosition,
+                          const double& resolution, const Size& bufferSize,
                           const Index& bufferStartIndex = Index::Zero());
 
 /*!
@@ -218,8 +191,8 @@ bool getSubmapInformation(Index& submapTopLeftIndex,
  * @param bottomRightIndex the bottom right index in the map.
  * @return buffer size for the submap.
  */
-Size getSubmapSizeFromCornerIndeces(const Index& topLeftIndex, const Index& bottomRightIndex,
-                                    const Size& bufferSize, const Index& bufferStartIndex);
+Size getSubmapSizeFromCornerIndeces(const Index& topLeftIndex, const Index& bottomRightIndex, const Size& bufferSize,
+                                    const Index& bufferStartIndex);
 
 /*!
  * Computes the regions in the circular buffer that make up the data for
@@ -231,10 +204,8 @@ Size getSubmapSizeFromCornerIndeces(const Index& topLeftIndex, const Index& bott
  * @param[in] bufferStartIndex the index of the starting point of the circular buffer (optional).
  * @return true if successful, false if requested submap is not fully contained in the map.
  */
-bool getBufferRegionsForSubmap(std::vector<BufferRegion>& submapBufferRegions,
-                               const Index& submapIndex,
-                               const Size& submapBufferSize,
-                               const Size& bufferSize,
+bool getBufferRegionsForSubmap(std::vector<BufferRegion>& submapBufferRegions, const Index& submapIndex,
+                               const Size& submapBufferSize, const Size& bufferSize,
                                const Index& bufferStartIndex = Index::Zero());
 
 /*!
@@ -246,8 +217,7 @@ bool getBufferRegionsForSubmap(std::vector<BufferRegion>& submapBufferRegions,
  * @param[in] bufferStartIndex the map buffer start index.
  * @return true if successfully incremented indeces, false if end of iteration limits are reached.
  */
-bool incrementIndex(Index& index, const Size& bufferSize,
-                    const Index& bufferStartIndex = Index::Zero());
+bool incrementIndex(Index& index, const Size& bufferSize, const Index& bufferStartIndex = Index::Zero());
 
 /*!
  * Increases the index by one to iterate through the cells of a submap.
@@ -277,8 +247,7 @@ bool incrementIndexForSubmap(Index& submapIndex, Index& index, const Index& subm
  * @param bufferStartIndex the map buffer start index.
  * @return the unwrapped index.
  */
-Index getIndexFromBufferIndex(const Index& bufferIndex, const Size& bufferSize,
-                              const Index& bufferStartIndex);
+Index getIndexFromBufferIndex(const Index& bufferIndex, const Size& bufferSize, const Index& bufferStartIndex);
 
 /*!
  * Retrieve the index of the buffer from a unwrapped index (reverse from function above).
@@ -315,8 +284,7 @@ Index getIndexFromLinearIndex(const size_t linearIndex, const Size& bufferSize, 
  * @param regionSize the region size.
  * @param indices the list of indices of the region.
  */
-void getIndicesForRegion(const Index& regionIndex, const Size& regionSize,
-                         std::vector<Index> indices);
+void getIndicesForRegion(const Index& regionIndex, const Size& regionSize, std::vector<Index> indices);
 
 /*!
  * Generates a list of indices for multiple regions in the map.
@@ -325,8 +293,7 @@ void getIndicesForRegion(const Index& regionIndex, const Size& regionSize,
  * @param regionSizes the regions' sizes.
  * @param indices the list of indices of the regions.
  */
-void getIndicesForRegions(const std::vector<Index>& regionIndeces, const Size& regionSizes,
-                          std::vector<Index> indices);
+void getIndicesForRegions(const std::vector<Index>& regionIndeces, const Size& regionSizes, std::vector<Index> indices);
 
 /*!
  * Transforms an int color value (concatenated RGB values) to an int color vector (RGB from 0-255).
@@ -374,4 +341,4 @@ void colorVectorToValue(const Eigen::Vector3i& colorVector, float& colorValue);
  */
 void colorVectorToValue(const Eigen::Vector3f& colorVector, float& colorValue);
 
-} // namespace
+}  // namespace grid_map

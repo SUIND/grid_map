@@ -8,21 +8,20 @@
 
 #pragma once
 
-#include <grid_map_core/TypeDefs.hpp>
 #include <filters/filter_base.h>
 
 #include <Eigen/Core>
+#include <grid_map_core/TypeDefs.hpp>
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Creates a new color layer with the color mapped between min. and max. value.
  */
-template<typename T>
+template <typename T>
 class ColorMapFilter : public filters::FilterBase<T>
 {
-
  public:
   /*!
    * Constructor
@@ -60,4 +59,4 @@ class ColorMapFilter : public filters::FilterBase<T>
   std::string outputLayer_;
 };
 
-} /* namespace */
+}  // namespace grid_map

@@ -7,6 +7,7 @@
  */
 
 #include <ros/ros.h>
+
 #include "grid_map_visualization/GridMapVisualization.hpp"
 
 int main(int argc, char** argv)

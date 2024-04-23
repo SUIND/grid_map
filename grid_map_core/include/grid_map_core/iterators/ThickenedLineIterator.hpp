@@ -14,16 +14,15 @@
 // Eigen
 #include <Eigen/Core>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Iterator class to iterate over a thick line in the map.
  * Based on the PolygonIterator class.
  */
 class ThickenedLineIterator
 {
-public:
-
+ public:
   /*!
    * Constructor.
    * @param gridMap the grid map to iterate on.
@@ -31,32 +30,33 @@ public:
    * @param end the ending position of the line.
    * @param thickness the thickness of the line.
    */
-  ThickenedLineIterator(const grid_map::GridMap& gridMap, const Position& start, const Position& end, const double thickness);
+  ThickenedLineIterator(const grid_map::GridMap& gridMap, const Position& start, const Position& end,
+                        const double thickness);
 
   /*!
    * Assignment operator.
    * @param iterator the iterator to copy data from.
    * @return a reference to *this.
    */
-  ThickenedLineIterator& operator =(const ThickenedLineIterator& other);
+  ThickenedLineIterator& operator=(const ThickenedLineIterator& other);
 
   /*!
    * Compare to another iterator.
    * @return whether the current iterator points to a different address than the other one.
    */
-  bool operator !=(const ThickenedLineIterator& other) const;
+  bool operator!=(const ThickenedLineIterator& other) const;
 
   /*!
    * Dereference the iterator with const.
    * @return the value to which the iterator is pointing.
    */
-  const Index& operator *() const;
+  const Index& operator*() const;
 
   /*!
    * Increase the iterator to the next element.
    * @return a reference to the updated iterator.
    */
-  ThickenedLineIterator& operator ++();
+  ThickenedLineIterator& operator++();
 
   /*!
    * Indicates if iterator is past end.
@@ -64,9 +64,7 @@ public:
    */
   bool isPastEnd() const;
 
-private:
-
-
+ private:
   /*!
    * Construct function.
    * @param gridMap the grid map to iterate on.
@@ -81,4 +79,4 @@ private:
   std::shared_ptr<PolygonIterator> polygonIterator_;
 };
 
-} /* namespace */
+}  // namespace grid_map

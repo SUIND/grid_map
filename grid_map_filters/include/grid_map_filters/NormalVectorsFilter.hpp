@@ -9,18 +9,19 @@
 #pragma once
 
 #include <filters/filter_base.h>
-#include <grid_map_core/grid_map_core.hpp>
 
 #include <Eigen/Core>
+#include <grid_map_core/grid_map_core.hpp>
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Compute the normal vectors of a layer in a map.
  */
 template <typename T>
-class NormalVectorsFilter : public filters::FilterBase<T> {
+class NormalVectorsFilter : public filters::FilterBase<T>
+{
  public:
   /*!
    * Constructor
@@ -40,13 +41,12 @@ class NormalVectorsFilter : public filters::FilterBase<T> {
    *      If something is wrong it switches to raster algorithm.
    *    3) parallelization_enabled, used for choosing between serial and parallel algorithm (default=false)
    *    4) thread_count, used to set the number of threads to be used in parallelization is enabled (default=auto)
-   * The parallelization_enabled and algorithm parameters allow to choose between the 4 different methods { AreaSerial, AreaParallel,
-   * RasterSerial, RasterParallel }
-   *    4) normal_vector_positive_axis, used to define the upward positive direction for the normals
-   *    5) input_layer, defines in which layer of the grid map lie the information needed (usually elevation or elevation_filtered)
-   *    6) output_layers_prefix, defines the prefix for the new 3 layers (x,y,z) that will define the normal vectors
-   * Those parameters have to be written in a .yaml file that will be processed as a sequence of filters.
-   * An example can be seen in grid_map_demos/config/normal_filter_comparison.yaml.
+   * The parallelization_enabled and algorithm parameters allow to choose between the 4 different methods { AreaSerial,
+   * AreaParallel, RasterSerial, RasterParallel } 4) normal_vector_positive_axis, used to define the upward positive
+   * direction for the normals 5) input_layer, defines in which layer of the grid map lie the information needed
+   * (usually elevation or elevation_filtered) 6) output_layers_prefix, defines the prefix for the new 3 layers (x,y,z)
+   * that will define the normal vectors Those parameters have to be written in a .yaml file that will be processed as a
+   * sequence of filters. An example can be seen in grid_map_demos/config/normal_filter_comparison.yaml.
    */
   bool configure() override;
 
@@ -82,23 +82,22 @@ class NormalVectorsFilter : public filters::FilterBase<T> {
   void computeWithAreaParallel(GridMap& map, const std::string& inputLayer, const std::string& outputLayersPrefix);
 
   /*!
-   * Estimate the normal vector at one point of the input layer, specified by the index parameter, by using points within
-   * a circle of specified radius.
+   * Estimate the normal vector at one point of the input layer, specified by the index parameter, by using points
+   * within a circle of specified radius.
    *
-   * The eigen decomposition of the covariance matrix (3x3) of all data points is used to establish the normal direction.
-   * Four cases can be identified when the eigenvalues are ordered in ascending order:
-   *    1) The data is in a cloud -> all eigenvalues are non-zero
-   *    2) The data is on a plane -> The first eigenvalue is zero
-   *    3) The data is on a line -> The first two eigenvalues are zero.
-   *    4) The data is in one point -> All eigenvalues are zero
+   * The eigen decomposition of the covariance matrix (3x3) of all data points is used to establish the normal
+   * direction. Four cases can be identified when the eigenvalues are ordered in ascending order: 1) The data is in a
+   * cloud -> all eigenvalues are non-zero 2) The data is on a plane -> The first eigenvalue is zero 3) The data is on a
+   * line -> The first two eigenvalues are zero. 4) The data is in one point -> All eigenvalues are zero
    *
    * Only case 1 & 2 provide enough information the establish a normal direction.
    * The degenerate cases (3 or 4) are identified by checking if the second eigenvalue is zero.
    *
-   * The numerical threshold (1e-8) for the eigenvalue being zero is given by the accuracy of the decomposition, as reported by Eigen:
-   * https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html
+   * The numerical threshold (1e-8) for the eigenvalue being zero is given by the accuracy of the decomposition, as
+   * reported by Eigen: https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html
    *
-   * Finally, the sign normal vector is correct to be in the same direction as the user defined "normal vector positive axis"
+   * Finally, the sign normal vector is correct to be in the same direction as the user defined "normal vector positive
+   * axis"
    *
    * @param map: grid map containing the layer for which the normal vectors are computed for.
    * @param inputLayer: Layer the normal vector should be computed for.
@@ -106,7 +105,7 @@ class NormalVectorsFilter : public filters::FilterBase<T> {
    * @param index: Index of point in the grid map for which this function calculates the normal vector.
    */
   void areaSingleNormalComputation(GridMap& map, const std::string& inputLayer, const std::string& outputLayersPrefix,
-                                          const grid_map::Index& index);
+                                   const grid_map::Index& index);
   /*!
    * Estimate the normal vector at each point of the input layer by using the rasterSingleNormalComputation function.
    * This function makes use of the raster method and is the serial version of such normal vector computation using a
@@ -130,8 +129,8 @@ class NormalVectorsFilter : public filters::FilterBase<T> {
   void computeWithRasterParallel(GridMap& map, const std::string& inputLayer, const std::string& outputLayersPrefix);
 
   /*!
-   * Estimate the normal vector at one point of the input layer, specified by the index parameter, by using neighboring points
-   * around the point for which the normal vector is being calculated.
+   * Estimate the normal vector at one point of the input layer, specified by the index parameter, by using neighboring
+   * points around the point for which the normal vector is being calculated.
    *
    * The neighboring cells are used to linearly approximate the first derivative in both directions.
    *
@@ -151,7 +150,8 @@ class NormalVectorsFilter : public filters::FilterBase<T> {
    *
    * Inspiration for algorithm: http://www.flipcode.com/archives/Calculating_Vertex_Normals_for_Height_Maps.shtml
    *
-   * Finally, the sign normal vector is correct to be in the same direction as the user defined "normal vector positive axis"
+   * Finally, the sign normal vector is correct to be in the same direction as the user defined "normal vector positive
+   * axis"
    *
    * @param map: grid map containing the layer for which the normal vectors are computed for.
    * @param inputLayer: Layer the normal vector should be computed for.
@@ -159,10 +159,16 @@ class NormalVectorsFilter : public filters::FilterBase<T> {
    * @param dataMap: Matrix containing the input layer of the grid map in question.
    * @param index: Index of point in the grid map for which this function calculates the normal vector.
    */
-  void rasterSingleNormalComputation(GridMap& map, const std::string& outputLayersPrefix, const grid_map::Matrix& dataMap,
-                                            const grid_map::Index& index);
+  void rasterSingleNormalComputation(GridMap& map, const std::string& outputLayersPrefix,
+                                     const grid_map::Matrix& dataMap, const grid_map::Index& index);
 
-  enum class Method { AreaSerial, AreaParallel, RasterSerial, RasterParallel };
+  enum class Method
+  {
+    AreaSerial,
+    AreaParallel,
+    RasterSerial,
+    RasterParallel
+  };
 
   Method method_;
 

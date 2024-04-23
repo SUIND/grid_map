@@ -6,25 +6,27 @@
  *      Institute: ETH Zurich, Robotic Systems Lab
  */
 
-#include <cstdlib>
-
 #include <gtest/gtest.h>
 
-#include "grid_map_pcl/helpers.hpp"
+#include <cstdlib>
 
 #include "PointcloudCreator.hpp"
+#include "grid_map_pcl/helpers.hpp"
 #include "test_helpers.hpp"
 
-namespace grid_map {
-namespace grid_map_pcl_test {
-
-TEST(HelpersTest, MeanPositionTest) {
+namespace grid_map
+{
+namespace grid_map_pcl_test
+{
+TEST(HelpersTest, MeanPositionTest)
+{
   grid_map_pcl_test::setVerbosityLevel(ros::console::levels::Warn);
   const auto seed = rand();
   grid_map_pcl_test::rndGenerator.seed(seed);
 
   const unsigned int numTests = 10;
-  for (unsigned int i = 0; i < numTests; ++i) {
+  for (unsigned int i = 0; i < numTests; ++i)
+  {
     double mean, stdDev;
     auto cloud = grid_map_pcl_test::PointcloudCreator::createBlobOfPoints(&mean, &stdDev);
     auto meanOfAllPoints = grid_map_pcl::calculateMeanOfPointPositions(cloud);
@@ -34,7 +36,8 @@ TEST(HelpersTest, MeanPositionTest) {
     EXPECT_NEAR(meanOfAllPoints.z(), mean, 3 * stdDev);
   }
 
-  if (::testing::Test::HasFailure()) {
+  if (::testing::Test::HasFailure())
+  {
     std::cout << "\n Test MeanPositionTest failed with seed: " << seed << std::endl;
   }
 }
