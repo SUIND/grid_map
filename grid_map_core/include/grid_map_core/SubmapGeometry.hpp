@@ -10,8 +10,8 @@
 
 #include <grid_map_core/GridMap.hpp>
 
-namespace grid_map {
-
+namespace grid_map
+{
 class GridMap;
 
 /*!
@@ -22,7 +22,6 @@ class GridMap;
 class SubmapGeometry
 {
  public:
-
   /*!
    * Constructor. Note that the requested position and length
    * of the submap is adapted to fit the geometry of the parent
@@ -32,8 +31,7 @@ class SubmapGeometry
    * @param[in] length the requested submap length.
    * @param[out] isSuccess true if successful, false otherwise.
    */
-  SubmapGeometry(const GridMap& gridMap, const Position& position, const Length& length,
-                 bool& isSuccess);
+  SubmapGeometry(const GridMap& gridMap, const Position& position, const Length& length, bool& isSuccess);
 
   virtual ~SubmapGeometry();
 
@@ -46,7 +44,6 @@ class SubmapGeometry
   const Index& getStartIndex() const;
 
  private:
-
   //! Parent grid map of the submap.
   const GridMap& gridMap_;
 

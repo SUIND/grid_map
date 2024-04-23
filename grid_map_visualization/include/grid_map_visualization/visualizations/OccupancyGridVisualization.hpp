@@ -8,18 +8,17 @@
 
 #pragma once
 
-#include <grid_map_visualization/visualizations/VisualizationBase.hpp>
 #include <grid_map_core/GridMap.hpp>
+#include <grid_map_visualization/visualizations/VisualizationBase.hpp>
 
 // ROS
 #include <ros/ros.h>
 
-namespace grid_map_visualization {
-
+namespace grid_map_visualization
+{
 class OccupancyGridVisualization : public VisualizationBase
 {
  public:
-
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -52,7 +51,6 @@ class OccupancyGridVisualization : public VisualizationBase
   bool visualize(const grid_map::GridMap& map);
 
  private:
-
   //! Type that is transformed to the occupancy grid.
   std::string layer_;
 
@@ -60,4 +58,4 @@ class OccupancyGridVisualization : public VisualizationBase
   float dataMin_, dataMax_;
 };
 
-} /* namespace */
+}  // namespace grid_map_visualization

@@ -8,21 +8,20 @@
 
 #pragma once
 
+#include <Eigen/Core>
+
 #include "grid_map_core/GridMap.hpp"
 #include "grid_map_core/iterators/SubmapIterator.hpp"
 
-#include <Eigen/Core>
-
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Iterator class to iterate over a line in the map.
  * Based on Bresenham Line Drawing algorithm.
  */
 class LineIterator
 {
-public:
-
+ public:
   /*!
    * Constructor.
    * @param gridMap the grid map to iterate on.
@@ -45,25 +44,25 @@ public:
    * @param iterator the iterator to copy data from.
    * @return a reference to *this.
    */
-  LineIterator& operator =(const LineIterator& other);
+  LineIterator& operator=(const LineIterator& other);
 
   /*!
    * Compare to another iterator.
    * @return whether the current iterator points to a different address than the other one.
    */
-  bool operator !=(const LineIterator& other) const;
+  bool operator!=(const LineIterator& other) const;
 
   /*!
    * Dereference the iterator with const.
    * @return the value to which the iterator is pointing.
    */
-  const Index& operator *() const;
+  const Index& operator*() const;
 
   /*!
    * Increase the iterator to the next element.
    * @return a reference to the updated iterator.
    */
-  LineIterator& operator ++();
+  LineIterator& operator++();
 
   /*!
    * Indicates if iterator is past end.
@@ -71,9 +70,7 @@ public:
    */
   bool isPastEnd() const;
 
-private:
-
-
+ private:
   /*!
    * Construct function.
    * @param gridMap the grid map to iterate on.
@@ -96,8 +93,8 @@ private:
    * @param[out] index the index of the moved start position.
    * @return true if successful, false otherwise.
    */
-  bool getIndexLimitedToMapRange(const grid_map::GridMap& gridMap, const Position& start,
-                                 const Position& end, Index& index);
+  bool getIndexLimitedToMapRange(const grid_map::GridMap& gridMap, const Position& start, const Position& end,
+                                 Index& index);
 
   //! Current index.
   Index index_;
@@ -129,4 +126,4 @@ private:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-} /* namespace */
+}  // namespace grid_map

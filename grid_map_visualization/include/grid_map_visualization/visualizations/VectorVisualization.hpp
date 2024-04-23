@@ -8,26 +8,25 @@
 
 #pragma once
 
-#include <grid_map_visualization/visualizations/VisualizationBase.hpp>
 #include <grid_map_core/GridMap.hpp>
+#include <grid_map_visualization/visualizations/VisualizationBase.hpp>
 
 // ROS
 #include <ros/ros.h>
-#include <visualization_msgs/Marker.h>
 #include <std_msgs/ColorRGBA.h>
+#include <visualization_msgs/Marker.h>
 
 // STD
 #include <vector>
 
-namespace grid_map_visualization {
-
+namespace grid_map_visualization
+{
 /*!
  * Visualization a combination of three layers of the grid map as a vector field.
  */
 class VectorVisualization : public VisualizationBase
 {
  public:
-
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -60,7 +59,6 @@ class VectorVisualization : public VisualizationBase
   bool visualize(const grid_map::GridMap& map);
 
  private:
-
   //! Marker to be published.
   visualization_msgs::Marker marker_;
 
@@ -80,4 +78,4 @@ class VectorVisualization : public VisualizationBase
   std_msgs::ColorRGBA color_;
 };
 
-} /* namespace */
+}  // namespace grid_map_visualization

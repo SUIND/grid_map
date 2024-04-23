@@ -7,6 +7,7 @@
  */
 
 #include "grid_map_cv/InpaintFilter.hpp"
+
 #include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>
 
@@ -15,41 +16,45 @@
 
 using namespace filters;
 
-namespace grid_map {
-
-template<typename T>
-InpaintFilter<T>::InpaintFilter()
-    : radius_(5.0) {
-
+namespace grid_map
+{
+template <typename T>
+InpaintFilter<T>::InpaintFilter() : radius_(5.0)
+{
 }
 
-template<typename T>
-InpaintFilter<T>::~InpaintFilter() {
-
+template <typename T>
+InpaintFilter<T>::~InpaintFilter()
+{
 }
 
-template<typename T>
-bool InpaintFilter<T>::configure() {
-  if (!FilterBase < T > ::getParam(std::string("radius"), radius_)) {
+template <typename T>
+bool InpaintFilter<T>::configure()
+{
+  if (!FilterBase<T>::getParam(std::string("radius"), radius_))
+  {
     ROS_ERROR("InpaintRadius filter did not find param radius.");
     return false;
   }
 
-  if (radius_ < 0.0) {
+  if (radius_ < 0.0)
+  {
     ROS_ERROR("Radius must be greater than zero.");
     return false;
   }
 
   ROS_DEBUG("Radius = %f.", radius_);
 
-  if (!FilterBase < T > ::getParam(std::string("input_layer"), inputLayer_)) {
+  if (!FilterBase<T>::getParam(std::string("input_layer"), inputLayer_))
+  {
     ROS_ERROR("Inpaint filter did not find parameter `input_layer`.");
     return false;
   }
 
   ROS_DEBUG("Inpaint input layer is = %s.", inputLayer_.c_str());
 
-  if (!FilterBase < T > ::getParam(std::string("output_layer"), outputLayer_)) {
+  if (!FilterBase<T>::getParam(std::string("output_layer"), outputLayer_))
+  {
     ROS_ERROR("Inpaint filter did not find parameter `output_layer`.");
     return false;
   }
@@ -59,19 +64,22 @@ bool InpaintFilter<T>::configure() {
   return true;
 }
 
-template<typename T>
-bool InpaintFilter<T>::update(const T& mapIn, T& mapOut) {
+template <typename T>
+bool InpaintFilter<T>::update(const T& mapIn, T& mapOut)
+{
   // Add new layer to the elevation map.
   mapOut = mapIn;
   mapOut.add(outputLayer_);
 
-  //Convert elevation layer to OpenCV image to fill in holes.
-  //Get the inpaint mask (nonzero pixels indicate where values need to be filled in).
+  // Convert elevation layer to OpenCV image to fill in holes.
+  // Get the inpaint mask (nonzero pixels indicate where values need to be filled in).
   mapOut.add("inpaint_mask", 0.0);
 
   mapOut.setBasicLayers(std::vector<std::string>());
-  for (grid_map::GridMapIterator iterator(mapOut); !iterator.isPastEnd(); ++iterator) {
-    if (!mapOut.isValid(*iterator, inputLayer_)) {
+  for (grid_map::GridMapIterator iterator(mapOut); !iterator.isPastEnd(); ++iterator)
+  {
+    if (!mapOut.isValid(*iterator, inputLayer_))
+    {
       mapOut.at("inpaint_mask", *iterator) = 1.0;
     }
   }
@@ -88,12 +96,13 @@ bool InpaintFilter<T>::update(const T& mapIn, T& mapOut) {
   const double radiusInPixels = radius_ / mapIn.getResolution();
   cv::inpaint(originalImage, mask, filledImage, radiusInPixels, cv::INPAINT_NS);
 
-  grid_map::GridMapCvConverter::addLayerFromImage<unsigned char, 3>(filledImage, outputLayer_, mapOut, minValue, maxValue);
+  grid_map::GridMapCvConverter::addLayerFromImage<unsigned char, 3>(filledImage, outputLayer_, mapOut, minValue,
+                                                                    maxValue);
   mapOut.erase("inpaint_mask");
 
   return true;
 }
 
-}/* namespace */
+}  // namespace grid_map
 
 PLUGINLIB_EXPORT_CLASS(grid_map::InpaintFilter<grid_map::GridMap>, filters::FilterBase<grid_map::GridMap>)

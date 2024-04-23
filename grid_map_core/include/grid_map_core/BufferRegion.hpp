@@ -10,8 +10,8 @@
 
 #include "grid_map_core/TypeDefs.hpp"
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * This class holds information about a rectangular region
  * of cells of the circular buffer.
@@ -19,7 +19,6 @@ namespace grid_map {
 class BufferRegion
 {
  public:
-
   /*!
    * The definition of the buffer region positions.
    */
@@ -46,7 +45,6 @@ class BufferRegion
   void setQuadrant(BufferRegion::Quadrant type);
 
  private:
-
   //! Start index (typically top-left) of the buffer region.
   Index staretIndex_;
 

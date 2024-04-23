@@ -8,9 +8,11 @@
 
 #include "grid_map_pcl/GridMapPclConverter.hpp"
 
-namespace grid_map {
-
-bool GridMapPclConverter::initializeFromPolygonMesh(const pcl::PolygonMesh& mesh, const double resolution, grid_map::GridMap& gridMap) {
+namespace grid_map
+{
+bool GridMapPclConverter::initializeFromPolygonMesh(const pcl::PolygonMesh& mesh, const double resolution,
+                                                    grid_map::GridMap& gridMap)
+{
   pcl::PointCloud<pcl::PointXYZ> cloud;
   pcl::fromPCLPointCloud2(mesh.cloud, cloud);
   pcl::PointXYZ minBound;
@@ -24,7 +26,9 @@ bool GridMapPclConverter::initializeFromPolygonMesh(const pcl::PolygonMesh& mesh
   return true;
 }
 
-bool GridMapPclConverter::addLayerFromPolygonMesh(const pcl::PolygonMesh& mesh, const std::string& layer, grid_map::GridMap& gridMap) {
+bool GridMapPclConverter::addLayerFromPolygonMesh(const pcl::PolygonMesh& mesh, const std::string& layer,
+                                                  grid_map::GridMap& gridMap)
+{
   // Adding a layer to the grid map to put data into
   gridMap.add(layer);
   // Converting out of binary cloud data
@@ -37,7 +41,8 @@ bool GridMapPclConverter::addLayerFromPolygonMesh(const pcl::PolygonMesh& mesh, 
   pcl::getMinMax3D(cloud, minBound, maxBound);
 
   // Iterating over the triangles in the mesh
-  for (const pcl::Vertices& polygon : mesh.polygons) {
+  for (const pcl::Vertices& polygon : mesh.polygons)
+  {
     // Testing this is a triangle
     assert(polygon.vertices.size() == 3);
     // Getting the vertices of the triangle (as a single matrix)
@@ -55,8 +60,10 @@ bool GridMapPclConverter::addLayerFromPolygonMesh(const pcl::PolygonMesh& mesh, 
     grid_map::Position position((maxX + minX) / 2.0, (maxY + minY) / 2.0);
     bool isSuccess;
     SubmapGeometry submap(gridMap, position, length, isSuccess);
-    if (isSuccess) {
-      for (grid_map::SubmapIterator iterator(submap); !iterator.isPastEnd(); ++iterator) {
+    if (isSuccess)
+    {
+      for (grid_map::SubmapIterator iterator(submap); !iterator.isPastEnd(); ++iterator)
+      {
         // Cell position
         const Index index(*iterator);
         grid_map::Position vertexPositionXY;
@@ -65,11 +72,15 @@ bool GridMapPclConverter::addLayerFromPolygonMesh(const pcl::PolygonMesh& mesh, 
         Eigen::Vector3f point(vertexPositionXY.x(), vertexPositionXY.y(), maxBound.z + 1.0);
         // Vertical ray/triangle intersection
         Eigen::Vector3f intersectionPoint;
-        if (rayTriangleIntersect(point, ray, triangleVertexMatrix, intersectionPoint)) {
+        if (rayTriangleIntersect(point, ray, triangleVertexMatrix, intersectionPoint))
+        {
           // If data already present in this cell, taking the max, else setting the data
-          if (gridMap.isValid(index, layer)) {
+          if (gridMap.isValid(index, layer))
+          {
             gridMap.at(layer, index) = std::max(gridMap.at(layer, index), intersectionPoint.z());
-          } else {
+          }
+          else
+          {
             gridMap.at(layer, index) = intersectionPoint.z();
           }
         }
@@ -81,7 +92,9 @@ bool GridMapPclConverter::addLayerFromPolygonMesh(const pcl::PolygonMesh& mesh, 
 }
 
 bool GridMapPclConverter::rayTriangleIntersect(const Eigen::Vector3f& point, const Eigen::Vector3f& ray,
-                                               const Eigen::Matrix3f& triangleVertexMatrix, Eigen::Vector3f& intersectionPoint) {
+                                               const Eigen::Matrix3f& triangleVertexMatrix,
+                                               Eigen::Vector3f& intersectionPoint)
+{
   // Algorithm here is adapted from:
   // http://softsurfer.com/Archive/algorithm_0105/algorithm_0105.htm#intersect_RayTriangle()
   //
@@ -98,13 +111,15 @@ bool GridMapPclConverter::rayTriangleIntersect(const Eigen::Vector3f& point, con
   const Eigen::Vector3f n = u.cross(v);
   const float n_dot_ray = n.dot(ray);
 
-  if (std::fabs(n_dot_ray) < 1e-9) {
+  if (std::fabs(n_dot_ray) < 1e-9)
+  {
     return false;
   }
 
   const float r = n.dot(a - point) / n_dot_ray;
 
-  if (r < 0) {
+  if (r < 0)
+  {
     return false;
   }
 
@@ -117,13 +132,15 @@ bool GridMapPclConverter::rayTriangleIntersect(const Eigen::Vector3f& point, con
   const float denominator = u.dot(v) * u.dot(v) - u.dot(u) * v.dot(v);
   const float s_numerator = u.dot(v) * w.dot(v) - v.dot(v) * w.dot(u);
   const float s = s_numerator / denominator;
-  if (s < (0 - delta) || s > (1 + delta)) {
+  if (s < (0 - delta) || s > (1 + delta))
+  {
     return false;
   }
 
   const float t_numerator = u.dot(v) * w.dot(u) - u.dot(u) * w.dot(v);
   const float t = t_numerator / denominator;
-  if (t < (0 - delta) || s + t > (1 + delta)) {
+  if (t < (0 - delta) || s + t > (1 + delta))
+  {
     return false;
   }
 

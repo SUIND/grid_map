@@ -9,14 +9,14 @@
 
 #pragma once
 
-#include <grid_map_ros/grid_map_ros.hpp>
-
 #include <filters/filter_chain.h>
 #include <ros/ros.h>
+
+#include <grid_map_ros/grid_map_ros.hpp>
 #include <string>
 
-namespace grid_map_demos {
-
+namespace grid_map_demos
+{
 /*!
  * Applies a chain of grid map filters to a topic and
  * republishes the resulting grid map.
@@ -24,7 +24,6 @@ namespace grid_map_demos {
 class FiltersDemo
 {
  public:
-
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -38,9 +37,9 @@ class FiltersDemo
   virtual ~FiltersDemo();
 
   /*!
-  * Reads and verifies the ROS parameters.
-  * @return true if successful.
-  */
+   * Reads and verifies the ROS parameters.
+   * @return true if successful.
+   */
   bool readParameters();
 
   /*!
@@ -50,7 +49,6 @@ class FiltersDemo
   void callback(const grid_map_msgs::GridMap& message);
 
  private:
-
   //! ROS nodehandle.
   ros::NodeHandle& nodeHandle_;
 
@@ -73,4 +71,4 @@ class FiltersDemo
   std::string filterChainParametersName_;
 };
 
-} /* namespace */
+}  // namespace grid_map_demos

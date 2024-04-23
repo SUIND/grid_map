@@ -8,18 +8,17 @@
 
 #include "grid_map_demos/OctomapToGridmapDemo.hpp"
 
+#include <octomap/octomap.h>
+#include <octomap_msgs/GetOctomap.h>
+#include <octomap_msgs/Octomap.h>
+#include <octomap_msgs/conversions.h>
+
 #include <grid_map_octomap/GridMapOctomapConverter.hpp>
 
-#include <octomap_msgs/Octomap.h>
-#include <octomap/octomap.h>
-#include <octomap_msgs/conversions.h>
-#include <octomap_msgs/GetOctomap.h>
-
-namespace grid_map_demos {
-
+namespace grid_map_demos
+{
 OctomapToGridmapDemo::OctomapToGridmapDemo(ros::NodeHandle& nodeHandle)
-    : nodeHandle_(nodeHandle),
-      map_(grid_map::GridMap({"elevation"}))
+    : nodeHandle_(nodeHandle), map_(grid_map::GridMap({"elevation"}))
 {
   readParameters();
   client_ = nodeHandle_.serviceClient<octomap_msgs::GetOctomap>(octomapServiceTopic_);
@@ -28,9 +27,7 @@ OctomapToGridmapDemo::OctomapToGridmapDemo(ros::NodeHandle& nodeHandle)
   octomapPublisher_ = nodeHandle_.advertise<octomap_msgs::Octomap>("octomap", 1, true);
 }
 
-OctomapToGridmapDemo::~OctomapToGridmapDemo()
-{
-}
+OctomapToGridmapDemo::~OctomapToGridmapDemo() {}
 
 bool OctomapToGridmapDemo::readParameters()
 {
@@ -47,7 +44,8 @@ bool OctomapToGridmapDemo::readParameters()
 void OctomapToGridmapDemo::convertAndPublishMap()
 {
   octomap_msgs::GetOctomap srv;
-  if (!client_.call(srv)) {
+  if (!client_.call(srv))
+  {
     ROS_ERROR_STREAM("Failed to call service: " << octomapServiceTopic_);
     return;
   }
@@ -55,9 +53,12 @@ void OctomapToGridmapDemo::convertAndPublishMap()
   // creating octree
   octomap::OcTree* octomap = nullptr;
   octomap::AbstractOcTree* tree = octomap_msgs::msgToMap(srv.response.map);
-  if (tree) {
+  if (tree)
+  {
     octomap = dynamic_cast<octomap::OcTree*>(tree);
-  } else {
+  }
+  else
+  {
     ROS_ERROR("Failed to call convert Octomap.");
     return;
   }
@@ -66,20 +67,15 @@ void OctomapToGridmapDemo::convertAndPublishMap()
   grid_map::Position3 max_bound;
   octomap->getMetricMin(min_bound(0), min_bound(1), min_bound(2));
   octomap->getMetricMax(max_bound(0), max_bound(1), max_bound(2));
-  if(!std::isnan(minX_))
-    min_bound(0) = minX_;
-  if(!std::isnan(maxX_))
-    max_bound(0) = maxX_;
-  if(!std::isnan(minY_))
-    min_bound(1) = minY_;
-  if(!std::isnan(maxY_))
-    max_bound(1) = maxY_;
-  if(!std::isnan(minZ_))
-    min_bound(2) = minZ_;
-  if(!std::isnan(maxZ_))
-    max_bound(2) = maxZ_;
+  if (!std::isnan(minX_)) min_bound(0) = minX_;
+  if (!std::isnan(maxX_)) max_bound(0) = maxX_;
+  if (!std::isnan(minY_)) min_bound(1) = minY_;
+  if (!std::isnan(maxY_)) max_bound(1) = maxY_;
+  if (!std::isnan(minZ_)) min_bound(2) = minZ_;
+  if (!std::isnan(maxZ_)) max_bound(2) = maxZ_;
   bool res = grid_map::GridMapOctomapConverter::fromOctomap(*octomap, "elevation", map_, &min_bound, &max_bound);
-  if (!res) {
+  if (!res)
+  {
     ROS_ERROR("Failed to call convert Octomap.");
     return;
   }
@@ -97,4 +93,4 @@ void OctomapToGridmapDemo::convertAndPublishMap()
   octomapPublisher_.publish(octomapMessage);
 }
 
-} /* namespace */
+}  // namespace grid_map_demos

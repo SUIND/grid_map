@@ -14,7 +14,8 @@ int argc;
 char** argv;
 
 // Run all the tests that were declared with TEST()
-int main(int _argc, char** _argv) {
+int main(int _argc, char** _argv)
+{
   ros::Time::init();
   argc = _argc;
   argv = _argv;

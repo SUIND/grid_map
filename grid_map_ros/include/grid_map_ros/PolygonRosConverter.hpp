@@ -14,17 +14,16 @@
 #include <string>
 
 // ROS
-#include <ros/time.h>
 #include <geometry_msgs/PolygonStamped.h>
-#include <visualization_msgs/Marker.h>
+#include <ros/time.h>
 #include <std_msgs/ColorRGBA.h>
+#include <visualization_msgs/Marker.h>
 
-namespace grid_map {
-
+namespace grid_map
+{
 class PolygonRosConverter
 {
  public:
-
   /*!
    * Default constructor.
    */

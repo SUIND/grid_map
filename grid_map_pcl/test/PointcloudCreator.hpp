@@ -10,15 +10,17 @@
 
 #include "test_helpers.hpp"
 
-namespace grid_map {
-namespace grid_map_pcl_test {
-
+namespace grid_map
+{
+namespace grid_map_pcl_test
+{
 /*
  * Creates point clouds with some noise in the z direction (which is
  * the direction perpendicular to the surface normal). This is an approximation
  * of a point cloud that would be obtained with a real sensor.
  */
-class PointcloudCreator {
+class PointcloudCreator
+{
  public:
   /*!
    * Creates a noisy point cloud of a step (i.e. two planes with some
@@ -31,7 +33,8 @@ class PointcloudCreator {
    * @param[out] std deviation in z direction of the points that form a plane
    * @return point cloud of the step terrain
    */
-  static Pointcloud::Ptr createNoisyPointcloudOfStepTerrain(double* stepLocation, double* zHigh, double* zLow, double* stdDev);
+  static Pointcloud::Ptr createNoisyPointcloudOfStepTerrain(double* stepLocation, double* zHigh, double* zLow,
+                                                            double* stdDev);
 
   /*!
    * Creates a blob of points (x,y,z). All coordinates (x,y,z)

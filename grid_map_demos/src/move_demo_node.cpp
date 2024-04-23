@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+
 #include <grid_map_ros/grid_map_ros.hpp>
 
 using namespace grid_map;
@@ -15,18 +16,22 @@ int main(int argc, char** argv)
   GridMap map({"layer"});
   map.setFrameId("map");
   map.setGeometry(Length(0.7, 0.7), 0.01, Position(0.0, 0.0));
-  ROS_INFO("Created map with size %f x %f m (%i x %i cells).\n The center of the map is located at (%f, %f) in the %s frame.",
-    map.getLength().x(), map.getLength().y(),
-    map.getSize()(0), map.getSize()(1),
-    map.getPosition().x(), map.getPosition().y(), map.getFrameId().c_str());
+  ROS_INFO(
+      "Created map with size %f x %f m (%i x %i cells).\n The center of the map is located at (%f, %f) in the %s "
+      "frame.",
+      map.getLength().x(), map.getLength().y(), map.getSize()(0), map.getSize()(1), map.getPosition().x(),
+      map.getPosition().y(), map.getFrameId().c_str());
   map["layer"].setRandom();
 
   bool useMoveMethod = true;
-  while (nh.ok()) {
-
-    if (useMoveMethod) {
+  while (nh.ok())
+  {
+    if (useMoveMethod)
+    {
       ROS_INFO("Using the `move(...)` method.");
-    } else {
+    }
+    else
+    {
       ROS_INFO("Using the `setPosition(...)` method.");
     }
 
@@ -36,7 +41,8 @@ int main(int argc, char** argv)
     ros::Time startTime = ros::Time::now();
     ros::Duration duration(0.0);
 
-    while (duration <= ros::Duration(10.0)) {
+    while (duration <= ros::Duration(10.0))
+    {
       ros::Time time = ros::Time::now();
       duration = time - startTime;
 
@@ -44,9 +50,12 @@ int main(int argc, char** argv)
       const double t = duration.toSec();
       Position newPosition = 0.03 * t * Position(cos(t), sin(t));
 
-      if (useMoveMethod) {
+      if (useMoveMethod)
+      {
         tempMap.move(newPosition);
-      } else {
+      }
+      else
+      {
         tempMap.setPosition(newPosition);
       }
 
@@ -55,8 +64,8 @@ int main(int argc, char** argv)
       grid_map_msgs::GridMap message;
       GridMapRosConverter::toMessage(tempMap, message);
       publisher.publish(message);
-      ROS_DEBUG("Grid map (duration %f) published with new position [%f, %f].",
-                duration.toSec(), tempMap.getPosition().x(), tempMap.getPosition().y());
+      ROS_DEBUG("Grid map (duration %f) published with new position [%f, %f].", duration.toSec(),
+                tempMap.getPosition().x(), tempMap.getPosition().y());
       rate.sleep();
     }
 

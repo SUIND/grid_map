@@ -25,7 +25,8 @@ using namespace std;
 using namespace Eigen;
 using namespace grid_map;
 
-TEST(SubmapIterator, Simple) {
+TEST(SubmapIterator, Simple)
+{
   Eigen::Array2i submapTopLeftIndex(3, 1);
   Eigen::Array2i submapBufferSize(3, 2);
   Eigen::Array2i index;
@@ -87,7 +88,8 @@ TEST(SubmapIterator, Simple) {
   EXPECT_EQ(1, iterator.getSubmapIndex()(1));
 }
 
-TEST(SubmapIterator, CircularBuffer) {
+TEST(SubmapIterator, CircularBuffer)
+{
   Eigen::Array2i submapTopLeftIndex(6, 3);
   Eigen::Array2i submapBufferSize(2, 4);
   Eigen::Array2i index;
@@ -192,7 +194,8 @@ TEST(SubmapIterator, CircularBuffer) {
  *              |9  9  9  9  9  9  9  9  9  9|
  *              +----------------------------+
  */
-TEST(SubmapIterator, InterleavedExecutionWithMove) {
+TEST(SubmapIterator, InterleavedExecutionWithMove)
+{
   grid_map::Index submapTopLeftIndex(3, 1);
   grid_map::Size submapSize(2, 2);
 
@@ -203,7 +206,8 @@ TEST(SubmapIterator, InterleavedExecutionWithMove) {
   auto& layer = map.get("layer");
 
   // Initialize the layer as sketched.
-  for (size_t colIndex = 0; colIndex < layer.cols(); colIndex++) {
+  for (size_t colIndex = 0; colIndex < layer.cols(); colIndex++)
+  {
     layer.col(colIndex).setConstant(colIndex);
   }
 
@@ -214,12 +218,18 @@ TEST(SubmapIterator, InterleavedExecutionWithMove) {
   // check that the submap iterator returns {1,1,2,2}
   auto checkCorrectValues = [](std::array<double, 4> given) {
     int countOnes = 0, countTwos = 0;
-    for (auto& value : given) {
-      if (std::abs(value - 1.0) < 1e-6) {
+    for (auto& value : given)
+    {
+      if (std::abs(value - 1.0) < 1e-6)
+      {
         countOnes++;
-      } else if (std::abs(value - 2.0) < 1e-6) {
+      }
+      else if (std::abs(value - 2.0) < 1e-6)
+      {
         countTwos++;
-      } else {
+      }
+      else
+      {
         FAIL() << "Submap iterator returned unexpected value.";
       }
     }
@@ -230,18 +240,22 @@ TEST(SubmapIterator, InterleavedExecutionWithMove) {
   std::array<double, 4> returnedSequence;
   returnedSequence.fill(0);
 
-  for (size_t submapIndex = 0; submapIndex < 4; submapIndex++) {
+  for (size_t submapIndex = 0; submapIndex < 4; submapIndex++)
+  {
     returnedSequence.at(submapIndex) = map.at("layer", *iterator);
     ++iterator;
   }
 
   checkCorrectValues(returnedSequence);
 
-  // Reset the iterator and now check that it still returns the same sequence when we move the map interleaved with iterating.
+  // Reset the iterator and now check that it still returns the same sequence when we move the map interleaved with
+  // iterating.
   iterator = SubmapIterator(map, submapTopLeftIndex, submapSize);
   returnedSequence.fill(0);
-  for (size_t submapIndex = 0; submapIndex < 4; submapIndex++) {
-    if (submapIndex == 2) {
+  for (size_t submapIndex = 0; submapIndex < 4; submapIndex++)
+  {
+    if (submapIndex == 2)
+    {
       // Now move the map as depicted.
       map.move(Position(2.0, 2.0));
     }

@@ -6,8 +6,9 @@
  *   Institute: ETH Zurich, ANYbotics
  */
 
-#include <grid_map_loader/GridMapLoader.hpp>
 #include <ros/ros.h>
+
+#include <grid_map_loader/GridMapLoader.hpp>
 
 int main(int argc, char** argv)
 {

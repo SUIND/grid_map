@@ -6,19 +6,20 @@
 
 #include <filters/filter_chain.h>
 #include <ros/ros.h>
+
 #include <Eigen/Core>
 #include <cmath>
-#include <vector>
-
 #include <grid_map_core/grid_map_core.hpp>
 #include <grid_map_ros/grid_map_ros.hpp>
+#include <vector>
 
 // Function headers
-namespace grid_map {
+namespace grid_map
+{
 /*!
  * Function to calculate the normal vector computation error.Error is defined as sum over the map of absolute cosines
- * between analytical and computed normals. The cosines are calculated using the dot product between two unitary vectors.
- * The error sum is then averaged between the latest 20 iteration of the functions.
+ * between analytical and computed normals. The cosines are calculated using the dot product between two unitary
+ * vectors. The error sum is then averaged between the latest 20 iteration of the functions.
  *
  * @param map: grid map to which add the layers that contains the errors.
  * @param gridMapSize: Dimensions of grid map, passed as parameter to not being calculated every time.
@@ -29,8 +30,8 @@ void normalsErrorCalculation(grid_map::GridMap& map, const grid_map::Size& gridM
                              double& directionalErrorRasterSum);
 
 /*!
- * Function to add noise to the elevation map. Noise added is white noise from a uniform distribution [-1:1] multiplied by
- * the amount of noise wanted specified by noise_on_map.
+ * Function to add noise to the elevation map. Noise added is white noise from a uniform distribution [-1:1] multiplied
+ * by the amount of noise wanted specified by noise_on_map.
  *
  * @param map: grid map to which add the layers that contains the errors.
  * @param gridMapSize: Dimensions of grid map, passed as parameter to not being calculated every time.
@@ -59,7 +60,8 @@ void mapAddOutliers(grid_map::GridMap& map, const grid_map::Size& gridMapSize, c
 void mapAverageFiltering(grid_map::GridMap& map, const grid_map::Size& gridMapSize, const double filterRadius);
 }  // namespace grid_map
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
   // Initialize node and publisher.
   ros::init(argc, argv, "normal_filter_comparison_demo");
   ros::NodeHandle nh("~");
@@ -84,7 +86,8 @@ int main(int argc, char** argv) {
   ROS_INFO("outliers_percentage = %f", outliers_percentage);
 
   // Configuration of chain filter.
-  if (!filterChain_.configure(filterChainParametersName_, nh)) {
+  if (!filterChain_.configure(filterChainParametersName_, nh))
+  {
     ROS_ERROR("Could not configure the filter chain!");
   }
 
@@ -98,9 +101,11 @@ int main(int argc, char** argv) {
   map.setFrameId("map");
   map.setGeometry(grid_map::Length(mapLength, mapWidth), mapResolution, grid_map::Position(0.0, 0.0));
   const grid_map::Size gridMapSize = map.getSize();
-  ROS_INFO("Created map with size %f x %f m (%i x %i cells).\n The center of the map is located at (%f, %f) in the %s frame.",
-           map.getLength().x(), map.getLength().y(), map.getSize()(0), map.getSize()(1), map.getPosition().x(), map.getPosition().y(),
-           map.getFrameId().c_str());
+  ROS_INFO(
+      "Created map with size %f x %f m (%i x %i cells).\n The center of the map is located at (%f, %f) in the %s "
+      "frame.",
+      map.getLength().x(), map.getLength().y(), map.getSize()(0), map.getSize()(1), map.getPosition().x(),
+      map.getPosition().y(), map.getFrameId().c_str());
 
   // Initialize variables for normal quality comparison.
   double directionalErrorAreaSum = 0;
@@ -114,41 +119,49 @@ int main(int argc, char** argv) {
 
   // Work with grid map in a loop. Grid map and analytic normals are continuously generated using exact functions.
   ros::Rate rate(10.0);
-  while (nh.ok()) {
+  while (nh.ok())
+  {
     ros::Time time = ros::Time::now();
 
     // Calculate wave shaped elevation and analytic surface normal.
-    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
+    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it)
+    {
       grid_map::Position position;
       map.getPosition(*it, position);
       map.at("elevation", *it) =
           surfaceBias + surfaceSlope * std::sin(surfaceSpeed * time.toSec() + wavePeriod * position.y()) * position.x();
 
       // Analytic normals computation.
-      grid_map::Vector3 normalAnalytic(-surfaceSlope * std::sin(surfaceSpeed * time.toSec() + wavePeriod * position.y()),
-                                       -position.x() * std::cos(surfaceSpeed * time.toSec() + wavePeriod * position.y()), 1.0);
+      grid_map::Vector3 normalAnalytic(
+          -surfaceSlope * std::sin(surfaceSpeed * time.toSec() + wavePeriod * position.y()),
+          -position.x() * std::cos(surfaceSpeed * time.toSec() + wavePeriod * position.y()), 1.0);
       normalAnalytic.normalize();
       map.at("normal_analytic_x", *it) = normalAnalytic.x();
       map.at("normal_analytic_y", *it) = normalAnalytic.y();
       map.at("normal_analytic_z", *it) = normalAnalytic.z();
     }
 
-    // elevation_filtered layer is used for visualization, initialize it here and if there is noise and filtering it will be updated.
+    // elevation_filtered layer is used for visualization, initialize it here and if there is noise and filtering it
+    // will be updated.
     map.add("elevation_filtered", map.get("elevation"));
 
     // Perturb and then filter map only if noise != 0.
-    if (noise_on_map != 0.0) {
+    if (noise_on_map != 0.0)
+    {
       grid_map::mapAddNoise(map, gridMapSize, noise_on_map);
     }
-    if (outliers_percentage != 0.0) {
+    if (outliers_percentage != 0.0)
+    {
       grid_map::mapAddOutliers(map, gridMapSize, outliers_percentage);
     }
-    if ((noise_on_map != 0.0) || (outliers_percentage != 0.0)) {
+    if ((noise_on_map != 0.0) || (outliers_percentage != 0.0))
+    {
       grid_map::mapAverageFiltering(map, gridMapSize, 0.1);
     }
 
     // Computation of normals using filterChain_.update function.
-    if (!filterChain_.update(map, map)) {
+    if (!filterChain_.update(map, map))
+    {
       ROS_ERROR("Could not update the grid map filter chain!");
     }
 
@@ -165,7 +178,8 @@ int main(int argc, char** argv) {
     double end = ros::Time::now().toSec();
 
     // Limit simulation length to 1 minute.
-    if ((end - begin) > 60) {
+    if ((end - begin) > 60)
+    {
       break;
     }
   }
@@ -173,9 +187,11 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-namespace grid_map {
+namespace grid_map
+{
 void normalsErrorCalculation(grid_map::GridMap& map, const grid_map::Size& gridMapSize, double& directionalErrorAreaSum,
-                             double& directionalErrorRasterSum) {
+                             double& directionalErrorRasterSum)
+{
   // If layers saved as matrices accessing values is faster.
   const grid_map::Matrix mapNormalAnalyticX = map["normal_analytic_x"];
   const grid_map::Matrix mapNormalAnalyticY = map["normal_analytic_y"];
@@ -199,7 +215,8 @@ void normalsErrorCalculation(grid_map::GridMap& map, const grid_map::Size& gridM
   // Raster normals not defined for outermost layer of cells.
   const grid_map::Index submapStartIndex(1, 1);
   const grid_map::Index submapBufferSize(gridMapSize(0) - 2, gridMapSize(1) - 2);
-  for (grid_map::SubmapIterator iterator(map, submapStartIndex, submapBufferSize); !iterator.isPastEnd(); ++iterator) {
+  for (grid_map::SubmapIterator iterator(map, submapStartIndex, submapBufferSize); !iterator.isPastEnd(); ++iterator)
+  {
     const grid_map::Index index(*iterator);
 
     normalVectorAnalytic(0) = mapNormalAnalyticX(index(0), index(1));
@@ -229,37 +246,45 @@ void normalsErrorCalculation(grid_map::GridMap& map, const grid_map::Size& gridM
   directionalErrorRasterSum = (directionalErrorRasterSum * 19.0 + directionalErrorRaster) / 20.0;
 }
 
-void mapAddNoise(grid_map::GridMap& map, const grid_map::Size& gridMapSize, const double& noise_on_map) {
+void mapAddNoise(grid_map::GridMap& map, const grid_map::Size& gridMapSize, const double& noise_on_map)
+{
   // Add noise (using Eigen operators).
   map.add("noise", noise_on_map * Matrix::Random(gridMapSize(0), gridMapSize(1)));
   map.add("elevation_noisy", map.get("elevation") + map["noise"]);
 }
 
-void mapAddOutliers(grid_map::GridMap& map, const grid_map::Size& gridMapSize, const double outlierPercentage) {
+void mapAddOutliers(grid_map::GridMap& map, const grid_map::Size& gridMapSize, const double outlierPercentage)
+{
   // Adding outliers at infinite height (accessing cell by position).
   const double numberInfPoints = outlierPercentage * gridMapSize(0) * gridMapSize(1);
 
-  for (int i = 0; i < static_cast<int>(numberInfPoints); ++i) {
+  for (int i = 0; i < static_cast<int>(numberInfPoints); ++i)
+  {
     grid_map::Position randomPosition = grid_map::Position::Random();
-    if (map.isInside(randomPosition)) {
+    if (map.isInside(randomPosition))
+    {
       map.atPosition("elevation_noisy", randomPosition) = std::numeric_limits<float>::infinity();
     }
   }
 }
 
-void mapAverageFiltering(grid_map::GridMap& map, const grid_map::Size& gridMapSize, const double filterRadius) {
+void mapAverageFiltering(grid_map::GridMap& map, const grid_map::Size& gridMapSize, const double filterRadius)
+{
   grid_map::Index startIndex(0, 0);
   grid_map::SubmapIterator it(map, startIndex, gridMapSize);
   // Iterate over whole map.
-  for (; !it.isPastEnd(); ++it) {
+  for (; !it.isPastEnd(); ++it)
+  {
     Position currentPosition;
     map.getPosition(*it, currentPosition);
     double mean = 0.0;
     double sumOfWeights = 0.0;
 
     // Compute weighted mean.
-    for (grid_map::CircleIterator circleIt(map, currentPosition, filterRadius); !circleIt.isPastEnd(); ++circleIt) {
-      if (!map.isValid(*circleIt, "elevation_noisy")) {
+    for (grid_map::CircleIterator circleIt(map, currentPosition, filterRadius); !circleIt.isPastEnd(); ++circleIt)
+    {
+      if (!map.isValid(*circleIt, "elevation_noisy"))
+      {
         continue;
       }
       grid_map::Position currentPositionInCircle;
@@ -271,9 +296,12 @@ void mapAverageFiltering(grid_map::GridMap& map, const grid_map::Size& gridMapSi
       mean += weight * map.at("elevation_noisy", *circleIt);
       sumOfWeights += weight;
     }
-    if (sumOfWeights!=0) {
+    if (sumOfWeights != 0)
+    {
       map.at("elevation_filtered", *it) = mean / sumOfWeights;
-    } else {
+    }
+    else
+    {
       map.at("elevation_filtered", *it) = std::numeric_limits<float>::infinity();
     }
   }

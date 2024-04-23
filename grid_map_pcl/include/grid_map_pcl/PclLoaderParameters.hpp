@@ -9,46 +9,54 @@
 #pragma once
 
 #include <yaml-cpp/yaml.h>
+
 #include <Eigen/Dense>
 #include <memory>
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 class GridMapPclLoader;
 
-namespace grid_map_pcl {
-
+namespace grid_map_pcl
+{
 class PointcloudProcessor;
 
-class PclLoaderParameters {
-  struct DownsamplingParameters {
+class PclLoaderParameters
+{
+  struct DownsamplingParameters
+  {
     Eigen::Vector3d voxelSize_{0.05, 0.05, 0.05};
     bool isDownsampleCloud_ = false;
   };
 
-  struct ClusterExtractionParameters {
+  struct ClusterExtractionParameters
+  {
     double clusterTolerance_ = 0.3;
     unsigned int minNumPoints_ = 2;
     unsigned int maxNumPoints_ = 1000000;
     bool useMaxHeightAsCellElevation_;
   };
-  struct OutlierRemovalParameters {
+  struct OutlierRemovalParameters
+  {
     bool isRemoveOutliers_ = false;
     int meanK_ = 10;
     double stddevThreshold_ = 1.0;
   };
-  struct RigidBodyTransformation {
+  struct RigidBodyTransformation
+  {
     Eigen::Vector3d translation_{0.0, 0.0, 0.0};
     Eigen::Vector3d rpyIntrinsic_{0.0, 0.0, 0.0};  // intrinsic rotation (opposite from the ROS convention), order X-Y-Z
   };
 
-  struct GridMapParameters {
+  struct GridMapParameters
+  {
     double resolution_ = 0.1;
     unsigned int minCloudPointsPerCell_ = 2;
   };
 
-  struct Parameters {
+  struct Parameters
+  {
     unsigned int numThreads_ = 4;
     RigidBodyTransformation cloudTransformation_;
     OutlierRemovalParameters outlierRemoval_;

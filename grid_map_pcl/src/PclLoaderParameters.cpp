@@ -10,26 +10,34 @@
 
 #include <ros/console.h>
 
-namespace grid_map {
-
-namespace grid_map_pcl {
-
-void PclLoaderParameters::handleYamlNode(const YAML::Node& yamlNode) {
+namespace grid_map
+{
+namespace grid_map_pcl
+{
+void PclLoaderParameters::handleYamlNode(const YAML::Node& yamlNode)
+{
   const std::string prefix = "pcl_grid_map_extraction";
 
   parameters_.numThreads_ = yamlNode[prefix]["num_processing_threads"].as<int>();
 
-  parameters_.cloudTransformation_.translation_.x() = yamlNode[prefix]["cloud_transform"]["translation"]["x"].as<double>();
-  parameters_.cloudTransformation_.translation_.y() = yamlNode[prefix]["cloud_transform"]["translation"]["y"].as<double>();
-  parameters_.cloudTransformation_.translation_.z() = yamlNode[prefix]["cloud_transform"]["translation"]["z"].as<double>();
+  parameters_.cloudTransformation_.translation_.x() =
+      yamlNode[prefix]["cloud_transform"]["translation"]["x"].as<double>();
+  parameters_.cloudTransformation_.translation_.y() =
+      yamlNode[prefix]["cloud_transform"]["translation"]["y"].as<double>();
+  parameters_.cloudTransformation_.translation_.z() =
+      yamlNode[prefix]["cloud_transform"]["translation"]["z"].as<double>();
 
-  parameters_.cloudTransformation_.rpyIntrinsic_.x() = yamlNode[prefix]["cloud_transform"]["rotation"]["r"].as<double>();
-  parameters_.cloudTransformation_.rpyIntrinsic_.y() = yamlNode[prefix]["cloud_transform"]["rotation"]["p"].as<double>();
-  parameters_.cloudTransformation_.rpyIntrinsic_.z() = yamlNode[prefix]["cloud_transform"]["rotation"]["y"].as<double>();
+  parameters_.cloudTransformation_.rpyIntrinsic_.x() =
+      yamlNode[prefix]["cloud_transform"]["rotation"]["r"].as<double>();
+  parameters_.cloudTransformation_.rpyIntrinsic_.y() =
+      yamlNode[prefix]["cloud_transform"]["rotation"]["p"].as<double>();
+  parameters_.cloudTransformation_.rpyIntrinsic_.z() =
+      yamlNode[prefix]["cloud_transform"]["rotation"]["y"].as<double>();
 
   parameters_.clusterExtraction_.useMaxHeightAsCellElevation_ =
       yamlNode[prefix]["cluster_extraction"]["use_max_height_as_cell_elevation"].as<bool>();
-  parameters_.clusterExtraction_.clusterTolerance_ = yamlNode[prefix]["cluster_extraction"]["cluster_tolerance"].as<double>();
+  parameters_.clusterExtraction_.clusterTolerance_ =
+      yamlNode[prefix]["cluster_extraction"]["cluster_tolerance"].as<double>();
   parameters_.clusterExtraction_.minNumPoints_ = yamlNode[prefix]["cluster_extraction"]["min_num_points"].as<int>();
   parameters_.clusterExtraction_.maxNumPoints_ = yamlNode[prefix]["cluster_extraction"]["max_num_points"].as<int>();
 
@@ -46,18 +54,23 @@ void PclLoaderParameters::handleYamlNode(const YAML::Node& yamlNode) {
   parameters_.downsampling_.voxelSize_.z() = yamlNode[prefix]["downsampling"]["voxel_size"]["z"].as<double>();
 }
 
-bool PclLoaderParameters::loadParameters(const std::string& filename) {
+bool PclLoaderParameters::loadParameters(const std::string& filename)
+{
   YAML::Node yamlNode = YAML::LoadFile(filename);
 
   const bool loadingFailed = yamlNode.IsNull();
-  if (loadingFailed) {
+  if (loadingFailed)
+  {
     ROS_ERROR_STREAM("PclLoaderParameters: Reading from file failed");
     return false;
   }
 
-  try {
+  try
+  {
     handleYamlNode(yamlNode);
-  } catch (const std::runtime_error& exception) {
+  }
+  catch (const std::runtime_error& exception)
+  {
     ROS_ERROR_STREAM("PclLoaderParameters: Loading parameters failed: " << exception.what());
     return false;
   }
@@ -65,9 +78,7 @@ bool PclLoaderParameters::loadParameters(const std::string& filename) {
   return true;
 }
 
-const PclLoaderParameters::Parameters& PclLoaderParameters::get() const {
-  return parameters_;
-}
+const PclLoaderParameters::Parameters& PclLoaderParameters::get() const { return parameters_; }
 
 }  // namespace grid_map_pcl
 

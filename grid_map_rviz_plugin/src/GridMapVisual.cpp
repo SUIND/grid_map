@@ -17,14 +17,16 @@
 #include <OGRE/OgreVector3.h>
 #include <rviz/ogre_helpers/billboard_line.h>
 #include <rviz/uniform_string_stream.h>
-#include <chrono>
 
+#include <chrono>
 #include <grid_map_core/GridMapMath.hpp>
 #include <grid_map_ros/grid_map_ros.hpp>
 
-namespace grid_map_rviz_plugin {
-
-GridMapVisual::GridMapVisual(Ogre::SceneManager* sceneManager, Ogre::SceneNode* parentNode) : manualObject_(0), haveMap_(false) {
+namespace grid_map_rviz_plugin
+{
+GridMapVisual::GridMapVisual(Ogre::SceneManager* sceneManager, Ogre::SceneNode* parentNode)
+    : manualObject_(0), haveMap_(false)
+{
   sceneManager_ = sceneManager;
   frameNode_ = parentNode->createChildSceneNode();
 
@@ -32,7 +34,8 @@ GridMapVisual::GridMapVisual(Ogre::SceneManager* sceneManager, Ogre::SceneNode* 
   meshLines_.reset(new rviz::BillboardLine(sceneManager_, frameNode_));
 }
 
-GridMapVisual::~GridMapVisual() {
+GridMapVisual::~GridMapVisual()
+{
   // Destroy the ManualObject.
   sceneManager_->destroyManualObject(manualObject_);
   material_->unload();
@@ -42,29 +45,35 @@ GridMapVisual::~GridMapVisual() {
   sceneManager_->destroySceneNode(frameNode_);
 }
 
-void GridMapVisual::setMessage(const grid_map_msgs::GridMap::ConstPtr& msg) {
+void GridMapVisual::setMessage(const grid_map_msgs::GridMap::ConstPtr& msg)
+{
   // Convert grid map message.
   grid_map::GridMapRosConverter::fromMessage(*msg, map_);
   haveMap_ = true;
 }
 
-void GridMapVisual::computeVisualization(float alpha, bool showGridLines, bool flatTerrain, std::string heightLayer, bool flatColor,
-                                         bool noColor, Ogre::ColourValue meshColor, bool mapLayerColor, std::string colorLayer,
-                                         bool useRainbow, bool invertRainbow, Ogre::ColourValue minColor, Ogre::ColourValue maxColor,
-                                         bool autocomputeIntensity, float minIntensity, float maxIntensity) {
+void GridMapVisual::computeVisualization(float alpha, bool showGridLines, bool flatTerrain, std::string heightLayer,
+                                         bool flatColor, bool noColor, Ogre::ColourValue meshColor, bool mapLayerColor,
+                                         std::string colorLayer, bool useRainbow, bool invertRainbow,
+                                         Ogre::ColourValue minColor, Ogre::ColourValue maxColor,
+                                         bool autocomputeIntensity, float minIntensity, float maxIntensity)
+{
   const auto startTime = std::chrono::high_resolution_clock::now();
-  if (!haveMap_) {
+  if (!haveMap_)
+  {
     ROS_DEBUG("Unable to visualize grid map, no map data. Use setMessage() first!");
     return;
   }
 
   // Get list of layers and check if the requested ones are present.
   const std::vector<std::string> layerNames = map_.getLayers();
-  if (layerNames.size() < 1) {
+  if (layerNames.size() < 1)
+  {
     ROS_DEBUG("Unable to visualize grid map, map must contain at least one layer.");
     return;
   }
-  if ((!flatTerrain && !map_.exists(heightLayer)) || (!noColor && !flatColor && !map_.exists(colorLayer))) {
+  if ((!flatTerrain && !map_.exists(heightLayer)) || (!noColor && !flatColor && !map_.exists(colorLayer)))
+  {
     ROS_DEBUG("Unable to visualize grid map, requested layer(s) not available.");
     return;
   }
@@ -75,7 +84,8 @@ void GridMapVisual::computeVisualization(float alpha, bool showGridLines, bool f
   // Basic grid map data.
   const size_t rows = map_.getSize()(0);
   const size_t cols = map_.getSize()(1);
-  if (rows < 2 || cols < 2) {
+  if (rows < 2 || cols < 2)
+  {
     ROS_DEBUG("GridMap has not enough cells.");
     return;
   }
@@ -90,39 +100,51 @@ void GridMapVisual::computeVisualization(float alpha, bool showGridLines, bool f
 
   // Reset the mesh lines.
   meshLines_->clear();
-  if (showGridLines) {
+  if (showGridLines)
+  {
     initializeMeshLines(cols, rows, resolution, alpha);
   }
 
   // Compute a mask of valid cells.
   auto basicLayers = map_.getBasicLayers();
-  if (std::find(basicLayers.begin(), basicLayers.end(), heightLayer) == basicLayers.end()) {
+  if (std::find(basicLayers.begin(), basicLayers.end(), heightLayer) == basicLayers.end())
+  {
     basicLayers.emplace_back(heightLayer);
   }
   const MaskArray isValid = computeIsValidMask(basicLayers);
 
   // Compute the display heights for each cell.
   Eigen::ArrayXXf heightOrFlatData;
-  if (flatTerrain) {
+  if (flatTerrain)
+  {
     heightOrFlatData = Eigen::ArrayXXf::Zero(heightData.rows(), heightData.cols());
-  } else {
+  }
+  else
+  {
     heightOrFlatData = heightData.array();
   }
 
   // Compute the color data for each cell.
   ColoringMethod coloringMethod;
-  if (flatColor) {
+  if (flatColor)
+  {
     coloringMethod = ColoringMethod::FLAT;
-  } else if (!useRainbow) {
+  }
+  else if (!useRainbow)
+  {
     coloringMethod = ColoringMethod::INTENSITY_LAYER_MANUAL;
-  } else if (!invertRainbow) {
+  }
+  else if (!invertRainbow)
+  {
     coloringMethod = ColoringMethod::INTENSITY_LAYER_RAINBOW;
-  } else {
+  }
+  else
+  {
     coloringMethod = ColoringMethod::INTENSITY_LAYER_INVERTED_RAINBOW;
   }
 
-  const auto colorValues = computeColorValues(heightData, colorData, coloringMethod, meshColor, minIntensity, maxIntensity,
-                                              autocomputeIntensity, minColor, maxColor);
+  const auto colorValues = computeColorValues(heightData, colorData, coloringMethod, meshColor, minIntensity,
+                                              maxIntensity, autocomputeIntensity, minColor, maxColor);
 
   // Initialize loop constants.
   grid_map::Position topLeft;
@@ -134,14 +156,17 @@ void GridMapVisual::computeVisualization(float alpha, bool showGridLines, bool f
   int ogreIndex = 0;
 
   // Add vertices for mesh.
-  for (size_t i = 0; i < rows; ++i) {
-    for (size_t j = 0; j < cols; ++j) {
+  for (size_t i = 0; i < rows; ++i)
+  {
+    for (size_t j = 0; j < cols; ++j)
+    {
       std::vector<int> vertices;
       std::vector<Ogre::ColourValue> colors;
 
       // Add the vertex to the scene
       grid_map::Index index(i, j);
-      if (!isValid(index(0), index(1))) {
+      if (!isValid(index(0), index(1)))
+      {
         continue;
       }
       grid_map::Position position = topLeft.array() - index.cast<double>() * resolution;
@@ -154,17 +179,21 @@ void GridMapVisual::computeVisualization(float alpha, bool showGridLines, bool f
       ogreIndex++;
 
       // We can only add triangles to the top left side of the current vertex if we have data.
-      if (i == 0 || j == 0) {
+      if (i == 0 || j == 0)
+      {
         continue;
       }
 
       // Add triangles and grid to scene.
       std::vector<int> vertexIndices;
       std::vector<Ogre::Vector3> vertexPositions;
-      for (size_t k = 0; k < 2; k++) {
-        for (size_t l = 0; l < 2; l++) {
+      for (size_t k = 0; k < 2; k++)
+      {
+        for (size_t l = 0; l < 2; l++)
+        {
           grid_map::Index index(i - k, j - l);
-          if (!isValid(index(0), index(1))) {
+          if (!isValid(index(0), index(1)))
+          {
             continue;
           }
           const grid_map::Position position = topLeft.array() - index.cast<double>() * resolution;
@@ -174,27 +203,36 @@ void GridMapVisual::computeVisualization(float alpha, bool showGridLines, bool f
       }
 
       // Plot triangles if we have enough vertices.
-      if (vertexIndices.size() > 2) {
+      if (vertexIndices.size() > 2)
+      {
         // Create one or two triangles from the vertices depending on how many vertices we have.
-        if (!noColor) {
-          if (vertexIndices.size() == 3) {
+        if (!noColor)
+        {
+          if (vertexIndices.size() == 3)
+          {
             manualObject_->triangle(vertexIndices[0], vertexIndices[1], vertexIndices[2]);
-          } else {
+          }
+          else
+          {
             manualObject_->quad(vertexIndices[0], vertexIndices[2], vertexIndices[3], vertexIndices[1]);
           }
         }
 
         // plot grid lines
-        if (showGridLines) {
+        if (showGridLines)
+        {
           meshLines_->addPoint(vertexPositions[0]);
           meshLines_->addPoint(vertexPositions[1]);
           meshLines_->newLine();
 
-          if (vertexIndices.size() == 3) {
+          if (vertexIndices.size() == 3)
+          {
             meshLines_->addPoint(vertexPositions[1]);
             meshLines_->addPoint(vertexPositions[2]);
             meshLines_->newLine();
-          } else {
+          }
+          else
+          {
             meshLines_->addPoint(vertexPositions[1]);
             meshLines_->addPoint(vertexPositions[3]);
             meshLines_->newLine();
@@ -215,10 +253,13 @@ void GridMapVisual::computeVisualization(float alpha, bool showGridLines, bool f
   manualObject_->end();
   material_->getTechnique(0)->setLightingEnabled(false);
 
-  if (alpha < 0.9998) {
+  if (alpha < 0.9998)
+  {
     material_->getTechnique(0)->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
     material_->getTechnique(0)->setDepthWriteEnabled(false);
-  } else {
+  }
+  else
+  {
     material_->getTechnique(0)->setSceneBlending(Ogre::SBT_REPLACE);
     material_->getTechnique(0)->setDepthWriteEnabled(true);
   }
@@ -228,8 +269,10 @@ void GridMapVisual::computeVisualization(float alpha, bool showGridLines, bool f
   ROS_DEBUG_STREAM("Visualization of grid_map took: " << elapsedTime.count() << " ms.");
 }
 
-void GridMapVisual::initializeAndBeginManualObject(size_t nVertices) {
-  if (!manualObject_) {
+void GridMapVisual::initializeAndBeginManualObject(size_t nVertices)
+{
+  if (!manualObject_)
+  {
     static uint32_t count = 0;
     rviz::UniformStringStream ss;
     ss << "Mesh" << count++;
@@ -239,7 +282,8 @@ void GridMapVisual::initializeAndBeginManualObject(size_t nVertices) {
 
     ss << "Material";
     materialName_ = ss.str();
-    material_ = Ogre::MaterialManager::getSingleton().create(materialName_, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    material_ = Ogre::MaterialManager::getSingleton().create(materialName_,
+                                                             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     material_->setReceiveShadows(false);
     material_->getTechnique(0)->setLightingEnabled(true);
     material_->setCullingMode(Ogre::CULL_NONE);
@@ -252,19 +296,24 @@ void GridMapVisual::initializeAndBeginManualObject(size_t nVertices) {
 
 GridMapVisual::ColorArray GridMapVisual::computeColorValues(Eigen::Ref<const grid_map::Matrix> heightData,
                                                             Eigen::Ref<const grid_map::Matrix> colorData,
-                                                            GridMapVisual::ColoringMethod coloringMethod, Ogre::ColourValue flatColor,
-                                                            double minIntensity, double maxIntensity, bool autocomputeIntensity,
-                                                            Ogre::ColourValue minColor, Ogre::ColourValue maxColor) {
+                                                            GridMapVisual::ColoringMethod coloringMethod,
+                                                            Ogre::ColourValue flatColor, double minIntensity,
+                                                            double maxIntensity, bool autocomputeIntensity,
+                                                            Ogre::ColourValue minColor, Ogre::ColourValue maxColor)
+{
   // Determine max and min intensity.
   bool isIntensityColoringMethod = coloringMethod == ColoringMethod::INTENSITY_LAYER_INVERTED_RAINBOW ||
                                    coloringMethod == ColoringMethod::INTENSITY_LAYER_RAINBOW ||
                                    coloringMethod == ColoringMethod::INTENSITY_LAYER_MANUAL;
-  if (autocomputeIntensity && isIntensityColoringMethod) {
+  if (autocomputeIntensity && isIntensityColoringMethod)
+  {
     minIntensity = colorData.minCoeffOfFinites();
-    maxIntensity = minIntensity + std::max(colorData.maxCoeffOfFinites() - minIntensity, 0.2);  // regularize the intensity range.
+    maxIntensity =
+        minIntensity + std::max(colorData.maxCoeffOfFinites() - minIntensity, 0.2);  // regularize the intensity range.
   }
 
-  switch (coloringMethod) {
+  switch (coloringMethod)
+  {
     case ColoringMethod::FLAT:
       return ColorArray::Constant(heightData.rows(), heightData.cols(), flatColor);
     case ColoringMethod::COLOR_LAYER:
@@ -294,7 +343,8 @@ GridMapVisual::ColorArray GridMapVisual::computeColorValues(Eigen::Ref<const gri
   }
 }
 
-void GridMapVisual::initializeMeshLines(size_t cols, size_t rows, double resolution, double alpha) {
+void GridMapVisual::initializeMeshLines(size_t cols, size_t rows, double resolution, double alpha)
+{
   meshLines_->setColor(0.0, 0.0, 0.0, alpha);
   meshLines_->setLineWidth(resolution / 10.0);
   meshLines_->setMaxPointsPerLine(2);
@@ -303,33 +353,34 @@ void GridMapVisual::initializeMeshLines(size_t cols, size_t rows, double resolut
   meshLines_->setNumLines(nLines);
 }
 
-GridMapVisual::MaskArray GridMapVisual::computeIsValidMask(std::vector<std::string> basicLayers) {
+GridMapVisual::MaskArray GridMapVisual::computeIsValidMask(std::vector<std::string> basicLayers)
+{
   MaskArray isValid = MaskArray::Ones(map_.getSize()(0), map_.getSize()(1));
-  for (const std::string& layer : basicLayers) {
+  for (const std::string& layer : basicLayers)
+  {
     isValid = isValid && map_.get(layer).array().unaryExpr([](float v) { return std::isfinite(v); });
   }
   return isValid;
 }
 
-void GridMapVisual::setFramePosition(const Ogre::Vector3& position) {
-  frameNode_->setPosition(position);
-}
+void GridMapVisual::setFramePosition(const Ogre::Vector3& position) { frameNode_->setPosition(position); }
 
-void GridMapVisual::setFrameOrientation(const Ogre::Quaternion& orientation) {
+void GridMapVisual::setFrameOrientation(const Ogre::Quaternion& orientation)
+{
   frameNode_->setOrientation(orientation);
 }
 
-std::vector<std::string> GridMapVisual::getLayerNames() {
-  return map_.getLayers();
-}
+std::vector<std::string> GridMapVisual::getLayerNames() { return map_.getLayers(); }
 
-void GridMapVisual::normalizeIntensity(float& intensity, float min_intensity, float max_intensity) {
+void GridMapVisual::normalizeIntensity(float& intensity, float min_intensity, float max_intensity)
+{
   intensity = std::min(intensity, max_intensity);
   intensity = std::max(intensity, min_intensity);
   intensity = (intensity - min_intensity) / (max_intensity - min_intensity);
 }
 
-Ogre::ColourValue GridMapVisual::getRainbowColor(float intensity) {
+Ogre::ColourValue GridMapVisual::getRainbowColor(float intensity)
+{
   intensity = std::min(intensity, 1.0f);
   intensity = std::max(intensity, 0.0f);
 
@@ -355,7 +406,9 @@ Ogre::ColourValue GridMapVisual::getRainbowColor(float intensity) {
 }
 
 // Get interpolated color value.
-Ogre::ColourValue GridMapVisual::getInterpolatedColor(float intensity, Ogre::ColourValue min_color, Ogre::ColourValue max_color) {
+Ogre::ColourValue GridMapVisual::getInterpolatedColor(float intensity, Ogre::ColourValue min_color,
+                                                      Ogre::ColourValue max_color)
+{
   intensity = std::min(intensity, 1.0f);
   intensity = std::max(intensity, 0.0f);
 

@@ -6,26 +6,25 @@
  *   Institute: ETH Zurich, ANYbotics
  */
 
-#include <grid_map_visualization/visualizations/PointCloudVisualization.hpp>
-#include <grid_map_ros/GridMapRosConverter.hpp>
-
 #include <sensor_msgs/PointCloud2.h>
 
-namespace grid_map_visualization {
+#include <grid_map_ros/GridMapRosConverter.hpp>
+#include <grid_map_visualization/visualizations/PointCloudVisualization.hpp>
 
+namespace grid_map_visualization
+{
 PointCloudVisualization::PointCloudVisualization(ros::NodeHandle& nodeHandle, const std::string& name)
     : VisualizationBase(nodeHandle, name)
 {
 }
 
-PointCloudVisualization::~PointCloudVisualization()
-{
-}
+PointCloudVisualization::~PointCloudVisualization() {}
 
 bool PointCloudVisualization::readParameters(XmlRpc::XmlRpcValue& config)
 {
   VisualizationBase::readParameters(config);
-  if (!getParam("layer", layer_)) {
+  if (!getParam("layer", layer_))
+  {
     ROS_ERROR("PointCloudVisualization with name '%s' did not find a 'layer' parameter.", name_.c_str());
     return false;
   }
@@ -41,7 +40,8 @@ bool PointCloudVisualization::initialize()
 bool PointCloudVisualization::visualize(const grid_map::GridMap& map)
 {
   if (!isActive()) return true;
-  if (!map.exists(layer_)) {
+  if (!map.exists(layer_))
+  {
     ROS_WARN_STREAM("PointCloudVisualization::visualize: No grid map layer with name '" << layer_ << "' found.");
     return false;
   }
@@ -51,4 +51,4 @@ bool PointCloudVisualization::visualize(const grid_map::GridMap& map)
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map_visualization

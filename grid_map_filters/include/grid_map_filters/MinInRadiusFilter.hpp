@@ -12,14 +12,14 @@
 
 #include <string>
 
-namespace grid_map {
-
+namespace grid_map
+{
 /*!
  * Filter class to compute the minimal value inside a radius.
  */
-template<typename T>
-class MinInRadiusFilter : public filters::FilterBase<T> {
-
+template <typename T>
+class MinInRadiusFilter : public filters::FilterBase<T>
+{
  public:
   /*!
    * Constructor.
@@ -55,4 +55,4 @@ class MinInRadiusFilter : public filters::FilterBase<T> {
   std::string outputLayer_;
 };
 
-} /* namespace */
+}  // namespace grid_map

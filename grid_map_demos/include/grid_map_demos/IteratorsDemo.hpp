@@ -14,15 +14,14 @@
 // ROS
 #include <ros/ros.h>
 
-namespace grid_map_demos {
-
+namespace grid_map_demos
+{
 /*!
  * Visualizes a grid map by publishing different topics that can be viewed in Rviz.
  */
 class IteratorsDemo
 {
  public:
-
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -52,7 +51,6 @@ class IteratorsDemo
   void publish();
 
  private:
-
   //! ROS nodehandle.
   ros::NodeHandle& nodeHandle_;
 
@@ -66,4 +64,4 @@ class IteratorsDemo
   grid_map::GridMap map_;
 };
 
-} /* namespace */
+}  // namespace grid_map_demos

@@ -7,40 +7,46 @@
  */
 
 #include "grid_map_visualization/visualizations/GridCellsVisualization.hpp"
-#include <grid_map_ros/GridMapRosConverter.hpp>
+
 #include <nav_msgs/GridCells.h>
+
+#include <grid_map_ros/GridMapRosConverter.hpp>
 
 // STD
 #include <limits>
 
-namespace grid_map_visualization {
-
+namespace grid_map_visualization
+{
 GridCellsVisualization::GridCellsVisualization(ros::NodeHandle& nodeHandle, const std::string& name)
-: VisualizationBase(nodeHandle, name),
-  lowerThreshold_(-std::numeric_limits<float>::infinity()),
-  upperThreshold_(std::numeric_limits<float>::infinity())
+    : VisualizationBase(nodeHandle, name),
+      lowerThreshold_(-std::numeric_limits<float>::infinity()),
+      upperThreshold_(std::numeric_limits<float>::infinity())
 {
 }
 
-GridCellsVisualization::~GridCellsVisualization()
-{
-}
+GridCellsVisualization::~GridCellsVisualization() {}
 
 bool GridCellsVisualization::readParameters(XmlRpc::XmlRpcValue& config)
 {
   VisualizationBase::readParameters(config);
 
-  if (!getParam("layer", layer_)) {
+  if (!getParam("layer", layer_))
+  {
     ROS_ERROR("GridCellsVisualization with name '%s' did not find a 'layer' parameter.", name_.c_str());
     return false;
   }
 
-  if (!getParam("lower_threshold", lowerThreshold_)) {
-    ROS_INFO("GridCellsVisualization with name '%s' did not find a 'lower_threshold' parameter. Using negative infinity.", name_.c_str());
+  if (!getParam("lower_threshold", lowerThreshold_))
+  {
+    ROS_INFO(
+        "GridCellsVisualization with name '%s' did not find a 'lower_threshold' parameter. Using negative infinity.",
+        name_.c_str());
   }
 
-  if (!getParam("upper_threshold", upperThreshold_)) {
-    ROS_INFO("GridCellsVisualization with name '%s' did not find a 'upper_threshold' parameter. Using infinity.", name_.c_str());
+  if (!getParam("upper_threshold", upperThreshold_))
+  {
+    ROS_INFO("GridCellsVisualization with name '%s' did not find a 'upper_threshold' parameter. Using infinity.",
+             name_.c_str());
   }
 
   return true;
@@ -55,7 +61,8 @@ bool GridCellsVisualization::initialize()
 bool GridCellsVisualization::visualize(const grid_map::GridMap& map)
 {
   if (!isActive()) return true;
-  if (!map.exists(layer_)) {
+  if (!map.exists(layer_))
+  {
     ROS_WARN_STREAM("GridCellsVisualization::visualize: No grid map layer with name '" << layer_ << "' found.");
     return false;
   }
@@ -65,4 +72,4 @@ bool GridCellsVisualization::visualize(const grid_map::GridMap& map)
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map_visualization
