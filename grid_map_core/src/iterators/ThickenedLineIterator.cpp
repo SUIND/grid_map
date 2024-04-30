@@ -18,8 +18,11 @@ namespace grid_map
 ThickenedLineIterator::ThickenedLineIterator(const grid_map::GridMap& gridMap, const Position& start,
                                              const Position& end, const double thickness)
 {
-  throw std::runtime_error("Not Stable. Fix before using....");
   initialize(gridMap, start, end, thickness);
+  if (polygonIterator_->isPastEnd())
+  {
+    throw std::runtime_error("Failed to initialize ThickenedLineIterator!");
+  }
 }
 
 ThickenedLineIterator& ThickenedLineIterator::operator=(const ThickenedLineIterator& other)
