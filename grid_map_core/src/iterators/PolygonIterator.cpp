@@ -24,7 +24,7 @@ PolygonIterator::PolygonIterator(const grid_map::GridMap& gridMap, const grid_ma
   Index submapStartIndex;
   Size submapBufferSize;
   findSubmapParameters(polygon, submapStartIndex, submapBufferSize);
-  internalIterator_ = std::shared_ptr<SubmapIterator>(new SubmapIterator(gridMap, submapStartIndex, submapBufferSize));
+  internalIterator_ = std::make_shared<SubmapIterator>(gridMap, submapStartIndex, submapBufferSize);
   if (!isInside()) ++(*this);
 }
 

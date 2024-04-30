@@ -26,7 +26,7 @@ CircleIterator::CircleIterator(const GridMap& gridMap, const Position& center, c
   Index submapStartIndex;
   Index submapBufferSize;
   findSubmapParameters(center, radius, submapStartIndex, submapBufferSize);
-  internalIterator_ = std::shared_ptr<SubmapIterator>(new SubmapIterator(gridMap, submapStartIndex, submapBufferSize));
+  internalIterator_ = std::make_shared<SubmapIterator>(gridMap, submapStartIndex, submapBufferSize);
   if (!isInside()) ++(*this);
 }
 

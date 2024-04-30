@@ -18,6 +18,7 @@ namespace grid_map
 ThickenedLineIterator::ThickenedLineIterator(const grid_map::GridMap& gridMap, const Position& start,
                                              const Position& end, const double thickness)
 {
+  throw std::runtime_error("Not Stable. Fix before using....");
   initialize(gridMap, start, end, thickness);
 }
 
@@ -64,7 +65,7 @@ bool ThickenedLineIterator::initialize(const grid_map::GridMap& gridMap, const P
   thickLine.addVertex(end - perpoffset);
   thickLine.addVertex(end + perpoffset);
 
-  polygonIterator_ = std::shared_ptr<PolygonIterator>(new PolygonIterator(gridMap, thickLine));
+  polygonIterator_ = std::make_shared<PolygonIterator>(gridMap, thickLine);
 
   return true;
 }

@@ -34,7 +34,7 @@ EllipseIterator::EllipseIterator(const GridMap& gridMap, const Position& center,
   Index submapStartIndex;
   Index submapBufferSize;
   findSubmapParameters(center, length, rotation, submapStartIndex, submapBufferSize);
-  internalIterator_ = std::shared_ptr<SubmapIterator>(new SubmapIterator(gridMap, submapStartIndex, submapBufferSize));
+  internalIterator_ = std::make_shared<SubmapIterator>(gridMap, submapStartIndex, submapBufferSize);
   if (!isInside()) ++(*this);
 }
 
