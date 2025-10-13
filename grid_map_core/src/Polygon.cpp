@@ -267,6 +267,13 @@ Polygon Polygon::convexHull(Polygon& polygon1, Polygon& polygon2)
   return monotoneChainConvexHullOfPoints(vertices);
 }
 
+Polygon Polygon::monotoneChainConvexHullOfPoints(const std::vector<Position>& points)
+{
+  // Convert to aligned allocator version and delegate
+  std::vector<Position, Eigen::aligned_allocator<Position>> alignedPoints(points.begin(), points.end());
+  return monotoneChainConvexHullOfPoints(alignedPoints);
+}
+
 Polygon Polygon::monotoneChainConvexHullOfPoints(
     const std::vector<Position, Eigen::aligned_allocator<Position>>& points)
 {
