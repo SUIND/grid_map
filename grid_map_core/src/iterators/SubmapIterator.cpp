@@ -32,7 +32,9 @@ SubmapIterator::SubmapIterator(const grid_map::GridMap& gridMap, const Index& su
   submapSize_ = submapSize;
   submapStartIndex_ = submapStartIndex;
   submapIndex_.setZero();
-  isPastEnd_ = false;
+  
+  // If submap has zero size, iterator should be immediately past end
+  isPastEnd_ = (submapSize_.array() == 0).any();
 }
 
 SubmapIterator::SubmapIterator(const SubmapIterator* other)
