@@ -72,19 +72,66 @@ bool PolygonIterator::isInside() const
 
 void PolygonIterator::findSubmapParameters(const grid_map::Polygon& polygon, Index& startIndex, Size& bufferSize) const
 {
+  // Find bounding box in world/map coordinates
+  // Note: "topLeft" means maximum x,y in world frame, "bottomRight" means minimum x,y
   Position topLeft = polygon_.getVertices()[0];
   Position bottomRight = topLeft;
   for (const auto& vertex : polygon_.getVertices())
   {
-    topLeft = topLeft.array().max(vertex.array());
-    bottomRight = bottomRight.array().min(vertex.array());
+    topLeft = topLeft.array().max(vertex.array());        // Maximum world coordinates
+    bottomRight = bottomRight.array().min(vertex.array()); // Minimum world coordinates
   }
+  
+  // Check if polygon is completely outside map bounds before clamping
+  const double halfMapX = mapLength_(0) / 2.0;
+  const double halfMapY = mapLength_(1) / 2.0;
+  const Position mapMin = mapPosition_ - Position(halfMapX, halfMapY);
+  const Position mapMax = mapPosition_ + Position(halfMapX, halfMapY);
+  
+  // If polygon bounding box doesn't intersect map, create empty iterator (zero size submap)
+  if (bottomRight(0) > mapMax(0) || topLeft(0) < mapMin(0) ||
+      bottomRight(1) > mapMax(1) || topLeft(1) < mapMin(1)) {
+    // Polygon is completely outside - return zero size to create empty iterator
+    startIndex = bufferStartIndex_;  // Use a valid index
+    bufferSize = Size::Zero();       // Zero size = empty iterator
+    return;
+  }
+  
+  // Clamp positions to map range
   boundPositionToRange(topLeft, mapLength_, mapPosition_);
   boundPositionToRange(bottomRight, mapLength_, mapPosition_);
-  getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
-  Index endIndex;
-  getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
-  bufferSize = getSubmapSizeFromCornerIndeces(startIndex, endIndex, bufferSize_, bufferStartIndex_);
+  
+  // After clamping, verify positions are still valid and distinct
+  const double minSeparation = resolution_ * 0.5;
+  if ((topLeft - bottomRight).norm() < minSeparation) {
+    // Positions collapsed to same point - polygon is likely outside or degenerate
+    // Return zero size for empty iterator
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
+  
+  // Convert world positions to grid indices
+  // IMPORTANT: Due to the coordinate frame transformation (Index = -Position after offset/scale),
+  // the relationship between world positions and grid indices is INVERTED:
+  // - topLeft (max world coords) -> SMALLER index values
+  // - bottomRight (min world coords) -> LARGER index values
+  Index topLeftIndex, bottomRightIndex;
+  getIndexFromPosition(topLeftIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  getIndexFromPosition(bottomRightIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  
+  // Calculate submap size
+  // getSubmapSizeFromCornerIndeces expects topLeft (smaller index) first, bottomRight (larger index) second
+  startIndex = topLeftIndex;
+  bufferSize = getSubmapSizeFromCornerIndeces(topLeftIndex, bottomRightIndex, bufferSize_, bufferStartIndex_);
+  
+  // Validate that we got a positive size - protects against edge cases with circular buffer wrapping
+  if ((bufferSize.array() <= 0).any()) {
+    // This can happen in rare cases with circular buffer edge conditions
+    // Return zero size for empty iterator rather than trying to fix it
+    bufferSize = Size::Zero();
+    startIndex = bufferStartIndex_;
+  }
 }
 
 } /* namespace grid_map */

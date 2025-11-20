@@ -101,10 +101,32 @@ bool LineIterator::getIndexLimitedToMapRange(const grid_map::GridMap& gridMap, c
 {
   Position newStart = start;
   Vector direction = (end - start).normalized();
+  
+  // Use smaller step size for better accuracy near boundaries
+  const double stepSize = gridMap.getResolution() * 0.5;
+  const double maxDistance = (end - start).norm();
+  double traveledDistance = 0.0;
+  
+  // Special case: if start is already valid, use it
+  if (gridMap.getIndex(newStart, index)) {
+    return true;
+  }
+  
+  // Step along the line until we find a valid point or exceed max distance
   while (!gridMap.getIndex(newStart, index))
   {
-    newStart += (gridMap.getResolution() - std::numeric_limits<double>::epsilon()) * direction;
-    if ((end - newStart).norm() < gridMap.getResolution() - std::numeric_limits<double>::epsilon()) return false;
+    newStart += stepSize * direction;
+    traveledDistance += stepSize;
+    
+    // Give up if we've traveled past the end point
+    if (traveledDistance > maxDistance) {
+      return false;
+    }
+    
+    // Safety check: limit iterations to prevent infinite loop
+    if (traveledDistance > maxDistance + gridMap.getResolution()) {
+      return false;
+    }
   }
   return true;
 }
