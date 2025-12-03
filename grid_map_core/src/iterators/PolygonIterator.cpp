@@ -25,6 +25,12 @@ PolygonIterator::PolygonIterator(const grid_map::GridMap& gridMap, const grid_ma
   Size submapBufferSize;
   findSubmapParameters(polygon, submapStartIndex, submapBufferSize);
   internalIterator_ = std::make_shared<SubmapIterator>(gridMap, submapStartIndex, submapBufferSize);
+  
+  // Safety check: ensure internalIterator_ is not null before dereferencing
+  if (!internalIterator_) {
+    throw std::runtime_error("PolygonIterator: Failed to create internal iterator");
+  }
+  
   if (!isInside()) ++(*this);
 }
 
@@ -45,10 +51,20 @@ bool PolygonIterator::operator!=(const PolygonIterator& other) const
   return (internalIterator_ != other.internalIterator_);
 }
 
-const Index& PolygonIterator::operator*() const { return *(*internalIterator_); }
+const Index& PolygonIterator::operator*() const
+{
+  if (!internalIterator_) {
+    throw std::runtime_error("PolygonIterator: Internal iterator is null");
+  }
+  return *(*internalIterator_);
+}
 
 PolygonIterator& PolygonIterator::operator++()
 {
+  if (!internalIterator_) {
+    return *this;
+  }
+  
   ++(*internalIterator_);
   if (internalIterator_->isPastEnd()) return *this;
 
@@ -60,7 +76,13 @@ PolygonIterator& PolygonIterator::operator++()
   return *this;
 }
 
-bool PolygonIterator::isPastEnd() const { return internalIterator_->isPastEnd(); }
+bool PolygonIterator::isPastEnd() const
+{
+  if (!internalIterator_) {
+    return true;
+  }
+  return internalIterator_->isPastEnd();
+}
 
 bool PolygonIterator::isInside() const
 {
@@ -72,12 +94,33 @@ bool PolygonIterator::isInside() const
 
 void PolygonIterator::findSubmapParameters(const grid_map::Polygon& polygon, Index& startIndex, Size& bufferSize) const
 {
+  // Safety check: ensure polygon has vertices
+  if (polygon_.getVertices().size() == 0) {
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
+  
   // Find bounding box in world/map coordinates
   // Note: "topLeft" means maximum x,y in world frame, "bottomRight" means minimum x,y
   Position topLeft = polygon_.getVertices()[0];
   Position bottomRight = topLeft;
+  
+  // Verify first vertex is finite
+  if (!topLeft.allFinite()) {
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
+  
   for (const auto& vertex : polygon_.getVertices())
   {
+    // Check for NaN or inf in vertices
+    if (!vertex.allFinite()) {
+      startIndex = bufferStartIndex_;
+      bufferSize = Size::Zero();
+      return;
+    }
     topLeft = topLeft.array().max(vertex.array());        // Maximum world coordinates
     bottomRight = bottomRight.array().min(vertex.array()); // Minimum world coordinates
   }
@@ -111,14 +154,39 @@ void PolygonIterator::findSubmapParameters(const grid_map::Polygon& polygon, Ind
     return;
   }
   
+  // Safety check: ensure resolution is valid
+  if (resolution_ <= 0.0 || !std::isfinite(resolution_)) {
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
+  
+  // Safety check: ensure buffer size is valid
+  if ((bufferSize_.array() <= 0).any()) {
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
+  
   // Convert world positions to grid indices
   // IMPORTANT: Due to the coordinate frame transformation (Index = -Position after offset/scale),
   // the relationship between world positions and grid indices is INVERTED:
   // - topLeft (max world coords) -> SMALLER index values
   // - bottomRight (min world coords) -> LARGER index values
   Index topLeftIndex, bottomRightIndex;
-  getIndexFromPosition(topLeftIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
-  getIndexFromPosition(bottomRightIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  
+  // Check if conversion is successful - if not, positions are outside valid map range
+  if (!getIndexFromPosition(topLeftIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_)) {
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
+  
+  if (!getIndexFromPosition(bottomRightIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_)) {
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
   
   // Calculate submap size
   // getSubmapSizeFromCornerIndeces expects topLeft (smaller index) first, bottomRight (larger index) second

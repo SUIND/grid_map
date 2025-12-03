@@ -68,6 +68,16 @@ const Index& SubmapIterator::getSubmapIndex() const { return submapIndex_; }
 
 SubmapIterator& SubmapIterator::operator++()
 {
+  if (isPastEnd()) {
+    return *this;
+  }
+  
+  // Safety check for zero-size submap
+  if ((submapSize_.array() == 0).any()) {
+    isPastEnd_ = true;
+    return *this;
+  }
+  
   isPastEnd_ = !incrementIndexForSubmap(submapIndex_, index_, submapStartIndex_, submapSize_, size_, startIndex_);
   return *this;
 }
