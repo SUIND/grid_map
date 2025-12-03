@@ -88,18 +88,38 @@ bool EllipseIterator::isInside() const
 void EllipseIterator::findSubmapParameters(const Position& center, const Length& length, const double rotation,
                                            Index& startIndex, Size& bufferSize) const
 {
+  // Safety checks
+  if (resolution_ <= 0.0 || !std::isfinite(resolution_) || (bufferSize_.array() <= 0).any()) {
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
+  
   const Eigen::Rotation2Dd rotationMatrix(rotation);
   Eigen::Vector2d u = rotationMatrix * Eigen::Vector2d(length(0), 0.0);
   Eigen::Vector2d v = rotationMatrix * Eigen::Vector2d(0.0, length(1));
   const Length boundingBoxHalfLength = (u.cwiseAbs2() + v.cwiseAbs2()).array().sqrt();
+  
   Position topLeft = center.array() + boundingBoxHalfLength;
   Position bottomRight = center.array() - boundingBoxHalfLength;
   boundPositionToRange(topLeft, mapLength_, mapPosition_);
   boundPositionToRange(bottomRight, mapLength_, mapPosition_);
-  getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  
   Index endIndex;
-  getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  if (!getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_) ||
+      !getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_)) {
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
+  
   bufferSize = getSubmapSizeFromCornerIndeces(startIndex, endIndex, bufferSize_, bufferStartIndex_);
+  
+  // Validate positive size
+  if ((bufferSize.array() <= 0).any()) {
+    bufferSize = Size::Zero();
+    startIndex = bufferStartIndex_;
+  }
 }
 
 } /* namespace grid_map */

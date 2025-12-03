@@ -210,6 +210,15 @@ class Polygon
    */
   static Polygon monotoneChainConvexHullOfPoints(
       const std::vector<Position, Eigen::aligned_allocator<Position>>& points);
+  
+  /*!
+   * Computes the convex hull of given points, using Andrew's monotone chain
+   * convex hull algorithm, and returns it as polygon. Overload for standard allocator.
+   * @param[in] points points to use to compute the convex hull used to create
+   * the polygon.
+   * @return convex hull as polygon.
+   */
+  static Polygon monotoneChainConvexHullOfPoints(const std::vector<Position>& points);
 
  protected:
   /*!

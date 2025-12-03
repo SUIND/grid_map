@@ -78,14 +78,33 @@ bool CircleIterator::isInside() const
 void CircleIterator::findSubmapParameters(const Position& center, const double radius, Index& startIndex,
                                           Size& bufferSize) const
 {
+  // Safety checks
+  if (resolution_ <= 0.0 || !std::isfinite(resolution_) || (bufferSize_.array() <= 0).any()) {
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
+  
   Position topLeft = center.array() + radius;
   Position bottomRight = center.array() - radius;
   boundPositionToRange(topLeft, mapLength_, mapPosition_);
   boundPositionToRange(bottomRight, mapLength_, mapPosition_);
-  getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  
   Index endIndex;
-  getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  if (!getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_) ||
+      !getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_)) {
+    startIndex = bufferStartIndex_;
+    bufferSize = Size::Zero();
+    return;
+  }
+  
   bufferSize = getSubmapSizeFromCornerIndeces(startIndex, endIndex, bufferSize_, bufferStartIndex_);
+  
+  // Validate positive size
+  if ((bufferSize.array() <= 0).any()) {
+    bufferSize = Size::Zero();
+    startIndex = bufferStartIndex_;
+  }
 }
 
 } /* namespace grid_map */

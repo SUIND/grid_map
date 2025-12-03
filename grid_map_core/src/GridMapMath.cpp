@@ -111,6 +111,13 @@ void getIndexFromPositionUnsafe(Index& index, const Position& position, const Le
 {
   Vector offset;
   getVectorToOrigin(offset, mapLength);
+  
+  // Prevent division by zero or invalid resolution
+  if (resolution <= 0.0 || !std::isfinite(resolution)) {
+    index = Index::Zero();
+    return;
+  }
+  
   Vector indexVector = ((position - offset - mapPosition).array() / resolution).matrix();
   index = getIndexFromIndexVector(indexVector, bufferSize, bufferStartIndex);
 }
@@ -118,6 +125,12 @@ void getIndexFromPositionUnsafe(Index& index, const Position& position, const Le
 bool getIndexFromPosition(Index& index, const Position& position, const Length& mapLength, const Position& mapPosition,
                           const double& resolution, const Size& bufferSize, const Index& bufferStartIndex)
 {
+  // Prevent division by zero or invalid resolution
+  if (resolution <= 0.0 || !std::isfinite(resolution)) {
+    index = Index::Zero();
+    return false;
+  }
+  
   Vector offset;
   getVectorToOrigin(offset, mapLength);
   Vector indexVector = ((position - offset - mapPosition).array() / resolution).matrix();
@@ -149,6 +162,12 @@ void getPositionOfDataStructureOrigin(const Position& position, const Length& ma
 
 bool getIndexShiftFromPositionShift(Index& indexShift, const Vector& positionShift, const double& resolution)
 {
+  // Prevent division by zero or invalid resolution
+  if (resolution <= 0.0 || !std::isfinite(resolution)) {
+    indexShift = Index::Zero();
+    return false;
+  }
+  
   Vector indexShiftVectorTemp = (positionShift.array() / resolution).matrix();
   Eigen::Vector2i indexShiftVector;
 
@@ -202,6 +221,12 @@ void wrapIndexToRange(Index& index, const Size& bufferSize)
 
 void wrapIndexToRange(int& index, int bufferSize)
 {
+  // Safety check: prevent modulo by zero
+  if (bufferSize <= 0) {
+    index = 0;
+    return;
+  }
+  
   // Try shortcuts before resorting to the expensive modulo operation.
   if (index < bufferSize)
   {

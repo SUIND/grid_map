@@ -68,6 +68,15 @@ const Index& LineIterator::operator*() const { return index_; }
 
 LineIterator& LineIterator::operator++()
 {
+  if (isPastEnd()) {
+    return *this;
+  }
+  
+  if (denominator_ <= 0) {
+    iCell_ = nCells_;
+    return *this;
+  }
+  
   numerator_ += numeratorAdd_;  // Increase the numerator by the top of the fraction.
   if (numerator_ >= denominator_)
   {
@@ -99,12 +108,45 @@ bool LineIterator::initialize(const grid_map::GridMap& gridMap, const Index& sta
 bool LineIterator::getIndexLimitedToMapRange(const grid_map::GridMap& gridMap, const Position& start,
                                              const Position& end, Index& index)
 {
+  const double maxDistance = (end - start).norm();
+  
+  // Check for degenerate case: start and end are the same
+  if (maxDistance < std::numeric_limits<double>::epsilon()) {
+    return gridMap.getIndex(start, index);
+  }
+  
   Position newStart = start;
   Vector direction = (end - start).normalized();
+  
+  // Verify direction is valid (no NaN or inf)
+  if (!direction.allFinite()) {
+    return false;
+  }
+  
+  // Use smaller step size for better accuracy near boundaries
+  const double stepSize = gridMap.getResolution() * 0.5;
+  double traveledDistance = 0.0;
+  
+  // Special case: if start is already valid, use it
+  if (gridMap.getIndex(newStart, index)) {
+    return true;
+  }
+  
+  // Step along the line until we find a valid point or exceed max distance
   while (!gridMap.getIndex(newStart, index))
   {
-    newStart += (gridMap.getResolution() - std::numeric_limits<double>::epsilon()) * direction;
-    if ((end - newStart).norm() < gridMap.getResolution() - std::numeric_limits<double>::epsilon()) return false;
+    newStart += stepSize * direction;
+    traveledDistance += stepSize;
+    
+    // Give up if we've traveled past the end point
+    if (traveledDistance > maxDistance) {
+      return false;
+    }
+    
+    // Safety check: limit iterations to prevent infinite loop
+    if (traveledDistance > maxDistance + gridMap.getResolution()) {
+      return false;
+    }
   }
   return true;
 }
@@ -163,6 +205,11 @@ void LineIterator::initializeIterationParameters()
     numerator_ = delta.y() / 2;
     numeratorAdd_ = delta.x();
     nCells_ = delta.y() + 1;  // There are more y-values than x-values.
+  }
+  
+  // Safety check: if denominator is 0, we have a degenerate line (single point)
+  if (denominator_ == 0) {
+    nCells_ = 1;
   }
 }
 
