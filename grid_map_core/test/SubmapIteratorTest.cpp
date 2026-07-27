@@ -7,6 +7,7 @@
  */
 
 #include "grid_map_core/GridMap.hpp"
+#include "grid_map_core/GridMapMath.hpp"
 #include "grid_map_core/iterators/SubmapIterator.hpp"
 
 // Eigen
@@ -277,4 +278,47 @@ TEST(SubmapIterator, InterleavedExecutionWithMove)
   //    returnedSequence.at(submapIndex) = map.at("layer", *iterator);
   //    ++iterator;
   //  });
+}
+
+/*
+ * Regression test: a submap spanning the corners of a polygon that overhangs a map edge.
+ *
+ * This is the same failure as PolygonIterator.MovedMapWithPolygonOverhangingMapEdge, observed one
+ * layer down: bounding the overhanging corner into the map and converting it to an index yields an
+ * index that wraps to the opposite edge of the ring buffer, so getSubmapSizeFromCornerIndeces()
+ * returns a negative size and the iterator is degenerate.
+ */
+TEST(SubmapIterator, BoxSpanningCornersOverhangingMapEdgeOnMovedMap)
+{
+  GridMap map({"layer"});
+  map.setGeometry(Length(33.746855726960831, 9.9433593878904709), 0.25,
+                  Position(10.795406602280387, -22.994307697034245));
+  map.move(Position(24.953846346189515, -38.957489169334572));
+  ASSERT_FALSE((map.getStartIndex() == 0).all()) << "this test requires a moved (circular buffer) map";
+
+  // Corners of a box overhanging the lower x and y edges of the map, bounded back into the map.
+  Position topLeft(13.526077842487485, -38.044727225921832);
+  Position bottomRight(2.3031839924109754, -47.214226670855084);
+  boundPositionToRange(topLeft, map.getLength(), map.getPosition());
+  boundPositionToRange(bottomRight, map.getLength(), map.getPosition());
+
+  grid_map::Index topLeftIndex;
+  grid_map::Index bottomRightIndex;
+  EXPECT_TRUE(getIndexFromPosition(topLeftIndex, topLeft, map.getLength(), map.getPosition(), map.getResolution(),
+                                   map.getSize(), map.getStartIndex()));
+  EXPECT_TRUE(getIndexFromPosition(bottomRightIndex, bottomRight, map.getLength(), map.getPosition(),
+                                   map.getResolution(), map.getSize(), map.getStartIndex()));
+
+  const Size submapSize =
+      getSubmapSizeFromCornerIndeces(topLeftIndex, bottomRightIndex, map.getSize(), map.getStartIndex());
+  ASSERT_TRUE((submapSize > 0).all()) << "submap size is (" << submapSize(0) << ", " << submapSize(1)
+                                      << "), which makes the iterator degenerate";
+
+  size_t visited = 0;
+  for (SubmapIterator iterator(map, topLeftIndex, submapSize); !iterator.isPastEnd(); ++iterator)
+  {
+    EXPECT_TRUE(checkIfIndexInRange(*iterator, map.getSize()));
+    ++visited;
+  }
+  EXPECT_EQ(static_cast<size_t>(submapSize.prod()), visited);
 }

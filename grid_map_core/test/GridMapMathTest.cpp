@@ -1064,3 +1064,59 @@ TEST(getIndexFromLinearIndex, Simple)
   EXPECT_TRUE((Index(0, 1) == getIndexFromLinearIndex(8, Size(8, 5), false)).all());
   EXPECT_TRUE((Index(7, 4) == getIndexFromLinearIndex(39, Size(8, 5), false)).all());
 }
+
+/*
+ * Regression tests for the root cause of the empty PolygonIterator / SubmapIterator.
+ *
+ * A polygon that overhangs a map edge has its corner bounded back into the map by
+ * boundPositionToRange(), and the bounded corner is then converted to an index. Both steps break
+ * for positions at the lower map edge:
+ *
+ *  1. boundPositionToRange() keeps the position inside the map with an epsilon of 10 * DBL_EPSILON
+ *     that is destroyed by the cancellation in `positionShifted + mapPosition - vectorToOrigin`,
+ *     so the bounded position can land exactly on (or just outside) the lower edge.
+ *  2. Even when the bounded position is inside the map, getIndexFromPosition() can compute the
+ *     unwrapped index `bufferSize` - one past the last cell. On a moved map that index is wrapped
+ *     into a valid-looking buffer index at the opposite edge of the map, so getIndexFromPosition()
+ *     reports success and the caller silently gets the wrong cell. That is what turns the submap
+ *     size negative and leaves PolygonIterator empty.
+ */
+TEST(boundPositionToRange, PositionBelowLowerEdgeIsBoundedIntoTheMap)
+{
+  const Length length(3.0, 19.5);
+  const Position mapPosition(14.440429591999774, 12.802288627421142);
+
+  Position position(12.994258432388101, -0.91696556244599114);
+  boundPositionToRange(position, length, mapPosition);
+
+  EXPECT_TRUE(checkIfPositionWithinMap(position, length, mapPosition))
+      << "bounded position (" << position.x() << ", " << position.y() << ") is not inside the map, lower edge is ("
+      << mapPosition.x() - 0.5 * length(0) << ", " << mapPosition.y() - 0.5 * length(1) << ")";
+}
+
+TEST(getIndexFromPosition, PositionInsideMovedMapDoesNotWrapToTheOppositeEdge)
+{
+  const double resolution = 0.1;
+  const Size bufferSize(312, 185);
+  const Length length = (bufferSize.cast<double>() * resolution).matrix();  // as GridMap::setGeometry() computes it
+  const Position mapPosition(21.754268045561968, -28.805077950077653);
+  const Index bufferStartIndex(250, 114);
+
+  // What boundPositionToRange() returns for a corner overhanging the lower map edge: a position a
+  // few ULP inside the map.
+  const Position position(6.1542680455619703, -38.055077950077553);
+  ASSERT_TRUE(checkIfPositionWithinMap(position, length, mapPosition)) << "test precondition";
+
+  Index index;
+  EXPECT_TRUE(getIndexFromPosition(index, position, length, mapPosition, resolution, bufferSize, bufferStartIndex));
+
+  // The index must refer to the cell that contains the position, not to a cell on the far side of
+  // the circular buffer.
+  Position positionOfCell;
+  ASSERT_TRUE(
+      getPositionFromIndex(positionOfCell, index, length, mapPosition, resolution, bufferSize, bufferStartIndex));
+  EXPECT_NEAR(position.x(), positionOfCell.x(), resolution)
+      << "index (" << index(0) << ", " << index(1) << ") refers to a cell at (" << positionOfCell.x() << ", "
+      << positionOfCell.y() << ") instead of (" << position.x() << ", " << position.y() << ")";
+  EXPECT_NEAR(position.y(), positionOfCell.y(), resolution);
+}
