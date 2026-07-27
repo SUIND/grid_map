@@ -322,3 +322,19 @@ TEST(SubmapIterator, BoxSpanningCornersOverhangingMapEdgeOnMovedMap)
   }
   EXPECT_EQ(static_cast<size_t>(submapSize.prod()), visited);
 }
+
+/*
+ * A submap with a non-positive size has nothing to iterate over. Before this was handled the
+ * iterator started out not-past-end and returned one cell that is not part of any submap.
+ */
+TEST(SubmapIterator, NonPositiveSubmapSizeIsPastEndImmediately)
+{
+  GridMap map({"layer"});
+  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0));  // bufferSize(8, 5)
+
+  EXPECT_TRUE(SubmapIterator(map, grid_map::Index(2, 1), Size(0, 0)).isPastEnd());
+  EXPECT_TRUE(SubmapIterator(map, grid_map::Index(2, 1), Size(3, 0)).isPastEnd());
+  EXPECT_TRUE(SubmapIterator(map, grid_map::Index(2, 1), Size(0, 3)).isPastEnd());
+  EXPECT_TRUE(SubmapIterator(map, grid_map::Index(2, 1), Size(-4, 3)).isPastEnd());
+  EXPECT_FALSE(SubmapIterator(map, grid_map::Index(2, 1), Size(1, 1)).isPastEnd());
+}

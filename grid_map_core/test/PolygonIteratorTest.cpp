@@ -21,6 +21,15 @@
 // Limits
 #include <cfloat>
 
+// Algorithm
+#include <algorithm>
+
+// Pair
+#include <utility>
+
+// Random
+#include <random>
+
 // Vector
 #include <vector>
 
@@ -208,16 +217,33 @@ TEST(PolygonIterator, MoveMap)
  * iterator hands indices outside the buffer to the caller.
  */
 
-//! Brute force reference: every cell of the map whose center lies inside the polygon.
-static std::vector<grid_map::Index> cellsInsidePolygon(const GridMap& map, const Polygon& polygon)
+/*!
+ * Brute force reference: every cell of the map whose center lies inside the polygon. Sorted,
+ * because GridMapIterator walks the buffer column by column while PolygonIterator walks the submap
+ * row by row, so only the set of visited cells is comparable, not the order.
+ */
+static std::vector<std::pair<int, int>> cellsInsidePolygon(const GridMap& map, const Polygon& polygon)
 {
-  std::vector<grid_map::Index> cells;
+  std::vector<std::pair<int, int>> cells;
   for (GridMapIterator iterator(map); !iterator.isPastEnd(); ++iterator)
   {
     Position position;
     map.getPosition(*iterator, position);
-    if (polygon.isInside(position)) cells.push_back(*iterator);
+    if (polygon.isInside(position)) cells.emplace_back((*iterator)(0), (*iterator)(1));
   }
+  std::sort(cells.begin(), cells.end());
+  return cells;
+}
+
+//! The cells visited by a PolygonIterator, sorted so they can be compared with the reference.
+static std::vector<std::pair<int, int>> cellsVisitedByIterator(const GridMap& map, const Polygon& polygon)
+{
+  std::vector<std::pair<int, int>> cells;
+  for (PolygonIterator iterator(map, polygon); !iterator.isPastEnd(); ++iterator)
+  {
+    cells.emplace_back((*iterator)(0), (*iterator)(1));
+  }
+  std::sort(cells.begin(), cells.end());
   return cells;
 }
 
@@ -236,19 +262,13 @@ TEST(PolygonIterator, MovedMapWithPolygonOverhangingMapEdge)
   polygon.addVertex(Position(2.3031839924109754, -47.214226670855084));
   polygon.addVertex(Position(2.3031839924109754, -38.044727225921832));
 
-  const std::vector<grid_map::Index> expected = cellsInsidePolygon(map, polygon);
+  const std::vector<std::pair<int, int>> expected = cellsInsidePolygon(map, polygon);
   ASSERT_FALSE(expected.empty()) << "the polygon must overlap the map for this test to mean anything";
 
-  std::vector<grid_map::Index> visited;
-  for (PolygonIterator iterator(map, polygon); !iterator.isPastEnd(); ++iterator) visited.push_back(*iterator);
+  const std::vector<std::pair<int, int>> visited = cellsVisitedByIterator(map, polygon);
 
   EXPECT_EQ(expected.size(), visited.size());
-  for (size_t i = 0; i < std::min(expected.size(), visited.size()); ++i)
-  {
-    EXPECT_TRUE((expected.at(i) == visited.at(i)).all())
-        << "cell " << i << ": expected (" << expected.at(i)(0) << ", " << expected.at(i)(1) << "), got ("
-        << visited.at(i)(0) << ", " << visited.at(i)(1) << ")";
-  }
+  EXPECT_TRUE(expected == visited) << "the iterator visited a different set of cells than the polygon covers";
 }
 
 /*
@@ -258,3 +278,70 @@ TEST(PolygonIterator, MovedMapWithPolygonOverhangingMapEdge)
  * boundPositionToRange.PositionBelowLowerEdgeIsBoundedIntoTheMap in GridMapMathTest.cpp for the
  * deterministic form of that case.
  */
+
+/*
+ * Sweep of maps and polygons that straddle a map edge, checked against a brute force scan of the
+ * whole map. This is the general form of PolygonIterator.MovedMapWithPolygonOverhangingMapEdge:
+ * the failure only appears for map positions and polygon corners whose floating point
+ * representation is unlucky, so a sweep is the only way to cover it properly. With these
+ * parameters roughly 0.7% of the overlapping cases used to come back empty.
+ */
+TEST(PolygonIterator, MatchesBruteForceForPolygonsStraddlingMapEdges)
+{
+  std::mt19937 randomNumberGenerator(20250727);
+  std::uniform_real_distribution<double> mapCentre(-50.0, 50.0);
+  std::uniform_real_distribution<double> mapSide(20.0, 40.0);
+  const double resolution = 0.5;
+
+  size_t comparisons = 0;
+  size_t emptyIterators = 0;
+  size_t wrongCellSets = 0;
+  size_t indicesOutsideBuffer = 0;
+
+  for (int trial = 0; trial < 1200; ++trial)
+  {
+    const Length length(mapSide(randomNumberGenerator), mapSide(randomNumberGenerator));
+    GridMap map({"layer"});
+    map.setGeometry(length, resolution, Position(mapCentre(randomNumberGenerator), mapCentre(randomNumberGenerator)));
+    if (trial % 4 != 0)
+    {
+      // Move the map so that the circular buffer start index is not at its default position.
+      std::uniform_real_distribution<double> moveBy(-0.5 * length(0), 0.5 * length(0));
+      map.move(map.getPosition() + Position(moveBy(randomNumberGenerator), moveBy(randomNumberGenerator)));
+    }
+
+    // A box centred anywhere near the map, so that it often overhangs one or more map edges.
+    std::uniform_real_distribution<double> offsetX(-0.7 * length(0), 0.7 * length(0));
+    std::uniform_real_distribution<double> offsetY(-0.7 * length(1), 0.7 * length(1));
+    std::uniform_real_distribution<double> halfSide(0.3, 0.6 * std::min(length(0), length(1)));
+    const Position centre =
+        map.getPosition() + Position(offsetX(randomNumberGenerator), offsetY(randomNumberGenerator));
+    const double halfX = halfSide(randomNumberGenerator);
+    const double halfY = halfSide(randomNumberGenerator);
+    Polygon polygon;
+    polygon.addVertex(centre + Position(halfX, halfY));
+    polygon.addVertex(centre + Position(halfX, -halfY));
+    polygon.addVertex(centre + Position(-halfX, -halfY));
+    polygon.addVertex(centre + Position(-halfX, halfY));
+
+    const std::vector<std::pair<int, int>> expected = cellsInsidePolygon(map, polygon);
+    if (expected.empty()) continue;
+    ++comparisons;
+
+    for (PolygonIterator iterator(map, polygon); !iterator.isPastEnd(); ++iterator)
+    {
+      if (!checkIfIndexInRange(*iterator, map.getSize())) ++indicesOutsideBuffer;
+    }
+    const std::vector<std::pair<int, int>> visited = cellsVisitedByIterator(map, polygon);
+
+    if (visited.empty())
+      ++emptyIterators;
+    else if (visited != expected)
+      ++wrongCellSets;
+  }
+
+  EXPECT_GT(comparisons, 500u) << "the sweep did not produce enough overlapping cases to be meaningful";
+  EXPECT_EQ(0u, emptyIterators) << "of " << comparisons << " polygons overlapping the map";
+  EXPECT_EQ(0u, wrongCellSets) << "of " << comparisons << " polygons overlapping the map";
+  EXPECT_EQ(0u, indicesOutsideBuffer);
+}

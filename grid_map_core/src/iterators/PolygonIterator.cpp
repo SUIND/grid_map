@@ -23,9 +23,14 @@ PolygonIterator::PolygonIterator(const grid_map::GridMap& gridMap, const grid_ma
   bufferStartIndex_ = gridMap.getStartIndex();
   Index submapStartIndex;
   Size submapBufferSize;
-  findSubmapParameters(polygon, submapStartIndex, submapBufferSize);
+  if (!findSubmapParameters(polygon, submapStartIndex, submapBufferSize))
+  {
+    // The polygon does not map to a region of the grid map, so there is nothing to iterate over.
+    submapStartIndex.setZero();
+    submapBufferSize.setZero();
+  }
   internalIterator_ = std::make_shared<SubmapIterator>(gridMap, submapStartIndex, submapBufferSize);
-  if (!isInside()) ++(*this);
+  if (!isPastEnd() && !isInside()) ++(*this);
 }
 
 PolygonIterator& PolygonIterator::operator=(const PolygonIterator& other)
@@ -65,12 +70,15 @@ bool PolygonIterator::isPastEnd() const { return internalIterator_->isPastEnd();
 bool PolygonIterator::isInside() const
 {
   Position position;
-  getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_,
-                       bufferStartIndex_);
+  if (!getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_,
+                            bufferStartIndex_))
+  {
+    return false;
+  }
   return polygon_.isInside(position);
 }
 
-void PolygonIterator::findSubmapParameters(const grid_map::Polygon& polygon, Index& startIndex, Size& bufferSize) const
+bool PolygonIterator::findSubmapParameters(const grid_map::Polygon& polygon, Index& startIndex, Size& bufferSize) const
 {
   Position topLeft = polygon_.getVertices()[0];
   Position bottomRight = topLeft;
@@ -81,10 +89,18 @@ void PolygonIterator::findSubmapParameters(const grid_map::Polygon& polygon, Ind
   }
   boundPositionToRange(topLeft, mapLength_, mapPosition_);
   boundPositionToRange(bottomRight, mapLength_, mapPosition_);
-  getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  if (!getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_))
+  {
+    return false;
+  }
   Index endIndex;
-  getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  if (!getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_,
+                            bufferStartIndex_))
+  {
+    return false;
+  }
   bufferSize = getSubmapSizeFromCornerIndeces(startIndex, endIndex, bufferSize_, bufferStartIndex_);
+  return (bufferSize > 0).all();
 }
 
 } /* namespace grid_map */

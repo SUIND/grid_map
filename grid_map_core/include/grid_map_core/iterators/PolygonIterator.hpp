@@ -72,8 +72,9 @@ class PolygonIterator
    * @param[in] polygon the polygon to get the submap for.
    * @param[out] startIndex the start index of the submap.
    * @param[out] bufferSize the buffer size of the submap.
+   * @return true if a submap was found, false if the polygon does not map to a region of the grid map.
    */
-  void findSubmapParameters(const grid_map::Polygon& polygon, Index& startIndex, Size& bufferSize) const;
+  bool findSubmapParameters(const grid_map::Polygon& polygon, Index& startIndex, Size& bufferSize) const;
 
   //! Polygon to iterate on.
   grid_map::Polygon polygon_;

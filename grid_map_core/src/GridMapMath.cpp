@@ -69,6 +69,20 @@ inline bool checkIfStartIndexAtDefaultPosition(const Index& bufferStartIndex)
   return ((bufferStartIndex == 0).all());
 }
 
+/*!
+ * Checks if a position is within the map boundaries along one axis. This is the single axis form of
+ * checkIfPositionWithinMap() and performs the same arithmetic, so both agree bit for bit.
+ * @param[in] position the position along the axis.
+ * @param[in] mapLength the length of the map along the axis.
+ * @param[in] mapPosition the position of the map along the axis.
+ * @return true if the position is within the map, false otherwise.
+ */
+inline bool checkIfPositionWithinMapAxis(const double position, const double mapLength, const double mapPosition)
+{
+  const double positionTransformed = -(position - mapPosition - 0.5 * mapLength);
+  return positionTransformed >= 0.0 && positionTransformed < mapLength;
+}
+
 inline Vector getIndexVectorFromIndex(const Index& index, const Size& bufferSize, const Index& bufferStartIndex)
 {
   Index unwrappedIndex;
@@ -121,8 +135,31 @@ bool getIndexFromPosition(Index& index, const Position& position, const Length& 
   Vector offset;
   getVectorToOrigin(offset, mapLength);
   Vector indexVector = ((position - offset - mapPosition).array() / resolution).matrix();
-  index = getIndexFromIndexVector(indexVector, bufferSize, bufferStartIndex);
-  return checkIfPositionWithinMap(position, mapLength, mapPosition) && checkIfIndexInRange(index, bufferSize);
+  Index unwrappedIndex = transformMapFrameToBufferOrder(indexVector);
+  const bool isWithinMap = checkIfPositionWithinMap(position, mapLength, mapPosition);
+
+  if (isWithinMap)
+  {
+    // Rounding in the transformation above can place a position at a map edge one cell past the
+    // boundary of the buffer. Bound the index here, because wrapping it into buffer order below
+    // would turn it into a valid looking index on the opposite side of the circular buffer.
+    for (int i = 0; i < unwrappedIndex.size(); i++)
+    {
+      if (unwrappedIndex(i) == bufferSize(i))
+      {
+        unwrappedIndex(i) = bufferSize(i) - 1;
+      }
+      else if (unwrappedIndex(i) == -1)
+      {
+        unwrappedIndex(i) = 0;
+      }
+    }
+  }
+
+  index = getBufferIndexFromIndex(unwrappedIndex, bufferSize, bufferStartIndex);
+  // Check the unwrapped index: the wrapped one is in range whenever the buffer start index has
+  // moved, which would mask an index that is actually outside the map.
+  return isWithinMap && checkIfIndexInRange(unwrappedIndex, bufferSize);
 }
 
 bool checkIfPositionWithinMap(const Position& position, const Length& mapLength, const Position& mapPosition)
@@ -235,27 +272,27 @@ void boundPositionToRange(Position& position, const Length& mapLength, const Pos
 {
   Vector vectorToOrigin;
   getVectorToOrigin(vectorToOrigin, mapLength);
-  Position positionShifted = position - mapPosition + vectorToOrigin;
 
-  // We have to make sure to stay inside the map.
-  for (int i = 0; i < positionShifted.size(); i++)
+  for (int i = 0; i < position.size(); i++)
   {
-    double epsilon = 10.0 * numeric_limits<double>::epsilon();  // TODO Why is the factor 10 necessary.
-    if (std::fabs(position(i)) > 1.0) epsilon *= std::fabs(position(i));
+    if (checkIfPositionWithinMapAxis(position(i), mapLength(i), mapPosition(i))) continue;
 
-    if (positionShifted(i) <= 0)
+    // The map covers the half open interval (mapPosition - mapLength / 2, mapPosition + mapLength / 2],
+    // so bound the position to the edge it lies beyond.
+    position(i) =
+        position(i) > mapPosition(i) ? mapPosition(i) + vectorToOrigin(i) : mapPosition(i) - vectorToOrigin(i);
+
+    // Bounding to an edge is not enough on its own: the lower edge is not part of the map, and
+    // rounding in the expression above can leave the position marginally outside either edge. A
+    // position outside the map converts to an index outside the buffer, so step towards the center
+    // of the map until the position is inside. This takes a few units in the last place at most.
+    while (!checkIfPositionWithinMapAxis(position(i), mapLength(i), mapPosition(i)))
     {
-      positionShifted(i) = epsilon;
-      continue;
-    }
-    if (positionShifted(i) >= mapLength(i))
-    {
-      positionShifted(i) = mapLength(i) - epsilon;
-      continue;
+      const double steppedPosition = std::nextafter(position(i), mapPosition(i));
+      if (steppedPosition == position(i)) break;  // Degenerate map, there is no position inside it.
+      position(i) = steppedPosition;
     }
   }
-
-  position = positionShifted + mapPosition - vectorToOrigin;
 }
 
 const Eigen::Matrix2i getBufferOrderToMapFrameAlignment()

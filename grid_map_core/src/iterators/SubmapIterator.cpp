@@ -32,7 +32,8 @@ SubmapIterator::SubmapIterator(const grid_map::GridMap& gridMap, const Index& su
   submapSize_ = submapSize;
   submapStartIndex_ = submapStartIndex;
   submapIndex_.setZero();
-  isPastEnd_ = false;
+  // A submap without extent has no cells to visit.
+  isPastEnd_ = (submapSize <= 0).any();
 }
 
 SubmapIterator::SubmapIterator(const SubmapIterator* other)
